@@ -98,7 +98,27 @@ object DialogController {
                     MapleInformationDialog(
                         title = "Icon Refresh Complete",
                         description =
-                            "The process took ${dialogData.duration / 1000} seconds.\n${dialogData.successRatio.first} out of ${dialogData.successRatio.second} icons were successfully refreshed.",
+                            "The process took ${buildString {
+                                val totalSeconds = dialogData.duration / 1000
+                                val (hours, minutes, remainingSeconds) =
+                                    listOf(
+                                        totalSeconds / 3600,
+                                        (totalSeconds % 3600) / 60,
+                                        totalSeconds % 60,
+                                    )
+
+                                if (hours > 0) append("$hours hour${if (hours > 1) "s" else ""} ")
+                                if (minutes > 0) {
+                                    append(
+                                        "$minutes minute${if (minutes > 1) "s" else ""} ",
+                                    )
+                                }
+                                if (remainingSeconds > 0 || (hours == 0L && minutes == 0L)) {
+                                    append(
+                                        "$remainingSeconds second${if (remainingSeconds != 1L) "s" else ""}",
+                                    )
+                                }
+                            }.trim()}.\n${dialogData.successRatio.first} out of ${dialogData.successRatio.second} icons were successfully refreshed.",
                         onDismiss = { currentDialogData = null },
                     )
                 }
@@ -129,7 +149,7 @@ object DialogController {
                             ContemporaryServerEntryListData.wipeServerFile()
                             currentDialogData = null
                         },
-                        onDismiss = { currentDialogData },
+                        onDismiss = { currentDialogData = null },
                     )
                 }
                 DialogData.ForceEncodeConfirmation -> {

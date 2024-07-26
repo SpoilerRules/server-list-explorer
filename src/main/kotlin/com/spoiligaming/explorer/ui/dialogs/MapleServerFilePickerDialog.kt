@@ -30,7 +30,6 @@ import com.spoiligaming.explorer.ui.dialogs.dialog.MapleDialogBase
 import com.spoiligaming.explorer.ui.fonts.FontFactory
 import com.spoiligaming.explorer.ui.widgets.MapleButton
 import com.spoiligaming.explorer.ui.widgets.MapleButtonHeight
-import com.spoiligaming.explorer.ui.widgets.MapleButtonWidth
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
@@ -56,7 +55,10 @@ fun MapleServerFilePickerDialog(
                 title = "Select server list file",
             ) { file ->
                 if (file != null) {
-                    val validationResult = ServerFileHandler.validateFile(File(file.path!!))
+                    val validationResult =
+                        ServerFileHandler.validateFile(
+                            file.path?.let { File(it) },
+                        )
 
                     if (validationResult == ServerFileValidationResult.VALID) {
                         hasFailedOnce = false
@@ -128,7 +130,8 @@ fun MapleServerFilePickerDialog(
                 // Error thrown by this will be fixed by JetBrains in next compose MP update:
                 // https://youtrack.jetbrains.com/issue/COMPT-5064/Clicking-a-clickable-component-inside-another-disabled-clickable-component-throws-IllegalStateException
                 MapleButton(
-                    width = MapleButtonWidth.FILL_MAX.width,
+                    Modifier.fillMaxWidth(),
+                    width = null,
                     height = MapleButtonHeight.ORIGINAL.height,
                     text = "Select server.dat file",
                 ) {

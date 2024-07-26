@@ -26,31 +26,12 @@
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/state/DialogController.kt">
         <error line="89" column="1" source="standard:max-line-length" />
-        <error line="101" column="1" source="standard:max-line-length" />
-        <error line="112" column="1" source="standard:max-line-length" />
-        <error line="120" column="1" source="standard:max-line-length" />
-        <error line="139" column="1" source="standard:max-line-length" />
-        <error line="165" column="1" source="standard:max-line-length" />
-    </file>
-    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/widgets/MapleHyperlink.kt">
-        <error line="44" column="1" source="standard:indent" />
-        <error line="45" column="1" source="standard:indent" />
-        <error line="46" column="1" source="standard:indent" />
-        <error line="47" column="1" source="standard:indent" />
-        <error line="48" column="1" source="standard:indent" />
-        <error line="49" column="1" source="standard:indent" />
-        <error line="50" column="1" source="standard:indent" />
-        <error line="51" column="1" source="standard:indent" />
-        <error line="52" column="1" source="standard:indent" />
-        <error line="53" column="1" source="standard:indent" />
-        <error line="54" column="1" source="standard:indent" />
-        <error line="55" column="1" source="standard:indent" />
-        <error line="56" column="1" source="standard:indent" />
-        <error line="57" column="1" source="standard:indent" />
-        <error line="58" column="1" source="standard:indent" />
-        <error line="59" column="1" source="standard:indent" />
-        <error line="60" column="1" source="standard:indent" />
-        <error line="61" column="1" source="standard:indent" />
+        <error line="118" column="1" source="standard:max-line-length" />
+        <error line="121" column="1" source="standard:max-line-length" />
+        <error line="132" column="1" source="standard:max-line-length" />
+        <error line="140" column="1" source="standard:max-line-length" />
+        <error line="159" column="1" source="standard:max-line-length" />
+        <error line="185" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/utils/ColorPaletteUtility.kt">
         <error line="37" column="1" source="standard:max-line-length" />
