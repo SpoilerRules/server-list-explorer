@@ -19,7 +19,7 @@
 
 Getting started with Server List Explorer is straightforward. Follow these steps to get up and running:
 
-1. **Install Java**: Ensure you have Java 11 runtime (or a later version) installed. If not, download and install it from the [official Java website](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html).
+1. **Install Java**: Ensure you have Java 11 runtime (or a later version) installed. If not, download and install it from the [official Java website](https://www.oracle.com/java/technologies/downloads/#java21).
 
 2. **Download Server List Explorer**: Head to our [releases page](https://github.com/SpoilerRules/server-list-explorer/releases/latest) and download the version that best fits your needs.
 
@@ -45,7 +45,7 @@ And you’re all set! You can now start exploring and managing your Minecraft se
 
 ## Important Note for Users
 
-**⚠️ Attention:** Base64 icon values copied from [NBT Editor](https://nbt.mcph.to/) or [Irath96 NBT Tool](https://irath96.github.io/webNBT/) are **not valid**. Please ensure you use valid icon values to ensure proper functionality.
+Base64 icon values copied from https://nbt.mcph.to/ or https://irath96.github.io/webNBT/ are **not valid**. Please ensure you use valid icon values to ensure proper functionality.
 
 ## User Interface Preview
 
