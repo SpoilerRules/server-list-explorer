@@ -49,7 +49,7 @@ tasks {
     shadowJar {
         mergeServiceFiles()
         duplicatesStrategy = DuplicatesStrategy.FAIL
-        archiveFileName.set("server-list-explorer.jar")
+        archiveFileName.set("ServerListExplorer.jar")
         manifest {
             attributes["Main-Class"] = mainFunction
         }
