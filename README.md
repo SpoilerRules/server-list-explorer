@@ -1,7 +1,5 @@
 # Server List Explorer
 
----
-
 [![Compose Desktop](https://img.shields.io/badge/Desktop-4CAF50.svg?style=flat&logo=jetpackcompose&logoColor=FFFFFF&labelColor=4CAF50&label=Compose&colorA=4CAF50&colorB=6A1B9A)](https://jb.gg/cmp)
 
 **Server List Explorer** is your ultimate tool for effortlessly managing your [Minecraft: Java Edition](https://www.minecraft.net/) server list. With a sleek, modern user interface inspired by [Maple](https://maple.software/) and built using [Compose Multiplatform](https://jb.gg/cmp), it combines both functionality and visual appeal. Check out the [User Interface Preview](#user-interface-preview) section to see our innovative design up close.
@@ -19,7 +17,6 @@
 
 ## Getting Started
 
----
 Getting started with Server List Explorer is straightforward. Follow these steps to get up and running:
 
 1. **Install Java**: Ensure you have Java 11 runtime (or a later version) installed. If not, download and install it from the [official Java website](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html).
@@ -48,12 +45,10 @@ And you’re all set! You can now start exploring and managing your Minecraft se
 
 ## Important Note for Users
 
----
 **⚠️ Attention:** Base64 icon values copied from [NBT Editor](https://nbt.mcph.to/) or [Irath96 NBT Tool](https://irath96.github.io/webNBT/) are **not valid**. Please ensure you use valid icon values to ensure proper functionality.
 
 ## User Interface Preview
 
----
 <details>
   <summary>View Screenshots</summary>
   <p align="center">
@@ -64,12 +59,10 @@ And you’re all set! You can now start exploring and managing your Minecraft se
 
 ## Wiki
 
----
 For detailed usage instructions and troubleshooting tips, please refer to the [GitHub Wiki](#).
 
 ## Contribution
 
----
 We welcome contributions to the project and encourage adherence to idiomatic and concise code practices.
 
 If your contribution involves user interface design changes, please consult with the lead developer on our [Discord server](https://discord.gg/fVA5Wr6Nns) to ensure your design aligns with the [Maple](https://maple.software/) design principles. However, if you're [Mikhail Cherepanov](https://github.com/mrflashstudio), the founder of [Maple](https://maple.software/), feel free to submit pull requests at your discretion.
