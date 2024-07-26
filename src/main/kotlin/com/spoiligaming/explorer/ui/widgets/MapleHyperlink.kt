@@ -41,23 +41,23 @@ fun MapleHyperlink(
         color = textColor,
         style = TextStyle(fontFamily = fontFamily, fontWeight = fontWeight, fontSize = fontSize),
         modifier =
-        Modifier.baseHoverColor(color) { modifiedColor ->
-            textColor =
-                if (isHovered) {
-                    modifiedColor
-                } else {
-                    color
-                }
-        }
-            .pointerHoverIcon(PointerIcon.Hand)
-            .onClick {
-                runCatching {
-                    uriHandler.openUri(url)
-                    Logger.printSuccess("Link opened successfully: $url")
-                }.onFailure { error ->
-                    Logger.printError("Failed to open link: $url - ${error.message}")
-                }
+            Modifier.baseHoverColor(color) { modifiedColor ->
+                textColor =
+                    if (isHovered) {
+                        modifiedColor
+                    } else {
+                        color
+                    }
             }
-            .onHover { isHovered = it },
+                .pointerHoverIcon(PointerIcon.Hand)
+                .onClick {
+                    runCatching {
+                        uriHandler.openUri(url)
+                        Logger.printSuccess("Link opened successfully: $url")
+                    }.onFailure { error ->
+                        Logger.printError("Failed to open link: $url - ${error.message}")
+                    }
+                }
+                .onHover { isHovered = it },
     )
 }
