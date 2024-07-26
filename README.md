@@ -59,7 +59,7 @@ Base64 icon values copied from https://nbt.mcph.to/ or https://irath96.github.io
 
 ## Wiki
 
-For detailed usage instructions and troubleshooting tips, please refer to the [GitHub Wiki](#).
+For detailed usage instructions and troubleshooting tips, please refer to the [GitHub Wiki](https://github.com/SpoilerRules/server-list-explorer/wiki).
 
 ## Contribution
 
