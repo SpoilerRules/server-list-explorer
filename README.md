@@ -4,13 +4,23 @@
 
 **Server List Explorer** is your ultimate tool for effortlessly managing your [Minecraft: Java Edition](https://www.minecraft.net/) server list. With a sleek, modern user interface inspired by [Maple](https://maple.software/) and built using [Compose Multiplatform](https://jb.gg/cmp), it combines both functionality and visual appeal. Check out the [User Interface Preview](#user-interface-preview) section to see our innovative design up close.
 
+## User Interface Preview
+
+<details>
+  <summary>View Screenshots</summary>
+  <p align="center">
+    <img src="https://i.imgur.com/6XNfIMI.png" width="500" alt="Screenshot 1">
+    <img src="https://i.imgur.com/vxgseoU.png" width="500" alt="Screenshot 2">
+  </p>
+</details>
+
 ## Table of Contents
 
+- [User Interface Preview](#user-interface-preview)
 - [Getting Started](#getting-started)
     - [Available Versions](#available-versions)
     - [Steps to Run](#steps-to-run)
 - [Important Note for Users](#important-note-for-users)
-- [User Interface Preview](#user-interface-preview)
 - [Wiki](#wiki)
 - [Contribution](#contribution)
 
@@ -38,7 +48,7 @@ Getting started with Server List Explorer is straightforward. Follow these steps
     - **On Windows**: Double-click the `.jar` file to launch it.
     - **On Linux/Mac**: Open a terminal, navigate to the directory where the `.jar` file is located, and run:
       ```sh
-      java -jar ServerListExplorer.jar -XX:+UseStringDeduplication
+      java -jar ServerListExplorer-minified.jar -XX:+UseStringDeduplication
       ```
 
 And you’re all set! You can now start exploring and managing your Minecraft server list with ease. For any issues or further assistance, feel free to join [our Discord community](https://discord.gg/fVA5Wr6Nns) or visit the [GitHub issues page](https://github.com/SpoilerRules/server-list-explorer/issues).
@@ -46,16 +56,6 @@ And you’re all set! You can now start exploring and managing your Minecraft se
 ## Important Note for Users
 
 Base64 icon values copied from https://nbt.mcph.to/ or https://irath96.github.io/webNBT/ are **not valid**. Please ensure you use valid icon values to ensure proper functionality.
-
-## User Interface Preview
-
-<details>
-  <summary>View Screenshots</summary>
-  <p align="center">
-    <img src="https://i.imgur.com/6XNfIMI.png" width="500" alt="Screenshot 1">
-    <img src="https://i.imgur.com/vxgseoU.png" width="500" alt="Screenshot 2">
-  </p>
-</details>
 
 ## Wiki
 
