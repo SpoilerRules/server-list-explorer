@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<baseline version="1.0">
+    <file name="src/main/kotlin/com/spoiligaming/explorer/server/ServerFileHandler.kt">
+        <error line="69" column="1" source="standard:max-line-length" />
+        <error line="245" column="1" source="standard:max-line-length" />
+        <error line="253" column="1" source="standard:max-line-length" />
+        <error line="353" column="1" source="standard:max-line-length" />
+    </file>
+    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/MapleColorInformation.kt">
+        <error line="47" column="1" source="standard:max-line-length" />
+    </file>
+    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/ServerInformationView.kt">
+        <error line="169" column="1" source="standard:max-line-length" />
+        <error line="204" column="1" source="standard:max-line-length" />
+        <error line="238" column="1" source="standard:max-line-length" />
+        <error line="263" column="1" source="standard:max-line-length" />
+        <error line="281" column="1" source="standard:max-line-length" />
+        <error line="336" column="1" source="standard:max-line-length" />
+    </file>
+    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/StationaryView.kt">
+        <error line="85" column="1" source="standard:max-line-length" />
+    </file>
+    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/dialogs/MapleValueReplacementDialog.kt">
+        <error line="83" column="1" source="standard:max-line-length" />
+        <error line="93" column="1" source="standard:max-line-length" />
+    </file>
+    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/state/DialogController.kt">
+        <error line="89" column="1" source="standard:max-line-length" />
+        <error line="101" column="1" source="standard:max-line-length" />
+        <error line="112" column="1" source="standard:max-line-length" />
+        <error line="120" column="1" source="standard:max-line-length" />
+        <error line="139" column="1" source="standard:max-line-length" />
+        <error line="165" column="1" source="standard:max-line-length" />
+    </file>
+    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/widgets/MapleHyperlink.kt">
+        <error line="44" column="1" source="standard:indent" />
+        <error line="45" column="1" source="standard:indent" />
+        <error line="46" column="1" source="standard:indent" />
+        <error line="47" column="1" source="standard:indent" />
+        <error line="48" column="1" source="standard:indent" />
+        <error line="49" column="1" source="standard:indent" />
+        <error line="50" column="1" source="standard:indent" />
+        <error line="51" column="1" source="standard:indent" />
+        <error line="52" column="1" source="standard:indent" />
+        <error line="53" column="1" source="standard:indent" />
+        <error line="54" column="1" source="standard:indent" />
+        <error line="55" column="1" source="standard:indent" />
+        <error line="56" column="1" source="standard:indent" />
+        <error line="57" column="1" source="standard:indent" />
+        <error line="58" column="1" source="standard:indent" />
+        <error line="59" column="1" source="standard:indent" />
+        <error line="60" column="1" source="standard:indent" />
+        <error line="61" column="1" source="standard:indent" />
+    </file>
+    <file name="src/main/kotlin/com/spoiligaming/explorer/utils/ColorPaletteUtility.kt">
+        <error line="37" column="1" source="standard:max-line-length" />
+    </file>
+</baseline>

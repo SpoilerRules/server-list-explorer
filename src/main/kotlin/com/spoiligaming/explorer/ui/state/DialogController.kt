@@ -1,0 +1,234 @@
+package com.spoiligaming.explorer.ui.state
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.ImageBitmap
+import com.spoiligaming.explorer.server.ContemporaryServerEntryListData
+import com.spoiligaming.explorer.server.ServerFileHandler
+import com.spoiligaming.explorer.ui.dialogs.MapleConfirmationDialog
+import com.spoiligaming.explorer.ui.dialogs.MapleInformationDialog
+import com.spoiligaming.explorer.ui.dialogs.MapleServerEntryCreationDialog
+import com.spoiligaming.explorer.ui.dialogs.MapleServerEntryValueReplacementDialog
+import com.spoiligaming.explorer.ui.dialogs.MapleServerFilePickerDialog
+import com.spoiligaming.explorer.ui.dialogs.ValueReplacementType
+
+sealed class DialogData {
+    data class ValueReplacement(
+        val serverName: String,
+        val serverAddress: String,
+        val serverIcon: ImageBitmap?,
+        val serverIconRaw: String?,
+        val serverPositionInList: Int,
+        val type: ValueReplacementType,
+        val onConfirm: (String) -> Unit,
+    ) : DialogData()
+
+    data class IconRefreshCompleted(val duration: Long, val successRatio: Pair<Int, Int>) :
+        DialogData()
+
+    data class DeletionConfirmation(val serverPosition: Int, val serverName: String) : DialogData()
+
+    data class ServerFilePicker(val closeable: Boolean) : DialogData()
+
+    data object WipeConfirmation : DialogData()
+
+    data object ForceEncodeConfirmation : DialogData()
+
+    data object EntryCreationDialog : DialogData()
+
+    data object IconRefreshStarted : DialogData()
+
+    data object ExternalModification : DialogData()
+
+    data object IconDecodeFailure : DialogData()
+}
+
+object DialogController {
+    private var currentDialogData by mutableStateOf<DialogData?>(null)
+
+    @Composable
+    fun Initialize() =
+        currentDialogData?.let { dialogData ->
+            when (dialogData) {
+                is DialogData.ValueReplacement -> {
+                    MapleServerEntryValueReplacementDialog(
+                        serverName = dialogData.serverName,
+                        serverAddress = dialogData.serverAddress,
+                        serverIcon = dialogData.serverIcon,
+                        type = dialogData.type,
+                        onConfirm = {
+                            when (dialogData.type) {
+                                ValueReplacementType.NAME ->
+                                    ContemporaryServerEntryListData.updateServerName(
+                                        dialogData.serverPositionInList,
+                                        dialogData.serverName,
+                                    )
+                                ValueReplacementType.ADDRESS ->
+                                    ContemporaryServerEntryListData.updateServerAddress(
+                                        dialogData.serverPositionInList,
+                                        dialogData.serverAddress,
+                                    )
+                                ValueReplacementType.ICON ->
+                                    ContemporaryServerEntryListData.updateServerIcon(
+                                        dialogData.serverPositionInList,
+                                        dialogData.serverIconRaw,
+                                    )
+                            }
+                            dialogData.onConfirm(it)
+                            currentDialogData = null
+                        },
+                        onDismiss = { currentDialogData = null },
+                    )
+                }
+                is DialogData.DeletionConfirmation -> {
+                    MapleConfirmationDialog(
+                        title = "Confirm Server Deletion",
+                        description =
+                            "Do you want to delete the server entry named ${dialogData.serverName}?\nThis action is irreversible.",
+                        onAccept = {
+                            ContemporaryServerEntryListData.deleteServer(dialogData.serverPosition)
+                            currentDialogData = null
+                        },
+                        onDismiss = { currentDialogData = null },
+                    )
+                }
+                is DialogData.IconRefreshCompleted -> {
+                    MapleInformationDialog(
+                        title = "Icon Refresh Complete",
+                        description =
+                            "The process took ${dialogData.duration / 1000} seconds.\n${dialogData.successRatio.first} out of ${dialogData.successRatio.second} icons were successfully refreshed.",
+                        onDismiss = { currentDialogData = null },
+                    )
+                }
+                is DialogData.ServerFilePicker -> {
+                    MapleServerFilePickerDialog(dialogData.closeable) { currentDialogData = null }
+                }
+                DialogData.ExternalModification -> {
+                    MapleInformationDialog(
+                        title = "External Modification Detected",
+                        description =
+                            "The 'server.dat' file has been modified externally. Please reload the server list to synchronize with these updates.",
+                        onDismiss = { currentDialogData = null },
+                    )
+                }
+                DialogData.IconRefreshStarted -> {
+                    MapleInformationDialog(
+                        title = "Icon Refresh Started",
+                        description =
+                            "The server icon refresh process has begun. Please avoid moving or deleting servers during this time. You will be notified when the process is complete.",
+                        onDismiss = { currentDialogData = null },
+                    )
+                }
+                DialogData.WipeConfirmation -> {
+                    MapleConfirmationDialog(
+                        title = "Are you sure about wiping your server.dat file?",
+                        description = "This action is irrecoverable and permanent.",
+                        onAccept = {
+                            ContemporaryServerEntryListData.wipeServerFile()
+                            currentDialogData = null
+                        },
+                        onDismiss = { currentDialogData },
+                    )
+                }
+                DialogData.ForceEncodeConfirmation -> {
+                    MapleConfirmationDialog(
+                        title = "Are you sure about forcefully saving to server.dat?",
+                        description =
+                            "This action is irreversible and may cause unexpected issues.\nYour data is automatically saved during regular actions.",
+                        onAccept = {
+                            ServerFileHandler.saveServerData()
+                            currentDialogData = null
+                        },
+                        onDismiss = { currentDialogData = null },
+                    )
+                }
+                DialogData.EntryCreationDialog -> {
+                    MapleServerEntryCreationDialog(
+                        onAccept = { serverData ->
+                            ContemporaryServerEntryListData.createServer(
+                                null,
+                                serverData.third,
+                                serverData.second,
+                                serverData.first,
+                            )
+                            currentDialogData = null
+                        },
+                        onDismiss = { currentDialogData = null },
+                    )
+                }
+                DialogData.IconDecodeFailure -> {
+                    MapleInformationDialog(
+                        title = "Failed to Update Server Icon",
+                        description =
+                            "The Base64 value provided for the server icon is invalid.\nConsequently, the server icon will remain unchanged.",
+                        onDismiss = { currentDialogData = null },
+                    )
+                }
+            }
+        }
+
+    fun showValueReplacementDialog(
+        serverName: String,
+        serverAddress: String,
+        serverIcon: ImageBitmap?,
+        serverIconRaw: String?,
+        serverPositionInList: Int,
+        type: ValueReplacementType,
+        onConfirm: (String) -> Unit,
+    ) {
+        currentDialogData =
+            DialogData.ValueReplacement(
+                serverName,
+                serverAddress,
+                serverIcon,
+                serverIconRaw,
+                serverPositionInList,
+                type,
+                onConfirm,
+            )
+    }
+
+    fun showExternalModificationDialog() {
+        currentDialogData = DialogData.ExternalModification
+    }
+
+    fun showDeletionConfirmationDialog(
+        serverPosition: Int,
+        serverName: String,
+    ) {
+        currentDialogData = DialogData.DeletionConfirmation(serverPosition, serverName)
+    }
+
+    fun showIconRefreshStartedDialog() {
+        currentDialogData = DialogData.IconRefreshStarted
+    }
+
+    fun showIconRefreshCompletedDialog(
+        duration: Long,
+        successRatio: Pair<Int, Int>,
+    ) {
+        currentDialogData = DialogData.IconRefreshCompleted(duration, successRatio)
+    }
+
+    fun showServerFilePickerDialog(closeable: Boolean) {
+        currentDialogData = DialogData.ServerFilePicker(closeable)
+    }
+
+    fun showWipeConfirmationDialog() {
+        currentDialogData = DialogData.WipeConfirmation
+    }
+
+    fun showForceEncodeConfirmationDialog() {
+        currentDialogData = DialogData.ForceEncodeConfirmation
+    }
+
+    fun showServerEntryCreationDialog() {
+        currentDialogData = DialogData.EntryCreationDialog
+    }
+
+    fun showIconValueDecodeFailureDialog() {
+        currentDialogData = DialogData.IconDecodeFailure
+    }
+}
