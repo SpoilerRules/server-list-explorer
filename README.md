@@ -2,7 +2,7 @@
 
 [![Compose Desktop](https://img.shields.io/badge/Desktop-4CAF50.svg?style=flat&logo=jetpackcompose&logoColor=FFFFFF&labelColor=4CAF50&label=Compose&colorA=4CAF50&colorB=6A1B9A)](https://jb.gg/cmp)
 
-**Server List Explorer** is your ultimate tool for effortlessly managing your [Minecraft: Java Edition](https://www.minecraft.net/) server list. With a sleek, modern user interface inspired by [Maple](https://maple.software/) and built using [Compose Multiplatform](https://jb.gg/cmp), it combines both functionality and visual appeal. Check out the [User Interface Preview](#user-interface-preview) section to see our innovative design up close.
+**Server List Explorer** is your ultimate tool for effortlessly managing your [Minecraft: Java Edition](https://www.minecraft.net/) server list. With a sleek, modern user interface inspired by [Maple](https://maple.software/) and built using [Compose Multiplatform](https://jb.gg/cmp), it combines both functionality and visual appeal. Discover the full range of features in our [Feature List on the wiki](https://github.com/SpoilerRules/server-list-explorer/wiki/Feature-List), and check out the [User Interface Preview](#user-interface-preview) section to see our innovative design up close.
 
 ## User Interface Preview
 
@@ -51,7 +51,11 @@ Getting started with Server List Explorer is straightforward. Follow these steps
       java -jar ServerListExplorer-minified.jar -XX:+UseStringDeduplication
       ```
 
-And you’re all set! You can now start exploring and managing your Minecraft server list with ease. For any issues or further assistance, feel free to join [our Discord community](https://discord.gg/fVA5Wr6Nns) or visit the [GitHub issues page](https://github.com/SpoilerRules/server-list-explorer/issues).
+And you’re all set! You can now start exploring and managing your Minecraft server list with ease.
+
+For a more detailed and technical guide, including advanced instructions, visit our [Installation Wiki Page](https://github.com/SpoilerRules/server-list-explorer/wiki/Installation).
+
+For any issues or further assistance, feel free to join [our Discord community](https://discord.gg/fVA5Wr6Nns) or visit the [GitHub issues page](https://github.com/SpoilerRules/server-list-explorer/issues).
 
 ## Important Note for Users
 
