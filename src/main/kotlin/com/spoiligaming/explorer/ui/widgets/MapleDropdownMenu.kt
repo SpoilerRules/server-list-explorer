@@ -154,7 +154,7 @@ fun MapleDropdownMenu(
 
             Box(modifier = Modifier.size(16.dp), contentAlignment = Alignment.Center) {
                 Image(
-                    bitmap = IconFactory.dropdownMenuChavronIcon,
+                    bitmap = IconFactory.chevronDownWhite,
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
                     contentScale = ContentScale.Fit,

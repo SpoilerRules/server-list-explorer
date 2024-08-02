@@ -190,11 +190,11 @@ private fun ActionButton(
                     bitmap =
                         when {
                             isHoveredState.value && iconType == ButtonType.ACCEPT ->
-                                IconFactory.acceptGreenIcon
+                                IconFactory.acceptIconGreen
                             !isHoveredState.value && iconType == ButtonType.ACCEPT ->
                                 IconFactory.acceptIcon
                             isHoveredState.value && iconType == ButtonType.DISMISS ->
-                                IconFactory.xRedIcon
+                                IconFactory.xIconRed
                             else -> IconFactory.xIcon
                         },
                     contentDescription = "Icon for ${iconType.name} Button",

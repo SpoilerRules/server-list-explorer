@@ -216,7 +216,7 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
             "Modify Address" -> IconFactory.keyIcon
             "Change Icon" -> IconFactory.editPaperIcon
             "Erase Icon" -> IconFactory.eraserIcon
-            "Delete Entry" -> IconFactory.deleteIconWhiteIcon
+            "Delete Entry" -> IconFactory.deleteIconWhite
             else ->
                 when (label) {
                     "Copy File Path",
@@ -225,9 +225,9 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
                     "Copy as Toml",
                     "Copy Icon as Base64",
                     "Copy Icon as Image",
-                    -> IconFactory.copyRegularIcon
-                    "Navigate to Directory" -> IconFactory.arrowRightOutIcon
-                    "Copy" -> if (type == 1) IconFactory.copyRegularIcon else null
+                    -> IconFactory.copyIconRegular
+                    "Navigate to Directory" -> IconFactory.arrowRightIcon
+                    "Copy" -> if (type == 1) IconFactory.copyIconRegular else null
                     "Cut" -> IconFactory.scissorIcon
                     "Paste" -> IconFactory.pasteIcon
                     else -> null

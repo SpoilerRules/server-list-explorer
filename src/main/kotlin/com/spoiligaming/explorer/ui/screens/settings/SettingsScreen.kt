@@ -71,7 +71,7 @@ private val categories =
         ),
         SettingsCategory(
             title = "Advanced",
-            icon = IconFactory.gearsIcon,
+            icon = IconFactory.advancedSettingsIcon,
             index = 2,
             content = { SettingsAdvanced() },
         ),

@@ -593,13 +593,13 @@ fun ServerElement(
                                                 )
                                         }
                                         createClickableIcon(
-                                            IconFactory.upArrowIcon,
+                                            IconFactory.chevronUp,
                                             "Up Arrow Icon for Moving Server Up",
                                         ) {
                                             onMoveUp(serverPositionInList)
                                         }
                                         createClickableIcon(
-                                            IconFactory.downArrowIcon,
+                                            IconFactory.chevronDown,
                                             "Down Arrow Icon for Moving Server Down",
                                         ) {
                                             onMoveDown(serverPositionInList)
