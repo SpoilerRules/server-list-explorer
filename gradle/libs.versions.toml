@@ -4,7 +4,6 @@ compose = "1.7.0-alpha02"
 serialization = "1.6.3"
 shadow = "8.1.1"
 ktlint = "12.1.1"
-material3 = "1.7.0-alpha02"
 colorPicker = "0.7.0"
 fileKit = "0.6.3"
 nbt = "6.1"
@@ -14,7 +13,7 @@ kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm", version.ref = "serialization" }
-material3-desktop = { module = "org.jetbrains.compose.material3:material3-desktop", version.ref = "material3" }
+material3-desktop = { module = "org.jetbrains.compose.material3:material3-desktop", version.ref = "compose" }
 color-picker = { module = "com.godaddy.android.colorpicker:compose-color-picker-jvm", version.ref = "colorPicker" }
 file-kit = { module = "io.github.vinceglb:filekit-compose", version.ref = "fileKit" }
 nbt = { module = "com.github.Querz:NBT", version.ref = "nbt" }
