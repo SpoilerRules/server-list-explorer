@@ -2,35 +2,31 @@ package com.spoiligaming.explorer.ui.screens.settings
 
 import androidx.compose.runtime.Composable
 import com.spoiligaming.explorer.ConfigurationHandler
-import com.spoiligaming.explorer.ui.SettingsViewModel
 import com.spoiligaming.explorer.ui.widgets.LabeledMapleToggleSwitch
 
 @Composable
 fun SettingsAdvanced() {
     LabeledMapleToggleSwitch(
         title = "Active Server File Monitoring",
-        currentValue = ConfigurationHandler.getInstance().themeSettings.shortcutsInContextMenu,
+        currentValue = ConfigurationHandler.getInstance().advancedSettings.serverFileMonitoring,
         onValueChange = { newValue ->
-            ConfigurationHandler.updateValue { themeSettings.shortcutsInContextMenu = newValue }
-            SettingsViewModel.displayShortcutsInContextMenu = newValue
+            ConfigurationHandler.updateValue { advancedSettings.serverFileMonitoring = newValue }
         },
     )
 
     LabeledMapleToggleSwitch(
         title = "Interpret Server File as Compressed",
-        currentValue = ConfigurationHandler.getInstance().themeSettings.iconifiedDialogOptions,
+        currentValue = ConfigurationHandler.getInstance().advancedSettings.isServerFileCompressed,
         onValueChange = { newValue ->
-            ConfigurationHandler.updateValue { themeSettings.iconifiedDialogOptions = newValue }
-            SettingsViewModel.experimentalIconifiedDialogOptions = newValue
+            ConfigurationHandler.updateValue { advancedSettings.isServerFileCompressed = newValue }
         },
     )
 
     LabeledMapleToggleSwitch(
         title = "Compress Server File on Save",
-        currentValue = ConfigurationHandler.getInstance().themeSettings.iconifiedDialogOptions,
+        currentValue = ConfigurationHandler.getInstance().advancedSettings.compressServerFile,
         onValueChange = { newValue ->
-            ConfigurationHandler.updateValue { themeSettings.iconifiedDialogOptions = newValue }
-            SettingsViewModel.experimentalIconifiedDialogOptions = newValue
+            ConfigurationHandler.updateValue { advancedSettings.compressServerFile = newValue }
         },
     )
 }
