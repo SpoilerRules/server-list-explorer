@@ -28,7 +28,6 @@ import com.spoiligaming.explorer.ui.fonts.FontFactory
 import com.spoiligaming.explorer.ui.state.DialogController
 import com.spoiligaming.explorer.ui.widgets.MapleButton
 import com.spoiligaming.explorer.ui.widgets.MapleButtonHeight
-import com.spoiligaming.explorer.ui.widgets.MapleButtonWidth
 import com.spoiligaming.explorer.ui.widgets.MapleTextField
 import com.spoiligaming.explorer.ui.widgets.MergedText
 import com.spoiligaming.explorer.ui.widgets.ServerIconImage
@@ -122,7 +121,8 @@ fun MapleServerEntryValueReplacementDialog(
                     MapleTextField(Modifier.fillMaxWidth(), placeholderValue) { value = it }
                 }
                 MapleButton(
-                    width = MapleButtonWidth.FILL_MAX.width,
+                    modifier = Modifier.fillMaxWidth(),
+                    width = null,
                     height = MapleButtonHeight.DIALOG.height,
                     text = "Confirm Modification",
                 ) {
