@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.0.0"
+kotlin = "2.0.10"
 compose = "1.7.0-alpha02"
 serialization = "1.6.3"
 shadow = "8.1.1"
