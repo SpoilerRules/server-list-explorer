@@ -115,103 +115,103 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
     private fun DisplayMenuItems(
         state: ContextMenuState,
         items: List<ContextMenuItem>,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            items
-                .distinctBy { it.label }
-                .forEach { item ->
-                    if (item.label in listOf("Erase Icon", "Copy as Toml")) {
-                        Spacer(Modifier.height(5.dp))
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = MapleColorPalette.control,
-                            modifier = Modifier.width(MenuWidth.getWidth(MenuWidth.MIN).dp),
-                        )
-                        Spacer(Modifier.height(5.dp))
-                    }
+    ) = Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        items
+            .distinctBy { it.label }
+            .forEach { item ->
+                if (item.label in listOf("Erase Icon", "Copy as Toml")) {
+                    Spacer(Modifier.height(5.dp))
+                    HorizontalDivider(
+                        thickness = 1.dp,
+                        color = MapleColorPalette.control,
+                        modifier = Modifier.width(MenuWidth.getWidth(MenuWidth.MIN).dp),
+                    )
+                    Spacer(Modifier.height(5.dp))
+                }
 
-                    MenuItemContent(
-                        itemHoverColor = Color(0xFF565656),
-                        onClick = {
-                            state.status = ContextMenuState.Status.Closed
-                            item.onClick()
-                        },
+                MenuItemContent(
+                    itemHoverColor = Color(0xFF565656),
+                    onClick = {
+                        state.status = ContextMenuState.Status.Closed
+                        item.onClick()
+                    },
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Spacer(Modifier.width(5.dp))
-                            IconForItem(item.label)?.let { bitmap ->
-                                Image(
-                                    bitmap = bitmap,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp),
-                                    contentScale = ContentScale.Fit,
-                                )
-                            }
-                            Text(
-                                text = item.label,
-                                color = MapleColorPalette.text,
-                                style =
-                                    TextStyle(
-                                        fontFamily = FontFactory.comfortaaRegular,
-                                        fontWeight = FontWeight.Normal,
-                                        fontSize = 14.sp,
-                                    ),
-                                modifier = Modifier.offset(y = 1.dp),
+                        Spacer(Modifier.width(5.dp))
+                        IconForItem(item.label)?.let { bitmap ->
+                            Image(
+                                bitmap = bitmap,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                contentScale = ContentScale.Fit,
                             )
-
-                            DisplayShortcutText(item.label)
                         }
+                        Text(
+                            text = item.label,
+                            color = MapleColorPalette.text,
+                            style =
+                                TextStyle(
+                                    fontFamily = FontFactory.comfortaaRegular,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 14.sp,
+                                ),
+                            modifier = Modifier.offset(y = 1.dp),
+                        )
+
+                        DisplayShortcutText(item.label)
                     }
                 }
-        }
+            }
     }
 
     @Composable
     private fun DisplayShortcutText(label: String) {
-        if (SettingsViewModel.displayShortcutsInContextMenu) {
-            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
-                val shortcutText =
-                    when (label) {
-                        "Copy Address" -> "$controlButtonAsString + C"
-                        "Delete Entry" -> "Delete"
-                        "Erase Icon" -> "$controlButtonAsString + Delete"
-                        "Navigate to Directory" -> "L-Click"
-                        "Copy File Path" -> "Double L-Click"
-                        "Copy" -> if (type == 1) "$controlButtonAsString + C" else null
-                        "Cut" -> "$controlButtonAsString + X"
-                        "Paste" -> "$controlButtonAsString + V"
-                        "Select All" -> "$controlButtonAsString + A"
-                        "Rename" -> "$controlButtonAsString + R"
-                        "Modify Address" -> "$controlButtonAsString + M"
-                        "Change Icon" -> "$controlButtonAsString + I"
-                        "Copy as Toml" -> "$controlButtonAsString + T"
-                        "Copy Name" -> "$controlButtonAsString + N"
-                        else -> null
-                    }
+        if (!SettingsViewModel.displayShortcutsInContextMenu) {
+            return
+        }
 
-                shortcutText?.let {
-                    Text(
-                        text = it,
-                        color = MapleColorPalette.fadedText,
-                        style =
-                            TextStyle(
-                                fontFamily = FontFactory.comfortaaRegular,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 14.sp,
-                            ),
-                        modifier = Modifier.offset(x = (-10).dp, y = 1.dp),
-                    )
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+            val shortcutText =
+                when (label) {
+                    "Copy Address" -> "$controlButtonAsString + C"
+                    "Delete Entry" -> "Delete"
+                    "Erase Icon" -> "$controlButtonAsString + Delete"
+                    "Navigate to Directory" -> "L-Click"
+                    "Copy File Path" -> "Double L-Click"
+                    "Copy" -> if (type == 1) "$controlButtonAsString + C" else null
+                    "Cut" -> "$controlButtonAsString + X"
+                    "Paste" -> "$controlButtonAsString + V"
+                    "Select All" -> "$controlButtonAsString + A"
+                    "Rename" -> "$controlButtonAsString + R"
+                    "Modify Address" -> "$controlButtonAsString + M"
+                    "Change Icon" -> "$controlButtonAsString + I"
+                    "Copy as Toml" -> "$controlButtonAsString + T"
+                    "Copy Name" -> "$controlButtonAsString + N"
+                    else -> null
                 }
+
+            shortcutText?.let {
+                Text(
+                    text = it,
+                    color = MapleColorPalette.fadedText,
+                    style =
+                        TextStyle(
+                            fontFamily = FontFactory.comfortaaRegular,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 14.sp,
+                        ),
+                    modifier = Modifier.offset(x = (-10).dp, y = 1.dp),
+                )
             }
         }
     }
 
     @Composable
-    private fun IconForItem(label: String): ImageBitmap? {
-        return when (label) {
+    private fun IconForItem(label: String): ImageBitmap? =
+        when (label) {
             "Rename" -> IconFactory.editIcon
             "Modify Address" -> IconFactory.keyIcon
             "Change Icon" -> IconFactory.editPaperIcon
@@ -233,7 +233,6 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
                     else -> null
                 }
         }
-    }
 
     @Composable
     private fun MenuItemContent(
