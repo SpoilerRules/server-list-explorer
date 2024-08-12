@@ -7,11 +7,7 @@ plugins {
     alias(libs.plugins.ktlint)
 }
 
-val applicationVersion = "1.0.0"
 val mainFunction = "com.spoiligaming.explorer.MainKt"
-
-group = "com.spoiligaming"
-version = applicationVersion
 
 repositories {
     mavenCentral()
