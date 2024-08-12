@@ -1,11 +1,7 @@
 package com.spoiligaming.explorer
 
-import androidx.compose.foundation.LocalContextMenuRepresentation
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.text.selection.LocalTextSelectionColors
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,7 +12,6 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.spoiligaming.explorer.ui.MapleColorPalette
-import com.spoiligaming.explorer.ui.presentation.MapleContextMenuRepresentation
 import com.spoiligaming.explorer.ui.state.DialogController
 import com.spoiligaming.logging.Logger
 import org.jetbrains.skiko.OS
@@ -162,24 +157,7 @@ fun main(args: Array<String>) {
             DialogController.Initialize()
 
             Surface(modifier = Modifier.fillMaxSize(), color = MapleColorPalette.menu) {
-                val contextMenuRepresentation =
-                    remember {
-                        MapleContextMenuRepresentation(null, 1)
-                    }
-
-                CompositionLocalProvider(
-                    LocalContextMenuRepresentation provides contextMenuRepresentation,
-                ) {
-                    CompositionLocalProvider(
-                        LocalTextSelectionColors provides
-                            TextSelectionColors(
-                                backgroundColor = MapleColorPalette.accent,
-                                handleColor = MapleColorPalette.accent,
-                            ),
-                    ) {
-                        StartupCoordinator.Coordinate()
-                    }
-                }
+                StartupCoordinator.Coordinate()
             }
         }
     }
