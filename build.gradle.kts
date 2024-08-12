@@ -31,9 +31,10 @@ dependencies {
     implementation(compose.desktop.linux_arm64) // UNCONFIRMED
     implementation(compose.desktop.macos_x64) // UNCONFIRMED
     implementation(compose.desktop.macos_arm64) // UNCONFIRMED
+    implementation(compose.material)
+    implementation(compose.material3)
 
     // Compose libraries
-    implementation(libs.material3.desktop)
     implementation(libs.color.picker)
     implementation(libs.file.kit)
 

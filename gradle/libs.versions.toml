@@ -13,7 +13,6 @@ kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm", version.ref = "serialization" }
-material3-desktop = { module = "org.jetbrains.compose.material3:material3-desktop", version.ref = "compose" }
 color-picker = { module = "com.godaddy.android.colorpicker:compose-color-picker-jvm", version.ref = "colorPicker" }
 file-kit = { module = "io.github.vinceglb:filekit-compose", version.ref = "fileKit" }
 nbt = { module = "com.github.Querz:NBT", version.ref = "nbt" }
