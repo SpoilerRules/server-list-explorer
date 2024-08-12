@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.zIndex
 import com.spoiligaming.explorer.SoftwareInformation
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.extensions.onHover
@@ -182,8 +183,9 @@ fun MapleDialogBase(
             modifier =
                 Modifier.fillMaxWidth()
                     .height(windowSize.second - 73.dp)
-                    .offset(y = 37.dp)
-                    .background(Color.Transparent),
+                    .offset(y = 107.dp)
+                    .background(Color.Transparent)
+                    .zIndex(1f),
             contentAlignment = Alignment.BottomCenter,
         ) {
             Surface(
