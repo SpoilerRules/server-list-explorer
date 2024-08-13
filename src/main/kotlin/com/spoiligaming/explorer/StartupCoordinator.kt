@@ -8,6 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,7 +24,6 @@ import com.spoiligaming.explorer.ui.state.DialogController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 object StartupCoordinator {
     private var isServerDataLoaded by mutableStateOf(false)
@@ -43,7 +43,9 @@ object StartupCoordinator {
 
     @Composable
     private fun Content() {
-        LaunchedEffect(isServerDataLoaded) { loadServerData() }
+        LaunchedEffect(Unit) {
+            verifyServerFile()
+        }
 
         if (isServerDataLoaded) {
             DisplayMainContent()
@@ -56,26 +58,28 @@ object StartupCoordinator {
 
     @Composable
     private fun DisplayMainContent() {
+        val names = remember { ServerFileHandler.loadNames() }
+        val addresses = remember { ServerFileHandler.loadAddresses() }
+
         ContemporaryServerEntryListData.initialize(
-            mutableStateListOf(*ServerFileHandler.loadNames().toTypedArray()),
-            mutableStateListOf(*ServerFileHandler.loadAddresses().toTypedArray()),
+            mutableStateListOf(*names.toTypedArray()),
+            mutableStateListOf(*addresses.toTypedArray()),
         )
+
         NavigationComponent()
         NavigationController.navigateTo(Screen.Main)
     }
 
-    private suspend fun loadServerData() =
-        withContext(Dispatchers.IO) {
-            isServerDataLoaded =
-                (
-                    ServerFileHandler.initializeServerFileLocation() ==
-                        ServerFileValidationResult.VALID
-                )
+    // TODO: fix this getting invoked twice when called by `retryLoad` function
+    private fun verifyServerFile() {
+        isServerDataLoaded = ServerFileHandler.initializeServerFileLocation() == ServerFileValidationResult.VALID
 
-            if (!isServerDataLoaded) {
-                shouldShowFilePickerDialog = true
-            }
+        shouldShowFilePickerDialog = !isServerDataLoaded
+    }
+
+    fun retryLoad() =
+        CoroutineScope(Dispatchers.IO).launch {
+            isServerDataLoaded = false
+            verifyServerFile()
         }
-
-    fun retryLoad() = CoroutineScope(Dispatchers.IO).launch { isServerDataLoaded = false }
 }

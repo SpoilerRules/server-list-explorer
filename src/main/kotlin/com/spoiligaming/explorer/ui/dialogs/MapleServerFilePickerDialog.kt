@@ -40,41 +40,40 @@ fun MapleServerFilePickerDialog(
     isUserRequested: Boolean,
     onDismiss: () -> Unit,
 ) {
+    var hasFailedOnce by remember { mutableStateOf(false) }
+    val filePicker =
+        rememberFilePickerLauncher(
+            type = PickerType.File(extensions = listOf("dat")),
+            mode = PickerMode.Single,
+            title = "Select server list file",
+        ) { file ->
+            if (file != null) {
+                val validationResult =
+                    ServerFileHandler.validateFile(
+                        file.path?.let { File(it) },
+                    )
+
+                if (validationResult == ServerFileValidationResult.VALID) {
+                    hasFailedOnce = false
+                    ConfigurationHandler.updateValue {
+                        generalSettings.serverFilePath = file.path.toString()
+                    }
+                    onDismiss()
+                    StartupCoordinator.retryLoad()
+                } else {
+                    hasFailedOnce = true
+                }
+            } else {
+                hasFailedOnce = true
+            }
+        }
+
     MapleDialogBase(
         isFullPopup = true,
         heightType = 0,
         isCloseable = isUserRequested,
         onDismiss = onDismiss,
     ) {
-        var hasFailedOnce by remember { mutableStateOf(false) }
-
-        val filePicker =
-            rememberFilePickerLauncher(
-                type = PickerType.File(extensions = listOf("dat")),
-                mode = PickerMode.Single,
-                title = "Select server list file",
-            ) { file ->
-                if (file != null) {
-                    val validationResult =
-                        ServerFileHandler.validateFile(
-                            file.path?.let { File(it) },
-                        )
-
-                    if (validationResult == ServerFileValidationResult.VALID) {
-                        hasFailedOnce = false
-                        ConfigurationHandler.updateValue {
-                            generalSettings.serverFilePath = file.path.toString()
-                        }
-                        onDismiss()
-                        StartupCoordinator.retryLoad()
-                    } else {
-                        hasFailedOnce = true
-                    }
-                } else {
-                    hasFailedOnce = true
-                }
-            }
-
         Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
             Text(
                 text =
@@ -127,8 +126,6 @@ fun MapleServerFilePickerDialog(
                         .fillMaxWidth(),
                 contentAlignment = Alignment.Center,
             ) {
-                // Error thrown by this will be fixed by JetBrains in next compose MP update:
-                // https://youtrack.jetbrains.com/issue/COMPT-5064/Clicking-a-clickable-component-inside-another-disabled-clickable-component-throws-IllegalStateException
                 MapleButton(
                     Modifier.fillMaxWidth(),
                     width = null,

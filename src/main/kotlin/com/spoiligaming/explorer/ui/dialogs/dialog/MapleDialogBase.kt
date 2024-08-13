@@ -81,7 +81,6 @@ fun MapleDialogBase(
                     }
                 }
                     .clickable(
-                        enabled = isCloseable,
                         onClick = { if (!isHovered && isCloseable) onDismiss() },
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() },
