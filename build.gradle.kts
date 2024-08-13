@@ -37,6 +37,7 @@ dependencies {
     // Other libraries
     implementation(files("libraries/mcserverping-1.0.7.jar"))
     implementation(libs.nbt)
+    implementation(libs.s4lfj.noop)
 
     testImplementation(compose.desktop.uiTestJUnit4)
     testImplementation(libs.kotlin.test)

@@ -7,6 +7,7 @@ ktlint = "12.1.1"
 colorPicker = "0.7.0"
 fileKit = "0.7.0"
 nbt = "6.1"
+s4lfj-nop = "2.0.16"
 
 [libraries]
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
@@ -16,6 +17,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 color-picker = { module = "com.godaddy.android.colorpicker:compose-color-picker-jvm", version.ref = "colorPicker" }
 file-kit = { module = "io.github.vinceglb:filekit-compose", version.ref = "fileKit" }
 nbt = { module = "com.github.Querz:NBT", version.ref = "nbt" }
+s4lfj-noop = { module = "org.slf4j:slf4j-nop", version.ref = "s4lfj-nop" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
