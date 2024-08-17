@@ -166,7 +166,8 @@ fun ServerInformationView(
                                     Modifier.fillMaxWidth().height(26.dp),
                                     text = "Move to Specified Index in List",
                                     hoverTooltipText =
-                                        "This feature is under consideration for future updates.\n\nIts availability will depend on project growth and user demand.",
+                                    "This feature is under consideration for future updates." +
+                                        "\n\nIts availability will depend on project growth and user demand.",
                                 )
                             }
                         }
@@ -201,7 +202,8 @@ fun ServerInformationView(
                                     ) {
                                         Text(
                                             text =
-                                                "Unable to retrieve server information.\nThe server may be offline.",
+                                                "Unable to retrieve server information." +
+                                                    "\nThe server may be offline.",
                                             color = MapleColorPalette.fadedText,
                                             fontSize = 16.sp,
                                             maxLines = 2,
@@ -238,7 +240,8 @@ fun ServerInformationView(
                                             Modifier.size(112.33.dp, 26.dp),
                                             text = "View MOTD",
                                             hoverTooltipText =
-                                                "This feature is under consideration for future updates.\n\nIts availability will depend on project growth and user demand.",
+                                                "This feature is under consideration for future updates." +
+                                                    "\n\nIts availability will depend on project growth and user demand.",
                                         )
                                         MapleButton(
                                             modifier = Modifier.size(112.33.dp, 26.dp),
@@ -263,7 +266,8 @@ fun ServerInformationView(
                                         Modifier.fillMaxWidth().height(26.dp),
                                         text = "Classic View",
                                         hoverTooltipText =
-                                            "This feature is under consideration for future updates.\n\nIts availability will depend on project growth and user demand.",
+                                            "This feature is under consideration for future updates." +
+                                                "\n\nIts availability will depend on project growth and user demand.",
                                     )
 
                                     serverInfo?.let {
