@@ -3,9 +3,10 @@ package com.spoiligaming.explorer.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -38,49 +39,45 @@ import kotlin.system.exitProcess
 
 @Composable
 fun WindowHeaderView(displaySettingsButton: Boolean) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopEnd) {
-        ControlButtons(displaySettingsButton)
-    }
-
-    Divider()
-
-    WindowTitle()
-}
-
-@Composable
-private fun ControlButtons(displaySettingsButton: Boolean) {
     val currentScreen = NavigationController.currentScreen
 
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 5.dp),
-        horizontalArrangement = Arrangement.spacedBy((-7.5).dp),
-        verticalAlignment = Alignment.Top,
-    ) {
-        Spacer(modifier = Modifier.weight(1f))
-        ControlButton(ActionType.MINIMIZE)
-        ControlButton(ActionType.EXIT)
-    }
-
-    if (displaySettingsButton) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 5.dp),
-            horizontalArrangement = Arrangement.spacedBy((-7.5).dp),
-            verticalAlignment = Alignment.Top,
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
+        WindowTitle()
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            SettingsButton(
-                currentScreen = currentScreen,
-                onClick = {
-                    NavigationController.navigateTo(
-                        if (currentScreen is Screen.Settings) Screen.Main else Screen.Settings,
-                    )
-                },
+            Box(Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(10.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (displaySettingsButton) {
+                        SettingsButton(
+                            currentScreen = currentScreen,
+                            onClick = {
+                                NavigationController.navigateTo(
+                                    if (currentScreen is Screen.Settings || currentScreen is Screen.FileBackupScreen) Screen.Main else Screen.Settings,
+                                )
+                            },
+                        )
+                    }
+                    Spacer(Modifier.weight(1f))
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        ControlButton(ActionType.MINIMIZE)
+                        ControlButton(ActionType.EXIT)
+                    }
+                }
+            }
+
+            HorizontalDivider(
+                color = MapleColorPalette.control,
+                thickness = 1.dp,
+                modifier = Modifier.fillMaxWidth(0.98f),
             )
         }
     }
 }
 
 @Composable
-private fun ControlButton(type: ActionType) {
+private fun ControlButton(type: ActionType) =
     Button(
         onClick = {
             if (type == ActionType.MINIMIZE) {
@@ -89,7 +86,7 @@ private fun ControlButton(type: ActionType) {
                 exitProcess(0)
             }
         },
-        modifier = Modifier.padding(6.dp).size(60.dp, 40.dp).pointerHoverIcon(PointerIcon.Hand),
+        modifier = Modifier.size(60.dp, 40.dp).pointerHoverIcon(PointerIcon.Hand),
         shape = RoundedCornerShape(12.dp),
         colors =
             ButtonDefaults.buttonColors(
@@ -109,7 +106,6 @@ private fun ControlButton(type: ActionType) {
             modifier = Modifier.padding(horizontal = 10.dp),
         )
     }
-}
 
 @Composable
 private fun SettingsButton(
@@ -117,7 +113,7 @@ private fun SettingsButton(
     onClick: () -> Unit,
 ) {
     val (icon, buttonText) =
-        if (currentScreen is Screen.Main) {
+        if (currentScreen is Screen.Main || currentScreen !is Screen.FileBackupScreen) {
             IconFactory.toolsIcon to "Settings"
         } else {
             IconFactory.goBackIcon to "Home"
@@ -126,7 +122,7 @@ private fun SettingsButton(
     Button(
         onClick = onClick,
         modifier =
-            Modifier.padding(6.dp)
+            Modifier
                 .width(123.dp)
                 .height(40.dp)
                 .pointerHoverIcon(PointerIcon(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR))),
@@ -155,10 +151,10 @@ private fun SettingsButton(
 }
 
 @Composable
-private fun WindowTitle() {
+private fun WindowTitle() =
     Box(
-        modifier = Modifier.fillMaxWidth().padding(top = 23.dp),
-        contentAlignment = Alignment.TopCenter,
+        modifier = Modifier.fillMaxWidth().height(40.dp),
+        contentAlignment = Alignment.BottomCenter,
     ) {
         Text(
             text = "Server List Explorer - ${SoftwareInformation.VERSION}",
@@ -171,21 +167,6 @@ private fun WindowTitle() {
                 ),
         )
     }
-}
-
-@Composable
-private fun Divider() {
-    Box(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 475.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        HorizontalDivider(
-            color = MapleColorPalette.control,
-            thickness = 1.dp,
-            modifier = Modifier.fillMaxWidth(0.98f),
-        )
-    }
-}
 
 enum class ActionType {
     EXIT,

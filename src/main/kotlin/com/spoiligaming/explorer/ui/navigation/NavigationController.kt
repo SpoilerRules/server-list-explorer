@@ -8,6 +8,8 @@ sealed class Screen {
     data object Main : Screen()
 
     data object Settings : Screen()
+
+    data object FileBackupScreen : Screen()
 }
 
 object NavigationController {

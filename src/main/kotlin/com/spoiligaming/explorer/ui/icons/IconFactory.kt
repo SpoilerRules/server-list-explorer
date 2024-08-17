@@ -79,4 +79,6 @@ object IconFactory {
         get() = loadIcon("icon/white/solid/icon_arrow-up-right-from-square.png")
     val scissorIcon: ImageBitmap
         get() = loadIcon("icon/white/solid/icon_scissor.png")
+    val magnifyingGlassIcon: ImageBitmap
+        get() = loadIcon("icon/gray/solid/icon_magnifying-glass.png")
 }

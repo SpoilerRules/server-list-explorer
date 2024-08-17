@@ -84,14 +84,16 @@ fun SettingsScreen() {
 
     Box(
         modifier =
-            Modifier.fillMaxWidth().height(526.dp).offset(y = 75.dp).background(Color.Transparent),
+            Modifier
+                .fillMaxSize()
+                .background(Color.Transparent)
+                .padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
         contentAlignment = Alignment.TopCenter,
     ) {
         Box(
             modifier =
-                Modifier.fillMaxWidth(0.98f)
-                    .height(517.dp)
-                    .offset(y = (-2).dp)
+                Modifier
+                    .fillMaxSize()
                     .background(MapleColorPalette.quaternary, RoundedCornerShape(12.dp)),
             contentAlignment = Alignment.TopCenter,
         ) {
@@ -100,7 +102,8 @@ fun SettingsScreen() {
             LazyColumn(
                 state = listState,
                 modifier =
-                    Modifier.fillMaxSize()
+                    Modifier
+                        .fillMaxSize()
                         .background(Color.Transparent)
                         .padding(top = 68.dp, start = 12.dp),
             ) {

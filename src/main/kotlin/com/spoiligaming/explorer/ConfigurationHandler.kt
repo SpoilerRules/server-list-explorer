@@ -11,6 +11,7 @@ import java.nio.file.Paths
 data class SettingsGeneral(
     var renderApi: String = "OpenGL",
     var scrollBarVisibility: String = "Right Side",
+    var controlPanelPosition: String = "Top",
     var serverFilePath: String =
         Paths.get(System.getenv("APPDATA"), ".minecraft", "servers.dat").toString(),
 )

@@ -169,50 +169,48 @@ private fun ActionButton(
     isHoveredState: MutableState<Boolean>,
     showIcon: Boolean,
     iconType: ButtonType? = null,
+) = Button(
+    onClick = onClick,
+    modifier =
+        Modifier.width(75.dp)
+            .height(40.dp)
+            .onHover { isHoveredState.value = it }
+            .pointerHoverIcon(PointerIcon.Hand),
+    shape = RoundedCornerShape(12.dp),
+    colors =
+        ButtonDefaults.buttonColors(
+            backgroundColor = MapleColorPalette.menu,
+            contentColor = MapleColorPalette.fadedText,
+        ),
 ) {
-    Button(
-        onClick = onClick,
-        modifier =
-            Modifier.width(75.dp)
-                .height(40.dp)
-                .onHover { isHoveredState.value = it }
-                .pointerHoverIcon(PointerIcon.Hand),
-        shape = RoundedCornerShape(12.dp),
-        colors =
-            ButtonDefaults.buttonColors(
-                backgroundColor = MapleColorPalette.menu,
-                contentColor = MapleColorPalette.fadedText,
-            ),
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            if (showIcon && iconType != null) {
-                Image(
-                    bitmap =
-                        when {
-                            isHoveredState.value && iconType == ButtonType.ACCEPT ->
-                                IconFactory.acceptIconGreen
-                            !isHoveredState.value && iconType == ButtonType.ACCEPT ->
-                                IconFactory.acceptIcon
-                            isHoveredState.value && iconType == ButtonType.DISMISS ->
-                                IconFactory.xIconRed
-                            else -> IconFactory.xIcon
-                        },
-                    contentDescription = "Icon for ${iconType.name} Button",
-                    modifier = Modifier.size(26.dp),
-                    contentScale = ContentScale.Fit,
-                )
-            } else if (text != null) {
-                Text(
-                    text = text,
-                    color = MapleColorPalette.text,
-                    style =
-                        TextStyle(
-                            fontFamily = FontFactory.comfortaaLight,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 15.sp,
-                        ),
-                )
-            }
+    Box(contentAlignment = Alignment.Center) {
+        if (showIcon && iconType != null) {
+            Image(
+                bitmap =
+                    when {
+                        isHoveredState.value && iconType == ButtonType.ACCEPT ->
+                            IconFactory.acceptIconGreen
+                        !isHoveredState.value && iconType == ButtonType.ACCEPT ->
+                            IconFactory.acceptIcon
+                        isHoveredState.value && iconType == ButtonType.DISMISS ->
+                            IconFactory.xIconRed
+                        else -> IconFactory.xIcon
+                    },
+                contentDescription = "Icon for ${iconType.name} Button",
+                modifier = Modifier.size(26.dp),
+                contentScale = ContentScale.Fit,
+            )
+        } else if (text != null) {
+            Text(
+                text = text,
+                color = MapleColorPalette.text,
+                style =
+                    TextStyle(
+                        fontFamily = FontFactory.comfortaaLight,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 15.sp,
+                    ),
+            )
         }
     }
 }

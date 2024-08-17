@@ -1,13 +1,11 @@
 package com.spoiligaming.explorer.ui.widgets
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.onClick
@@ -126,7 +124,7 @@ fun MergedText(
     onSecondTextClick: () -> Unit = {},
 ) {
     var isHovered by remember { mutableStateOf(false) }
-    val mutableInteractionSource = remember { MutableInteractionSource() }
+
     Row {
         Text(
             text = firstText,
@@ -239,12 +237,6 @@ fun ModifiableMergedInfoText(
     var isChangeTextHovered by remember { mutableStateOf(false) }
     val density = LocalDensity.current
 
-    val shadowBlurRadius by
-        animateFloatAsState(
-            targetValue = if (isChangeTextHovered) 0.5f else 0f,
-            animationSpec = tween(durationMillis = 300),
-        )
-
     var changeTextColor by remember { mutableStateOf(MapleColorPalette.accent) }
 
     val secondaryText: @Composable () -> Unit = {
@@ -262,8 +254,14 @@ fun ModifiableMergedInfoText(
         )
     }
 
-    Row(horizontalArrangement = Arrangement.spacedBy(offset)) {
-        Row {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(offset),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.weight(1f),
+        ) {
             Text(
                 text = firstText,
                 color = MapleColorPalette.fadedText,
@@ -274,15 +272,19 @@ fun ModifiableMergedInfoText(
                         fontSize = 16.sp,
                     ),
             )
-            if (selectableSecondaryText) {
-                SelectionContainer { secondaryText() }
-            } else {
-                secondaryText()
+            Box {
+                if (selectableSecondaryText) {
+                    SelectionContainer { secondaryText() }
+                } else {
+                    secondaryText()
+                }
             }
         }
+
         Text(
             text = customChangeTextString,
             color = if (isChangeTextDisabled) Color.Gray else changeTextColor,
+            maxLines = 1,
             style =
                 TextStyle(
                     fontFamily = FontFactory.comfortaaRegular,

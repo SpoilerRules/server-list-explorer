@@ -1,8 +1,5 @@
 package com.spoiligaming.explorer.ui.widgets
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.TooltipArea
-import androidx.compose.foundation.TooltipPlacement
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -13,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -111,7 +107,6 @@ fun MapleButton(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DisabledMapleButton(
     modifier: Modifier = Modifier,
@@ -120,50 +115,23 @@ fun DisabledMapleButton(
     textColor: Color = MapleColorPalette.text,
     hoverTooltipText: String,
     fontSize: TextUnit = 15.sp,
-) {
-    TooltipArea(
-        tooltip = {
-            Surface(
-                color = MapleColorPalette.control,
-                shape = RoundedCornerShape(10.dp),
-                shadowElevation = 8.dp,
-            ) {
-                Text(
-                    text = hoverTooltipText,
-                    color = MapleColorPalette.text,
-                    style =
-                        TextStyle(
-                            fontFamily = FontFactory.comfortaaRegular,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 14.sp,
-                        ),
-                    modifier = Modifier.padding(8.dp),
-                )
-            }
-        },
-        delayMillis = 500,
-        tooltipPlacement =
-            TooltipPlacement.CursorPoint(
-                alignment = Alignment.BottomEnd,
-            ),
+) = MapleTooltip(hoverTooltipText, MapleColorPalette.text, 500) {
+    Box(
+        modifier =
+            modifier
+                .clip(RoundedCornerShape(10.dp))
+                .background(backgroundColor.copy(alpha = 0.5f), RoundedCornerShape(10.dp)),
+        contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier =
-                modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(backgroundColor.copy(alpha = 0.5f), RoundedCornerShape(10.dp)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = text,
-                color = textColor.copy(alpha = 0.5f),
-                style =
-                    TextStyle(
-                        fontFamily = FontFactory.comfortaaLight,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = fontSize,
-                    ),
-            )
-        }
+        Text(
+            text = text,
+            color = textColor.copy(alpha = 0.5f),
+            style =
+                TextStyle(
+                    fontFamily = FontFactory.comfortaaLight,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = fontSize,
+                ),
+        )
     }
 }

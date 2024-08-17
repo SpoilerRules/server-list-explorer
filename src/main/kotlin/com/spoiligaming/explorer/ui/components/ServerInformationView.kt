@@ -150,13 +150,13 @@ fun ServerInformationView(
                                 }
                                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                     MapleButton(
-                                        Modifier.size(170.5.dp, 26.dp),
+                                        Modifier.weight(1f),
                                         text = "Copy Icon as Image",
                                     ) {
                                         ClipboardUtility.copyIconAsImage(serverIconRaw)
                                     }
                                     MapleButton(
-                                        Modifier.size(170.5.dp, 26.dp),
+                                        Modifier.weight(1f),
                                         text = "Copy Icon as Base64",
                                     ) {
                                         ClipboardUtility.copy(serverIconRaw)
@@ -224,7 +224,10 @@ fun ServerInformationView(
                             }
                             else -> {
                                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                    ) {
                                         MapleButton(
                                             Modifier.size(112.33.dp, 26.dp),
                                             text = "Refresh",
