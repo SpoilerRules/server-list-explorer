@@ -2,6 +2,9 @@
 
 [![Compose Desktop](https://img.shields.io/badge/Desktop-4CAF50.svg?style=flat&logo=jetpackcompose&logoColor=FFFFFF&labelColor=4CAF50&label=Compose&colorA=4CAF50&colorB=6A1B9A)](https://jb.gg/cmp)
 
+[![](https://dcbadge.limes.pink/api/server/https://discord.gg/fVA5Wr6Nns?style=flat)](https://discord.gg/fVA5Wr6Nns)
+
+
 **Server List Explorer** is your ultimate tool for effortlessly managing your [Minecraft: Java Edition](https://www.minecraft.net/) server list. With a sleek, modern user interface inspired by [Maple](https://maple.software/) and built using [Compose Multiplatform](https://jb.gg/cmp), it combines both functionality and visual appeal. Discover the full range of features in our [Feature List on the wiki](https://github.com/SpoilerRules/server-list-explorer/wiki/Feature-List), and check out the [User Interface Preview](#user-interface-preview) section to see our innovative design up close.
 
 ## User Interface Preview
