@@ -11,10 +11,10 @@
 
 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 0fr)); gap: 10px; justify-content: center;">
   <img src="https://i.ibb.co/yB7SV7B/java-qcie-Is-Na1-L.png" width="250" alt="Screenshot 1">
-  <img src="https://i.ibb.co/8KQsZpJ/java-xxz-Uxfs3-LQ.png" width="250" alt="Screenshot 3">
-  <img src="https://i.ibb.co/1s82y2H/java-MWLvw-CXBn-C.png" width="250" alt="Screenshot 4">
-  <img src="https://i.ibb.co/6bmwsL8/java-w9tg0-Jbd1v.png" width="250" alt="Screenshot 5">
-  <img src="https://i.ibb.co/mzH70d0/java-Aj-Iz4lq-D0u.png" width="250" alt="Screenshot 6">
+  <img src="https://i.imgur.com/5QUawrT.png" width="250" alt="Screenshot 3">
+  <img src="https://i.imgur.com/TbeCvfW.png" width="250" alt="Screenshot 4">
+  <img src="https://i.imgur.com/MALULZ6.png" width="250" alt="Screenshot 5">
+  <img src="https://i.imgur.com/uIWROgP.png" width="250" alt="Screenshot 6">
   <img src="https://i.ibb.co/74XkpTs/java-yp-Yvb-SNsai.png" width="250" alt="Screenshot 7">
   <img src="https://i.imgur.com/vxgseoU.png" width="250" alt="Screenshot 2">
   <img src="https://i.ibb.co/rFhGDdT/java-01-Xok-Ynq6-U.png" width="250" alt="Screenshot 8">
