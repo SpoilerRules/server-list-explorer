@@ -86,7 +86,7 @@ fun ServerElement(
     val focusRequester = remember { FocusRequester() }
 
     val contextMenuState = remember { ContextMenuState() }
-    val contextMenuRepresentation = remember { MapleContextMenuRepresentation(serverName, 0) }
+    val contextMenuRepresentation = MapleContextMenuRepresentation(serverName, 0)
 
     var isHovered by remember { mutableStateOf(false) }
     val backgroundColor by
