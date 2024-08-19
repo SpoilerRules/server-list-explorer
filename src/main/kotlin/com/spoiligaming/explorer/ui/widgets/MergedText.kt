@@ -365,7 +365,7 @@ fun MergedText(
                             fontWeight = firstTextWeight,
                             fontSize = 15.sp,
                         ),
-                    modifier = Modifier.offset(y = 3.5.dp),
+                    modifier = Modifier.offset(y = 3.dp),
                 )
             }
         }
