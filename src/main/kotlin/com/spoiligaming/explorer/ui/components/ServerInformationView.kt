@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
@@ -166,8 +165,8 @@ fun ServerInformationView(
                                     Modifier.fillMaxWidth().height(26.dp),
                                     text = "Move to Specified Index in List",
                                     hoverTooltipText =
-                                    "This feature is under consideration for future updates." +
-                                        "\n\nIts availability will depend on project growth and user demand.",
+                                        "This feature is under consideration for future updates." +
+                                            "\n\nIts availability will depend on project growth and user demand.",
                                 )
                             }
                         }
@@ -231,20 +230,20 @@ fun ServerInformationView(
                                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                                     ) {
                                         MapleButton(
-                                            Modifier.size(112.33.dp, 26.dp),
+                                            Modifier.weight(1f).height(26.dp),
                                             text = "Refresh",
                                         ) {
                                             fetchServerInfo(true)
                                         }
                                         DisabledMapleButton(
-                                            Modifier.size(112.33.dp, 26.dp),
+                                            Modifier.weight(1f).height(26.dp),
                                             text = "View MOTD",
                                             hoverTooltipText =
                                                 "This feature is under consideration for future updates." +
                                                     "\n\nIts availability will depend on project growth and user demand.",
                                         )
                                         MapleButton(
-                                            modifier = Modifier.size(112.33.dp, 26.dp),
+                                            modifier = Modifier.weight(1f).height(26.dp),
                                             text = "Refresh Icon",
                                         ) {
                                             CoroutineScope(Dispatchers.IO).launch {

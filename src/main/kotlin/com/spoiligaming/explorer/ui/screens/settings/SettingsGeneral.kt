@@ -20,7 +20,7 @@ import org.jetbrains.skiko.hostOs
 fun SettingsGeneral() =
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         DropdownMenuWithLabel(
-            label = "Scrollbar Visibility for Server List",
+            label = "Scrollbar Visibility",
             currentValue = ConfigurationHandler.getInstance().generalSettings.scrollBarVisibility,
             options = listOf("Right Side", "Left Side", "Disabled"),
         ) { newValue ->

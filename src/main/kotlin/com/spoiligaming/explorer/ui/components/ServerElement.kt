@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -58,7 +59,6 @@ import androidx.compose.ui.unit.sp
 import com.spoiligaming.explorer.server.ContemporaryServerEntryListData
 import com.spoiligaming.explorer.server.ServerFileHandler
 import com.spoiligaming.explorer.ui.MapleColorPalette
-import com.spoiligaming.explorer.ui.SettingsViewModel
 import com.spoiligaming.explorer.ui.dialogs.ValueReplacementType
 import com.spoiligaming.explorer.ui.extensions.onHover
 import com.spoiligaming.explorer.ui.fonts.FontFactory
@@ -94,7 +94,7 @@ fun ServerElement(
             targetValue =
                 when {
                     isHovered || isSelected -> MapleColorPalette.control
-                    else -> MapleColorPalette.secondaryControl
+                    else -> MapleColorPalette.tertiaryControl
                 },
             animationSpec = tween(durationMillis = 100),
         )
@@ -184,13 +184,8 @@ fun ServerElement(
         ) {
             Box(
                 modifier =
-                    Modifier.width(
-                        if (SettingsViewModel.scrollbarVisibility != "Disabled") {
-                            377.dp * 0.96f
-                        } else {
-                            377.dp
-                        },
-                    )
+                    Modifier
+                        .fillMaxWidth()
                         .height(68.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .background(backgroundColor, shape = RoundedCornerShape(12.dp))
@@ -347,7 +342,11 @@ fun ServerElement(
                     }
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                ) {
                     var isIconHovered by remember { mutableStateOf(false) }
                     var isOverlayHovered by remember { mutableStateOf(false) }
                     var isOverlayPressed by remember { mutableStateOf(false) }
@@ -378,8 +377,8 @@ fun ServerElement(
 
                     Box(
                         modifier =
-                            Modifier.width(48.dp)
-                                .height(48.dp)
+                            Modifier
+                                .size(48.dp, 48.dp)
                                 .background(Color.Transparent, shape = RoundedCornerShape(4.dp))
                                 .onHover { isIconHovered = it },
                     ) {
@@ -450,60 +449,55 @@ fun ServerElement(
                         }
                     }
 
-                    Box(
-                        modifier =
-                            Modifier.width(195.dp)
-                                .height(48.dp)
-                                .padding(start = 10.dp)
-                                .background(Color.Transparent),
-                        contentAlignment = Alignment.Center,
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(5.dp),
+                        modifier = Modifier.weight(1f),
                     ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                            SelectableInteractiveText(
-                                text = serverName,
-                                textColor = MapleColorPalette.fadedText,
-                                fontFamily = FontFactory.comfortaaBold,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 18.sp,
-                                onLongClick = {
-                                    DialogController.showValueReplacementDialog(
-                                        serverName = serverName,
-                                        serverAddress = serverAddress,
-                                        serverIcon = serverIcon,
-                                        serverIconRaw = serverIconRaw,
-                                        serverPositionInList = serverPositionInList,
-                                        type = ValueReplacementType.NAME,
-                                    ) { newName ->
-                                        ContemporaryServerEntryListData.updateServerName(
-                                            serverPositionInList,
-                                            newName,
-                                        )
-                                    }
-                                },
-                            )
-                            SelectableInteractiveText(
-                                text = serverAddress,
-                                textColor = MapleColorPalette.fadedText,
-                                fontFamily = FontFactory.comfortaaBold,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 16.sp,
-                                onLongClick = {
-                                    DialogController.showValueReplacementDialog(
-                                        serverName = serverName,
-                                        serverAddress = serverAddress,
-                                        serverIcon = serverIcon,
-                                        serverIconRaw = serverIconRaw,
-                                        serverPositionInList = serverPositionInList,
-                                        type = ValueReplacementType.ADDRESS,
-                                    ) { newAddress ->
-                                        ContemporaryServerEntryListData.updateServerAddress(
-                                            serverPositionInList,
-                                            newAddress,
-                                        )
-                                    }
-                                },
-                            )
-                        }
+                        SelectableInteractiveText(
+                            text = serverName,
+                            textColor = MapleColorPalette.fadedText,
+                            fontFamily = FontFactory.comfortaaBold,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 18.sp,
+                            onLongClick = {
+                                DialogController.showValueReplacementDialog(
+                                    serverName = serverName,
+                                    serverAddress = serverAddress,
+                                    serverIcon = serverIcon,
+                                    serverIconRaw = serverIconRaw,
+                                    serverPositionInList = serverPositionInList,
+                                    type = ValueReplacementType.NAME,
+                                ) { newName ->
+                                    ContemporaryServerEntryListData.updateServerName(
+                                        serverPositionInList,
+                                        newName,
+                                    )
+                                }
+                            },
+                        )
+                        SelectableInteractiveText(
+                            text = serverAddress,
+                            textColor = MapleColorPalette.fadedText,
+                            fontFamily = FontFactory.comfortaaBold,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 16.sp,
+                            onLongClick = {
+                                DialogController.showValueReplacementDialog(
+                                    serverName = serverName,
+                                    serverAddress = serverAddress,
+                                    serverIcon = serverIcon,
+                                    serverIconRaw = serverIconRaw,
+                                    serverPositionInList = serverPositionInList,
+                                    type = ValueReplacementType.ADDRESS,
+                                ) { newAddress ->
+                                    ContemporaryServerEntryListData.updateServerAddress(
+                                        serverPositionInList,
+                                        newAddress,
+                                    )
+                                }
+                            },
+                        )
                     }
 
                     val (initialWidth, initialHeight) = 0.dp to 0.dp
@@ -551,59 +545,53 @@ fun ServerElement(
                                 onClick = onClick,
                             )
                         }
-
                     Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.CenterEnd,
+                        modifier =
+                            Modifier.size(
+                                width = animatedWidth,
+                                height = animatedHeight,
+                            ),
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Box(
+                        Surface(
                             modifier =
-                                Modifier.size(
-                                    width = animatedWidth,
-                                    height = animatedHeight,
-                                ),
-                            contentAlignment = Alignment.Center,
+                                Modifier.width(animatedWidth)
+                                    .height(animatedHeight),
+                            shape = RoundedCornerShape(12.dp),
+                            color = MapleColorPalette.control,
+                            shadowElevation = 4.dp,
                         ) {
-                            Surface(
-                                modifier =
-                                    Modifier.width(animatedWidth)
-                                        .height(animatedHeight),
-                                shape = RoundedCornerShape(12.dp),
-                                color = MapleColorPalette.control,
-                                shadowElevation = 4.dp,
-                            ) {
-                                if (shouldExpand) {
-                                    Row(
-                                        modifier =
-                                            Modifier.fillMaxSize()
-                                                .alpha(animatedAlpha),
-                                        verticalAlignment =
-                                            Alignment.CenterVertically,
-                                        horizontalArrangement =
-                                            Arrangement.Center,
+                            if (shouldExpand) {
+                                Row(
+                                    modifier =
+                                        Modifier.fillMaxSize()
+                                            .alpha(animatedAlpha),
+                                    verticalAlignment =
+                                        Alignment.CenterVertically,
+                                    horizontalArrangement =
+                                        Arrangement.Center,
+                                ) {
+                                    createClickableIcon(
+                                        IconFactory.deleteIcon,
+                                        "Delete Icon for Deleting Server Item",
                                     ) {
-                                        createClickableIcon(
-                                            IconFactory.deleteIcon,
-                                            "Delete Icon for Deleting Server Item",
-                                        ) {
-                                            DialogController
-                                                .showDeletionConfirmationDialog(
-                                                    serverPositionInList,
-                                                    serverName,
-                                                )
-                                        }
-                                        createClickableIcon(
-                                            IconFactory.chevronUp,
-                                            "Up Arrow Icon for Moving Server Up",
-                                        ) {
-                                            onMoveUp(serverPositionInList)
-                                        }
-                                        createClickableIcon(
-                                            IconFactory.chevronDown,
-                                            "Down Arrow Icon for Moving Server Down",
-                                        ) {
-                                            onMoveDown(serverPositionInList)
-                                        }
+                                        DialogController
+                                            .showDeletionConfirmationDialog(
+                                                serverPositionInList,
+                                                serverName,
+                                            )
+                                    }
+                                    createClickableIcon(
+                                        IconFactory.chevronUp,
+                                        "Up Arrow Icon for Moving Server Up",
+                                    ) {
+                                        onMoveUp(serverPositionInList)
+                                    }
+                                    createClickableIcon(
+                                        IconFactory.chevronDown,
+                                        "Down Arrow Icon for Moving Server Down",
+                                    ) {
+                                        onMoveDown(serverPositionInList)
                                     }
                                 }
                             }

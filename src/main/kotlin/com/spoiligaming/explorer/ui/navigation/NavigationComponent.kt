@@ -11,7 +11,7 @@ fun NavigationComponent() {
     val controller = remember { NavigationController }
 
     when (controller.currentScreen) {
-        Screen.Main -> HomeScreen()
+        Screen.Home -> HomeScreen()
         Screen.Settings -> SettingsScreen()
         Screen.FileBackupScreen -> FileBackupSubScreen()
     }

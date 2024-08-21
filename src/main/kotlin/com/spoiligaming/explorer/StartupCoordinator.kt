@@ -80,7 +80,7 @@ object StartupCoordinator {
         )
 
         NavigationComponent()
-        NavigationController.navigateTo(Screen.Main)
+        NavigationController.navigateTo(Screen.Home)
     }
 
     // TODO: fix this getting invoked twice when called by `retryLoad` function

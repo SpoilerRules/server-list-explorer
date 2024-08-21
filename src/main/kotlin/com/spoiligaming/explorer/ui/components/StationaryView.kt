@@ -3,11 +3,9 @@ package com.spoiligaming.explorer.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
@@ -40,27 +38,21 @@ fun StationaryView() {
                 modifier = Modifier.fillMaxWidth().weight(1.35f),
                 color = MapleColorPalette.quaternary,
                 shape = RoundedCornerShape(12.dp),
-                shadowElevation = 12.dp,
+                shadowElevation = 4.dp,
             ) {
-                Box(Modifier.fillMaxSize()) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(
-                        modifier = Modifier.fillMaxSize().padding(top = 20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.TopCenter,
-                        ) {
-                            Text(
-                                text = "Tip",
-                                color = MapleColorPalette.accent,
-                                fontSize = 24.sp,
-                                fontFamily = FontFactory.comfortaaMedium,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center,
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Text(
+                            text = "Tip",
+                            color = MapleColorPalette.accent,
+                            fontSize = 24.sp,
+                            fontFamily = FontFactory.comfortaaMedium,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                        )
                         Text(
                             text = tip,
                             color = MapleColorPalette.text,
@@ -77,7 +69,7 @@ fun StationaryView() {
                 modifier = Modifier.fillMaxWidth().weight(1f),
                 color = MapleColorPalette.quaternary,
                 shape = RoundedCornerShape(12.dp),
-                shadowElevation = 12.dp,
+                shadowElevation = 4.dp,
             ) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(

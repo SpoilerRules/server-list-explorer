@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.onClick
@@ -47,12 +46,13 @@ import java.awt.Dimension
 private val colorPickerStates =
     mutableStateMapOf(
         "Accent" to false,
-        "Menu" to false,
-        "Control" to false,
-        "SecondaryControl" to false,
         "Secondary" to false,
-        "Tertiary" to false,
+        "Secondary Control" to false,
+        "Tertiary Control" to false,
+        "Control" to false,
+        "Menu" to false,
         "Quaternary" to false,
+        "Tertiary" to false,
     )
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
@@ -64,24 +64,26 @@ fun SettingsTheme() {
         remember {
             mutableStateMapOf(
                 "Accent" to BasicTooltipState(),
-                "Menu" to BasicTooltipState(),
-                "Control" to BasicTooltipState(),
-                "SecondaryControl" to BasicTooltipState(),
                 "Secondary" to BasicTooltipState(),
-                "Tertiary" to BasicTooltipState(),
+                "Secondary Control" to BasicTooltipState(),
+                "Control" to BasicTooltipState(),
+                "Tertiary Control" to BasicTooltipState(),
+                "Menu" to BasicTooltipState(),
                 "Quaternary" to BasicTooltipState(),
+                "Tertiary" to BasicTooltipState(),
             )
         }
 
     val colorPaletteMap =
         mutableMapOf(
             "Accent" to MapleColorPalette.accent,
-            "Menu" to MapleColorPalette.menu,
-            "Control" to MapleColorPalette.control,
-            "SecondaryControl" to MapleColorPalette.secondaryControl,
             "Secondary" to MapleColorPalette.secondary,
-            "Tertiary" to MapleColorPalette.tertiary,
+            "Secondary Control" to MapleColorPalette.secondaryControl,
+            "Control" to MapleColorPalette.control,
+            "Tertiary Control" to MapleColorPalette.tertiaryControl,
+            "Menu" to MapleColorPalette.menu,
             "Quaternary" to MapleColorPalette.quaternary,
+            "Tertiary" to MapleColorPalette.tertiary,
         )
 
     tooltipStates.forEach { (key, tooltipState) ->
@@ -92,6 +94,13 @@ fun SettingsTheme() {
                 tooltipState.dismiss()
             }
         }
+    }
+
+    LabeledMapleToggleSwitch(
+        "Show Scrollbar Background",
+        ConfigurationHandler.getInstance().themeSettings.showScrollbarBackground,
+    ) { newValue ->
+        ConfigurationHandler.updateValue { themeSettings.showScrollbarBackground = newValue }
     }
 
     LabeledMapleToggleSwitch(
@@ -112,27 +121,25 @@ fun SettingsTheme() {
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Box(contentAlignment = Alignment.Center) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                DropdownMenuWithLabel(
-                    label = "Window scale (not recommended)",
-                    currentValue = ConfigurationHandler.getInstance().themeSettings.windowScale,
-                    options = listOf("150%", "125%", "100%"),
-                ) { newValue ->
-                    val newScale =
-                        when (newValue) {
-                            "150%" -> 1.5f
-                            "125%" -> 1.25f
-                            "100%" -> 1f
-                            else ->
-                                throw IllegalArgumentException(
-                                    "Invalid window scale value: $newValue",
-                                )
-                        }
-                    ConfigurationHandler.updateValue {
-                        themeSettings.windowScale = newValue
-                        windowFrame.size =
-                            Dimension((800 * newScale).toInt(), (600 * newScale).toInt())
+            DropdownMenuWithLabel(
+                label = "Window scale",
+                currentValue = ConfigurationHandler.getInstance().themeSettings.windowScale,
+                options = listOf("150%", "125%", "100%"),
+            ) { newValue ->
+                val newScale =
+                    when (newValue) {
+                        "150%" -> 1.5f
+                        "125%" -> 1.25f
+                        "100%" -> 1f
+                        else ->
+                            throw IllegalArgumentException(
+                                "Invalid window scale value: $newValue",
+                            )
                     }
+                ConfigurationHandler.updateValue {
+                    themeSettings.windowScale = newValue
+                    windowFrame.size =
+                        Dimension((800 * newScale).toInt(), (600 * newScale).toInt())
                 }
             }
         }
@@ -141,15 +148,16 @@ fun SettingsTheme() {
             val colorKeys =
                 listOf(
                     "Accent",
-                    "Menu",
-                    "Control",
-                    "SecondaryControl",
                     "Secondary",
-                    "Tertiary",
+                    "Secondary Control",
+                    "Control",
+                    "Tertiary Control",
+                    "Menu",
                     "Quaternary",
+                    "Tertiary",
                 )
             colorKeys.forEach { key ->
-                MergedText("$key colour", MapleColorPalette.text, FontWeight.Light, 2.49988774.dp) {
+                MergedText("$key color", MapleColorPalette.text, FontWeight.Light, 2.49988774.dp) {
                     Box(
                         modifier =
                             Modifier.width(25.dp)
@@ -196,23 +204,12 @@ fun SettingsTheme() {
 
 @Composable
 fun SettingsThemeOuter() {
-    displayColorPicker("Accent", MapleColorPalette.accent, MapleColorPalette.defaultAccent) {
-            newValue ->
-        MapleColorPalette.accent = newValue
-    }
-    displayColorPicker("Menu", MapleColorPalette.menu, MapleColorPalette.defaultMenu) { newValue ->
-        MapleColorPalette.menu = newValue
-    }
-    displayColorPicker("Control", MapleColorPalette.control, MapleColorPalette.defaultControl) {
-            newValue ->
-        MapleColorPalette.control = newValue
-    }
     displayColorPicker(
-        "SecondaryControl",
-        MapleColorPalette.secondaryControl,
-        MapleColorPalette.defaultSecondaryControl,
+        "Accent",
+        MapleColorPalette.accent,
+        MapleColorPalette.defaultAccent,
     ) { newValue ->
-        MapleColorPalette.secondaryControl = newValue
+        MapleColorPalette.accent = newValue
     }
     displayColorPicker(
         "Secondary",
@@ -221,17 +218,43 @@ fun SettingsThemeOuter() {
     ) { newValue ->
         MapleColorPalette.secondary = newValue
     }
-    displayColorPicker("Tertiary", MapleColorPalette.tertiary, MapleColorPalette.defaultTertiary) {
-            newValue ->
-        MapleColorPalette.tertiary = newValue
+    displayColorPicker(
+        "Secondary Control",
+        MapleColorPalette.secondaryControl,
+        MapleColorPalette.defaultSecondaryControl,
+    ) { newValue ->
+        MapleColorPalette.secondaryControl = newValue
+    }
+    displayColorPicker(
+        "Control",
+        MapleColorPalette.control,
+        MapleColorPalette.defaultControl,
+    ) { newValue ->
+        MapleColorPalette.control = newValue
+    }
+    displayColorPicker(
+        "Tertiary Control",
+        MapleColorPalette.tertiaryControl,
+        MapleColorPalette.defaultTertiaryControl,
+    ) { newValue ->
+        MapleColorPalette.tertiaryControl = newValue
+    }
+    displayColorPicker("Menu", MapleColorPalette.menu, MapleColorPalette.defaultMenu) { newValue ->
+        MapleColorPalette.menu = newValue
     }
     displayColorPicker(
         "Quaternary",
         MapleColorPalette.quaternary,
         MapleColorPalette.defaultQuaternary,
-    ) { newValue,
-        ->
+    ) { newValue ->
         MapleColorPalette.quaternary = newValue
+    }
+    displayColorPicker(
+        "Tertiary",
+        MapleColorPalette.tertiary,
+        MapleColorPalette.defaultTertiary,
+    ) { newValue ->
+        MapleColorPalette.tertiary = newValue
     }
 }
 
@@ -244,7 +267,7 @@ private fun displayColorPicker(
 ) {
     if (colorPickerStates[key] == true) {
         MapleColorPicker(
-            "$key colour",
+            "$key color",
             color,
             defaultColor,
             { newValue ->

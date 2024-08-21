@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.spoiligaming.explorer.SoftwareInformation
+import com.spoiligaming.explorer.isBackupRestoreInProgress
 import com.spoiligaming.explorer.server.ContemporaryServerEntryListData
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.fonts.FontFactory
@@ -37,7 +38,7 @@ fun InformationContainer() =
                 "Server Count: ",
                 MapleColorPalette.fadedText,
                 FontWeight.Normal,
-                ContemporaryServerEntryListData.serverNameList.size.toString(),
+                if (isBackupRestoreInProgress) "unknown" else ContemporaryServerEntryListData.serverNameList.size.toString(),
                 MapleColorPalette.fadedText,
                 FontWeight.Normal,
             )

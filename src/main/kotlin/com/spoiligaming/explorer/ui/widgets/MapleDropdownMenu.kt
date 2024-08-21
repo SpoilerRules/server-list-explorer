@@ -107,7 +107,6 @@ fun MapleDropdownMenu(
 ) {
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(defaultValue) }
-    val interactionSource = remember { MutableInteractionSource() }
     val dropdownExpandedState = remember { MutableTransitionState(false) }
     val transformOriginState = remember { mutableStateOf(TransformOrigin.Center) }
     val density = LocalDensity.current
@@ -129,7 +128,7 @@ fun MapleDropdownMenu(
                 .clip(RoundedCornerShape(12.dp))
                 .background(MapleColorPalette.control, RoundedCornerShape(12.dp))
                 .clickable(
-                    interactionSource = interactionSource,
+                    interactionSource = remember { MutableInteractionSource() },
                     indication = ripple(color = Color.White),
                 ) {
                     isDropdownExpanded = true
@@ -201,11 +200,11 @@ fun MapleDropdownMenu(
                         Modifier.width(255.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .background(
-                                color = MapleColorPalette.secondaryControl,
+                                color = MapleColorPalette.tertiaryControl,
                                 RoundedCornerShape(12.dp),
                             )
                             .clickable(
-                                interactionSource = interactionSource,
+                                interactionSource = remember { MutableInteractionSource() },
                                 indication =
                                     ripple(color = MapleColorPalette.control),
                             ) {},
@@ -214,15 +213,16 @@ fun MapleDropdownMenu(
                         var isHovering by remember { mutableStateOf(false) }
                         Row(
                             modifier =
-                                Modifier.clickable(
-                                    indication = null,
-                                    interactionSource = interactionSource,
-                                    onClick = {
-                                        selectedOption = option
-                                        isDropdownExpanded = false
-                                        onValueUpdate(option)
-                                    },
-                                )
+                                Modifier
+                                    .clickable(
+                                        indication = null,
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        onClick = {
+                                            selectedOption = option
+                                            isDropdownExpanded = false
+                                            onValueUpdate(option)
+                                        },
+                                    )
                                     .width(245.dp)
                                     .height(26.dp)
                                     .offset(x = 5.dp)
@@ -235,6 +235,7 @@ fun MapleDropdownMenu(
                                                 MapleColorPalette.control
                                             else -> Color.Transparent
                                         },
+                                        RoundedCornerShape(12.dp),
                                     )
                                     .padding(horizontal = 15.dp, vertical = 0.dp),
                             verticalAlignment = Alignment.CenterVertically,

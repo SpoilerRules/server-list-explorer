@@ -178,7 +178,7 @@ fun ServerListControlPanelRow() {
 
                                 if (isSearchBarPlaceholderVisible) {
                                     Text(
-                                        text = if (isSearchBarFocused) "Search server entry" else "Search",
+                                        text = if (isSearchBarFocused) "Search server entry by name" else "Search",
                                         color = MapleColorPalette.fadedText,
                                         style =
                                             TextStyle(

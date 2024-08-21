@@ -1,6 +1,7 @@
 package com.spoiligaming.explorer.ui.widgets
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.LocalContextMenuRepresentation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -9,9 +10,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.onClick
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +38,7 @@ import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.extensions.baseHoverColor
 import com.spoiligaming.explorer.ui.extensions.onHover
 import com.spoiligaming.explorer.ui.fonts.FontFactory
+import com.spoiligaming.explorer.ui.presentation.MapleContextMenuRepresentation
 
 // hot mess. please refactor this if you're a developer
 
@@ -254,60 +259,71 @@ fun ModifiableMergedInfoText(
         )
     }
 
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(offset),
-        modifier = Modifier.fillMaxWidth(),
+    val contextMenuRepresentation = remember { MapleContextMenuRepresentation(null, 1) }
+
+    CompositionLocalProvider(
+        LocalTextSelectionColors provides
+            TextSelectionColors(
+                backgroundColor = MapleColorPalette.accent,
+                handleColor = MapleColorPalette.accent,
+            ),
+        LocalContextMenuRepresentation provides contextMenuRepresentation,
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(offset),
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(
-                text = firstText,
-                color = MapleColorPalette.fadedText,
-                style =
-                    TextStyle(
-                        fontFamily = FontFactory.comfortaaMedium,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                    ),
-            )
-            Box {
-                if (selectableSecondaryText) {
-                    SelectionContainer { secondaryText() }
-                } else {
-                    secondaryText()
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(
+                    text = firstText,
+                    color = MapleColorPalette.fadedText,
+                    style =
+                        TextStyle(
+                            fontFamily = FontFactory.comfortaaMedium,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                        ),
+                )
+                Box {
+                    if (selectableSecondaryText) {
+                        SelectionContainer { secondaryText() }
+                    } else {
+                        secondaryText()
+                    }
                 }
             }
-        }
 
-        Text(
-            text = customChangeTextString,
-            color = if (isChangeTextDisabled) Color.Gray else changeTextColor,
-            maxLines = 1,
-            style =
-                TextStyle(
-                    fontFamily = FontFactory.comfortaaRegular,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp,
-                ),
-            modifier =
-                secondTextModifier
-                    .onHover { isChangeTextHovered = it }
-                    .baseHoverColor(MapleColorPalette.accent) {
-                        changeTextColor =
-                            if (isChangeTextHovered && !isChangeTextDisabled) {
-                                it
-                            } else {
-                                MapleColorPalette.accent
-                            }
-                    }
-                    .pointerHoverIcon(
-                        if (isChangeTextDisabled) PointerIcon.Default else PointerIcon.Hand,
-                    )
-                    .onClick { onClick() }
-                    .offset(y = with(density) { (1.4).sp.toDp() }),
-        )
+            Text(
+                text = customChangeTextString,
+                color = if (isChangeTextDisabled) Color.Gray else changeTextColor,
+                maxLines = 1,
+                style =
+                    TextStyle(
+                        fontFamily = FontFactory.comfortaaRegular,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 14.sp,
+                    ),
+                modifier =
+                    secondTextModifier
+                        .onHover { isChangeTextHovered = it }
+                        .baseHoverColor(MapleColorPalette.accent) {
+                            changeTextColor =
+                                if (isChangeTextHovered && !isChangeTextDisabled) {
+                                    it
+                                } else {
+                                    MapleColorPalette.accent
+                                }
+                        }
+                        .pointerHoverIcon(
+                            if (isChangeTextDisabled) PointerIcon.Default else PointerIcon.Hand,
+                        )
+                        .onClick { onClick() }
+                        .offset(y = with(density) { (1.4).sp.toDp() }),
+            )
+        }
     }
 }
 

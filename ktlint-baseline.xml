@@ -4,10 +4,11 @@
         <error line="88" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/server/ServerFileHandler.kt">
-        <error line="69" column="1" source="standard:max-line-length" />
-        <error line="245" column="1" source="standard:max-line-length" />
-        <error line="253" column="1" source="standard:max-line-length" />
-        <error line="353" column="1" source="standard:max-line-length" />
+        <error line="72" column="1" source="standard:max-line-length" />
+        <error line="138" column="1" source="standard:max-line-length" />
+        <error line="252" column="1" source="standard:max-line-length" />
+        <error line="260" column="1" source="standard:max-line-length" />
+        <error line="360" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/InformationalServerElement.kt">
         <error line="1" column="1" source="standard:no-empty-file" />
@@ -16,25 +17,30 @@
         <error line="47" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/ServerInformationView.kt">
-        <error line="169" column="1" source="standard:indent" />
-        <error line="170" column="1" source="standard:indent" />
-        <error line="170" column="1" source="standard:max-line-length" />
+        <error line="169" column="1" source="standard:max-line-length" />
+        <error line="242" column="1" source="standard:max-line-length" />
         <error line="243" column="1" source="standard:max-line-length" />
-        <error line="244" column="1" source="standard:max-line-length" />
+        <error line="268" column="1" source="standard:max-line-length" />
         <error line="269" column="1" source="standard:max-line-length" />
-        <error line="270" column="1" source="standard:max-line-length" />
-        <error line="288" column="1" source="standard:max-line-length" />
-        <error line="343" column="1" source="standard:max-line-length" />
+        <error line="287" column="1" source="standard:max-line-length" />
+        <error line="342" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/StationaryView.kt">
-        <error line="85" column="1" source="standard:max-line-length" />
-    </file>
-    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/WindowHeaderView.kt">
-        <error line="57" column="1" source="standard:max-line-length" />
+        <error line="77" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/dialogs/MapleValueReplacementDialog.kt">
         <error line="82" column="1" source="standard:max-line-length" />
         <error line="92" column="1" source="standard:max-line-length" />
+    </file>
+    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/screens/home/FileBackupSubScreen.kt">
+        <error line="72" column="1" source="standard:max-line-length" />
+        <error line="78" column="1" source="standard:max-line-length" />
+        <error line="126" column="1" source="standard:max-line-length" />
+        <error line="243" column="1" source="standard:max-line-length" />
+        <error line="244" column="1" source="standard:max-line-length" />
+    </file>
+    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/screens/home/InformationContainer.kt">
+        <error line="41" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/screens/home/list/ServerListControlPanelRow.kt">
         <error line="69" column="1" source="standard:max-line-length" />
@@ -42,19 +48,31 @@
         <error line="181" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/screens/home/list/ServerListView.kt">
-        <error line="49" column="1" source="standard:max-line-length" />
-        <error line="91" column="1" source="standard:max-line-length" />
-        <error line="94" column="1" source="standard:max-line-length" />
-        <error line="135" column="1" source="standard:max-line-length" />
+        <error line="79" column="1" source="standard:max-line-length" />
+        <error line="80" column="1" source="standard:max-line-length" />
+        <error line="96" column="1" source="standard:max-line-length" />
+        <error line="98" column="1" source="standard:max-line-length" />
+        <error line="108" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/state/DialogController.kt">
-        <error line="89" column="1" source="standard:max-line-length" />
-        <error line="118" column="1" source="standard:max-line-length" />
-        <error line="121" column="1" source="standard:max-line-length" />
-        <error line="132" column="1" source="standard:max-line-length" />
-        <error line="140" column="1" source="standard:max-line-length" />
-        <error line="159" column="1" source="standard:max-line-length" />
-        <error line="185" column="1" source="standard:max-line-length" />
+        <error line="106" column="1" source="standard:max-line-length" />
+        <error line="141" column="1" source="standard:max-line-length" />
+        <error line="145" column="1" source="standard:max-line-length" />
+        <error line="156" column="1" source="standard:max-line-length" />
+        <error line="164" column="1" source="standard:max-line-length" />
+        <error line="183" column="1" source="standard:max-line-length" />
+        <error line="209" column="1" source="standard:max-line-length" />
+        <error line="216" column="1" source="standard:max-line-length" />
+        <error line="230" column="1" source="standard:max-line-length" />
+        <error line="244" column="1" source="standard:max-line-length" />
+    </file>
+    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/widgets/MapleToggleSwitch.kt">
+        <error line="52" column="1" source="standard:max-line-length" />
+        <error line="70" column="1" source="standard:max-line-length" />
+    </file>
+    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/widgets/MapleVerticalScrollbar.kt">
+        <error line="28" column="1" source="standard:max-line-length" />
+        <error line="47" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/utils/ColorPaletteUtility.kt">
         <error line="37" column="1" source="standard:max-line-length" />

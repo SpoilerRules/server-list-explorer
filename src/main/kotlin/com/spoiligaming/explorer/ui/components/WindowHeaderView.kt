@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.spoiligaming.explorer.SoftwareInformation
+import com.spoiligaming.explorer.isBackupRestoreInProgress
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.fonts.FontFactory
 import com.spoiligaming.explorer.ui.icons.IconFactory
@@ -38,7 +39,7 @@ import javax.swing.JFrame
 import kotlin.system.exitProcess
 
 @Composable
-fun WindowHeaderView(displaySettingsButton: Boolean) {
+fun WindowHeaderView(allowNavigation: Boolean) {
     val currentScreen = NavigationController.currentScreen
 
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
@@ -49,15 +50,34 @@ fun WindowHeaderView(displaySettingsButton: Boolean) {
         ) {
             Box(Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(10.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (displaySettingsButton) {
-                        SettingsButton(
-                            currentScreen = currentScreen,
-                            onClick = {
-                                NavigationController.navigateTo(
-                                    if (currentScreen is Screen.Settings || currentScreen is Screen.FileBackupScreen) Screen.Main else Screen.Settings,
-                                )
-                            },
-                        )
+                    if (allowNavigation && !isBackupRestoreInProgress) {
+                        if (currentScreen is Screen.FileBackupScreen) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                SettingsButton(
+                                    currentScreen = Screen.Settings,
+                                ) {
+                                    NavigationController.navigateTo(Screen.Home)
+                                }
+                                SettingsButton(
+                                    currentScreen = Screen.Home,
+                                ) {
+                                    NavigationController.navigateTo(Screen.Settings)
+                                }
+                            }
+                        } else {
+                            SettingsButton(
+                                currentScreen = currentScreen,
+                                onClick = {
+                                    NavigationController.navigateTo(
+                                        if (currentScreen is Screen.Settings) {
+                                            Screen.Home
+                                        } else {
+                                            Screen.Settings
+                                        },
+                                    )
+                                },
+                            )
+                        }
                     }
                     Spacer(Modifier.weight(1f))
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -113,7 +133,7 @@ private fun SettingsButton(
     onClick: () -> Unit,
 ) {
     val (icon, buttonText) =
-        if (currentScreen is Screen.Main || currentScreen !is Screen.FileBackupScreen) {
+        if (currentScreen is Screen.Home) {
             IconFactory.toolsIcon to "Settings"
         } else {
             IconFactory.goBackIcon to "Home"

@@ -48,7 +48,9 @@ fun MapleToggleSwitch(
                 Modifier.width(50.dp)
                     .height(20.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(MapleColorPalette.menu)
+                    .background(
+                        if (!isChecked) MapleColorPalette.tertiaryControl else MapleColorPalette.control,
+                    )
                     .clickable(
                         onClick = {
                             isChecked = !isChecked
@@ -64,7 +66,9 @@ fun MapleToggleSwitch(
                     .align(Alignment.TopStart)
                     .offset(x = (50.dp - 26.dp) * circleOffset, y = (-3).dp)
                     .clip(CircleShape)
-                    .background(MapleColorPalette.control),
+                    .background(
+                        if (!isChecked) MapleColorPalette.control else MapleColorPalette.secondaryControl,
+                    ),
         )
     }
 }

@@ -18,13 +18,15 @@ data class SettingsGeneral(
 
 @Serializable
 data class SettingsTheme(
+    var showScrollbarBackground: Boolean = true,
     var shortcutsInContextMenu: Boolean = true,
     var iconifiedDialogOptions: Boolean = false,
     var windowScale: String = "100%",
     var accentColor: String = "#E85D9B",
     var menuColor: String = "#404040",
     var controlColor: String = "#4C4C4C",
-    var secondaryControlColor: String = "#3F3F3F",
+    var secondaryControlColor: String = "#595959",
+    var tertiaryControlColor: String = "#3F3F3F",
     var secondaryColor: String = "#727272",
     var tertiaryColor: String = "#282828",
     var quaternaryColor: String = "#343434",

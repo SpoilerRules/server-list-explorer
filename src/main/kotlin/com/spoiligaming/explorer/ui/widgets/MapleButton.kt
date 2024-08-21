@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -115,14 +116,14 @@ fun DisabledMapleButton(
     textColor: Color = MapleColorPalette.text,
     hoverTooltipText: String,
     fontSize: TextUnit = 15.sp,
-) = MapleTooltip(hoverTooltipText, MapleColorPalette.text, 500) {
-    Box(
-        modifier =
-            modifier
-                .clip(RoundedCornerShape(10.dp))
-                .background(backgroundColor.copy(alpha = 0.5f), RoundedCornerShape(10.dp)),
-        contentAlignment = Alignment.Center,
-    ) {
+) = Box(
+    modifier =
+        modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(backgroundColor.copy(alpha = 0.5f), RoundedCornerShape(10.dp)),
+    contentAlignment = Alignment.Center,
+) {
+    MapleTooltip(hoverTooltipText, MapleColorPalette.text, 500) {
         Text(
             text = text,
             color = textColor.copy(alpha = 0.5f),
@@ -131,7 +132,9 @@ fun DisabledMapleButton(
                     fontFamily = FontFactory.comfortaaLight,
                     fontWeight = FontWeight.Normal,
                     fontSize = fontSize,
+                    textAlign = TextAlign.Center,
                 ),
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }

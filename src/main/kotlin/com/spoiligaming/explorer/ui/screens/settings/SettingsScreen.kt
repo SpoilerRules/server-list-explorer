@@ -90,22 +90,26 @@ fun SettingsScreen() {
                 .padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
         contentAlignment = Alignment.TopCenter,
     ) {
-        Box(
+        Column(
+            verticalArrangement = Arrangement.spacedBy(10.dp),
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .background(MapleColorPalette.quaternary, RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.TopCenter,
+                    .background(
+                        MapleColorPalette.quaternary,
+                        RoundedCornerShape(12.dp),
+                    )
+                    .padding(10.dp),
         ) {
             categories.forEach { category -> category.outerContent?.invoke() }
+            SettingsCategoryBar(listState, coroutineScope)
 
             LazyColumn(
                 state = listState,
                 modifier =
                     Modifier
-                        .fillMaxSize()
-                        .background(Color.Transparent)
-                        .padding(top = 68.dp, start = 12.dp),
+                        .weight(1f)
+                        .background(Color.Transparent),
             ) {
                 itemsIndexed(categories) { index, category ->
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -131,29 +135,17 @@ fun SettingsScreen() {
                     if (index != categories.lastIndex) {
                         Spacer(modifier = Modifier.height(16.dp))
                     } else {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(0.98f),
-                            contentAlignment = Alignment.Center,
-                        ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                             HorizontalDivider(
                                 color = MapleColorPalette.control,
                                 thickness = 1.dp,
                                 modifier = Modifier.fillMaxWidth(),
                             )
-                        }
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Column(
-                            modifier = Modifier.offset(x = 5.dp),
-                            verticalArrangement = Arrangement.spacedBy((-40).dp),
-                        ) {
                             MergedInfoText("Developed by ", "Spoili", MapleColorPalette.accent)
                         }
-                        Spacer(modifier = Modifier.height(24.dp))
                     }
                 }
             }
-
-            SettingsCategoryBar(listState, coroutineScope)
         }
     }
 }
@@ -162,23 +154,19 @@ fun SettingsScreen() {
 private fun SettingsCategoryBar(
     listState: LazyListState,
     coroutineScope: CoroutineScope,
+) = Box(
+    modifier =
+        Modifier.fillMaxWidth()
+            .background(MapleColorPalette.tertiary, RoundedCornerShape(12.dp)),
+    contentAlignment = Alignment.CenterStart,
 ) {
-    Box(
-        modifier =
-            Modifier.fillMaxWidth(0.98f)
-                .height(54.dp)
-                .offset(y = 8.dp)
-                .background(MapleColorPalette.tertiary, RoundedCornerShape(12.dp)),
-        contentAlignment = Alignment.CenterStart,
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(10.dp),
     ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(start = 7.dp),
-        ) {
-            categories.forEach { category ->
-                SettingsCategoryButton(category, listState, coroutineScope)
-            }
+        categories.forEach { category ->
+            SettingsCategoryButton(category, listState, coroutineScope)
         }
     }
 }
@@ -206,27 +194,29 @@ private fun SettingsCategoryButton(
                 .background(MapleColorPalette.secondary, RoundedCornerShape(8.dp)),
         contentAlignment = Alignment.CenterStart,
     ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Spacer(Modifier.width(4.dp))
-            Image(
-                bitmap = category.icon,
-                contentDescription = null,
-                modifier = Modifier.size(24.dp),
-                contentScale = ContentScale.Fit,
-            )
-            Text(
-                text = category.title,
-                color = MapleColorPalette.fadedText,
-                style =
-                    TextStyle(
-                        fontFamily = FontFactory.comfortaaRegular,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 16.sp,
-                    ),
-            )
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(10.dp),
+            ) {
+                Image(
+                    bitmap = category.icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp),
+                    contentScale = ContentScale.Fit,
+                )
+                Text(
+                    text = category.title,
+                    color = MapleColorPalette.fadedText,
+                    style =
+                        TextStyle(
+                            fontFamily = FontFactory.comfortaaRegular,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 16.sp,
+                        ),
+                )
+            }
         }
     }
 }

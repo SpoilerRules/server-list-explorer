@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
 sealed class Screen {
-    data object Main : Screen()
+    data object Home : Screen()
 
     data object Settings : Screen()
 
@@ -13,7 +13,7 @@ sealed class Screen {
 }
 
 object NavigationController {
-    var currentScreen by mutableStateOf<Screen>(Screen.Main)
+    var currentScreen by mutableStateOf<Screen>(Screen.Home)
         private set
 
     fun navigateTo(screen: Screen) {

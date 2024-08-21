@@ -2,6 +2,7 @@ package com.spoiligaming.explorer.server
 
 import com.spoiligaming.explorer.ConfigurationHandler
 import com.spoiligaming.explorer.StartupCoordinator
+import com.spoiligaming.explorer.isBackupRestoreInProgress
 import com.spoiligaming.explorer.ui.state.DialogController
 import com.spoiligaming.logging.Logger
 import kotlinx.coroutines.CoroutineScope
@@ -29,6 +30,8 @@ object ServerFileHandler {
     private var isInternalModification = false
     private var lastModifiedTime: FileTime? = null
     private var fileWatcherJob: Job? = null
+
+    private val scope = CoroutineScope(Dispatchers.IO + Job())
 
     private lateinit var serverData: ListTag<CompoundTag>
 
@@ -117,10 +120,6 @@ object ServerFileHandler {
 
         fileWatcherJob =
             CoroutineScope(Dispatchers.IO).launch {
-                if (!ConfigurationHandler.getInstance().advancedSettings.serverFileMonitoring) {
-                    return@launch fileWatcherJob?.cancel()!!
-                }
-
                 val watchService = FileSystems.getDefault().newWatchService()
                 serverFilePath.parent.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY)
 
@@ -136,7 +135,11 @@ object ServerFileHandler {
                         .map { it.context() as Path }
                         .firstOrNull { it.fileName.toString() == "servers.dat" }
                         ?.let {
-                            if (!isInternalModification) {
+                            if (!ConfigurationHandler.getInstance().advancedSettings.serverFileMonitoring) {
+                                return@launch fileWatcherJob?.cancel()!!
+                            }
+
+                            if (!isInternalModification && !isBackupRestoreInProgress) {
                                 val currentModifiedTime = Files.getLastModifiedTime(serverFilePath)
                                 if (lastModifiedTime != currentModifiedTime) {
                                     lastModifiedTime = currentModifiedTime
@@ -156,36 +159,40 @@ object ServerFileHandler {
     fun loadAddresses() = serverData.map { it.getString("ip") }
 
     fun saveServerData() =
-        runCatching {
-            if (isInternalModification) return@runCatching
+        scope.launch {
+            runCatching {
+                if (isInternalModification) return@runCatching
 
-            val serverDataFile =
-                File(ConfigurationHandler.getInstance().generalSettings.serverFilePath)
+                val serverDataFile =
+                    File(ConfigurationHandler.getInstance().generalSettings.serverFilePath)
 
-            if (!serverDataFile.exists()) {
-                StartupCoordinator.retryLoad()
-                return@runCatching
+                if (!serverDataFile.exists()) {
+                    StartupCoordinator.retryLoad()
+                    return@runCatching
+                }
+
+                BackupController.create(serverDataFile)
+
+                CompoundTag()
+                    .apply { put("servers", serverData) }
+                    .let { compoundTag ->
+                        isInternalModification = true
+                        NBTUtil.write(
+                            compoundTag,
+                            serverDataFile,
+                            ConfigurationHandler.getInstance().advancedSettings.compressServerFile,
+                        )
+                        Logger.printSuccess("Server data successfully saved.")
+                    }
             }
-
-            CompoundTag()
-                .apply { put("servers", serverData) }
-                .let { compoundTag ->
-                    isInternalModification = true
-                    NBTUtil.write(
-                        compoundTag,
-                        serverDataFile,
-                        ConfigurationHandler.getInstance().advancedSettings.compressServerFile,
-                    )
-                    Logger.printSuccess("Server data successfully saved.")
+                .onFailure { error ->
+                    Logger.printError("Error saving server data: ${error.localizedMessage}")
+                }
+                .also {
+                    isInternalModification = false
+                    lastModifiedTime = Files.getLastModifiedTime(serverFilePath)
                 }
         }
-            .onFailure { error ->
-                Logger.printError("Error saving server data: ${error.localizedMessage}")
-            }
-            .also {
-                isInternalModification = false
-                lastModifiedTime = Files.getLastModifiedTime(serverFilePath)
-            }
 
     fun wipeServerFile() =
         runCatching {

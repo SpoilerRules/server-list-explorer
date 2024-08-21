@@ -1,14 +1,22 @@
 package com.spoiligaming.explorer
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.spoiligaming.explorer.ui.MapleColorPalette
@@ -17,13 +25,8 @@ import com.spoiligaming.logging.Logger
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.hostOs
-import java.awt.Point
 import java.awt.Toolkit
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
-import java.awt.geom.RoundRectangle2D
 import javax.swing.JFrame
-import javax.swing.SwingUtilities
 
 val controlButtonAsString: String =
     when (hostOs) {
@@ -36,6 +39,8 @@ lateinit var windowSize: Pair<Dp, Dp>
 
 var disableIconIndexing = false
 var disableServerInfoIndexing = false
+
+var isBackupRestoreInProgress by mutableStateOf(false)
 
 /**
  * Entry point for the Server List Explorer application.
@@ -74,30 +79,37 @@ fun main(args: Array<String>) {
 
     args.forEach { argumentActions[it]?.invoke() }
 
-    application {
-        val windowScale by remember {
-            mutableStateOf(
-                ConfigurationHandler.getInstance().themeSettings.windowScale.run {
-                    when (this) {
-                        "150%" -> 1.5f
-                        "125%" -> 1.25f
-                        "100%" -> 1f
-                        else ->
-                            toFloatOrNull()
-                                ?: 1f.also {
-                                    Logger.printWarning(
-                                        "Invalid window scale value. Falling back to 100%.",
-                                    )
-                                }
-                    }
-                },
-            )
-        }
+    val windowScale by mutableStateOf(
+        ConfigurationHandler.getInstance().themeSettings.windowScale.run {
+            when (this) {
+                "150%" -> 1.5f
+                "125%" -> 1.25f
+                "100%" -> 1f
+                else ->
+                    toFloatOrNull()
+                        ?: 1f.also {
+                            Logger.printWarning(
+                                "Invalid window scale value. Falling back to 100%.",
+                            )
+                        }
+            }
+        },
+    )
+    val screenSize = Toolkit.getDefaultToolkit().screenSize
+    val windowWidth = (800 * windowScale).toInt().dp
+    val windowHeight = (600 * windowScale).toInt().dp
 
-        val screenSize = Toolkit.getDefaultToolkit().screenSize
-        val windowWidth = (800 * windowScale).toInt().dp
-        val windowHeight = (600 * windowScale).toInt().dp
-        val state = rememberWindowState(width = windowWidth, height = windowHeight)
+    application {
+        val state =
+            rememberWindowState(
+                width = windowWidth,
+                height = windowHeight,
+                position =
+                    WindowPosition(
+                        ((screenSize.width - windowWidth.value.toInt()) / 2).dp,
+                        ((screenSize.height - windowHeight.value.toInt()) / 2).dp,
+                    ),
+            )
 
         Window(
             onCloseRequest = ::exitApplication,
@@ -105,58 +117,27 @@ fun main(args: Array<String>) {
             title = "Server List Explorer",
             resizable = false,
             undecorated = true,
+            transparent = true,
             state = state,
         ) {
-            val initialClick = remember { Point() }
-            var isDragging = remember { false }
-
-            SwingUtilities.invokeLater {
-                window.setLocation(
-                    (screenSize.width - windowWidth.value.toInt()) / 2,
-                    (screenSize.height - windowHeight.value.toInt()) / 2,
-                )
-                window.shape =
-                    RoundRectangle2D.Double(
-                        0.0, 0.0, window.width.toDouble(), window.height.toDouble(), 30.0, 30.0,
-                    )
-
-                window.addMouseListener(
-                    object : MouseAdapter() {
-                        override fun mousePressed(event: MouseEvent) {
-                            if (event.point.y < 58) {
-                                initialClick.location = event.point
-                                isDragging = true
-                            }
-                        }
-
-                        override fun mouseReleased(event: MouseEvent) {
-                            isDragging = false
-                        }
-                    },
-                )
-
-                window.addMouseMotionListener(
-                    object : MouseAdapter() {
-                        override fun mouseDragged(event: MouseEvent) {
-                            if (isDragging) {
-                                val currentLocation = window.location
-                                window.location =
-                                    Point(
-                                        currentLocation.x + event.x - initialClick.x,
-                                        currentLocation.y + event.y - initialClick.y,
-                                    )
-                            }
-                        }
-                    },
-                )
-            }
-
             windowFrame = window
-            windowSize = Pair(state.size.width, state.size.height)
+            windowSize = remember { Pair(state.size.width, state.size.height) }
 
             DialogController.Initialize()
 
-            Surface(modifier = Modifier.fillMaxSize(), color = MapleColorPalette.menu) {
+            Surface(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(Color.Transparent, RoundedCornerShape(24.dp)),
+                color = MapleColorPalette.menu,
+            ) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    WindowDraggableArea(
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
                 StartupCoordinator.Coordinate()
             }
         }
