@@ -34,7 +34,7 @@ fun MapleServerEntryCreationDialog(
     onDismiss: () -> Unit,
 ) {
     MapleDialogBase(
-        false,
+        true,
         0,
         true,
         onDismiss,

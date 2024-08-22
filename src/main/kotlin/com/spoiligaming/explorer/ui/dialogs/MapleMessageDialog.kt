@@ -59,7 +59,7 @@ private fun MapleMessageDialog(
     onDismiss: () -> Unit,
 ) {
     MapleDialogBase(
-        true,
+        false,
         0,
         true,
         onDismiss,

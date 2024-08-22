@@ -65,7 +65,7 @@ object DialogController {
     private val scope = CoroutineScope(Dispatchers.IO + Job())
 
     @Composable
-    fun Initialize() =
+    fun RenderDialog() =
         currentDialogData?.let { dialogData ->
             when (dialogData) {
                 is DialogData.ValueReplacement -> {

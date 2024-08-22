@@ -123,8 +123,6 @@ fun main(args: Array<String>) {
             windowFrame = window
             windowSize = remember { Pair(state.size.width, state.size.height) }
 
-            DialogController.Initialize()
-
             Surface(
                 modifier =
                     Modifier
@@ -139,6 +137,7 @@ fun main(args: Array<String>) {
                     )
                 }
                 StartupCoordinator.Coordinate()
+                DialogController.RenderDialog()
             }
         }
     }

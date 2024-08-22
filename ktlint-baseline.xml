@@ -55,16 +55,16 @@
         <error line="108" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/state/DialogController.kt">
-        <error line="106" column="1" source="standard:max-line-length" />
-        <error line="141" column="1" source="standard:max-line-length" />
-        <error line="145" column="1" source="standard:max-line-length" />
-        <error line="156" column="1" source="standard:max-line-length" />
-        <error line="164" column="1" source="standard:max-line-length" />
-        <error line="183" column="1" source="standard:max-line-length" />
-        <error line="209" column="1" source="standard:max-line-length" />
-        <error line="216" column="1" source="standard:max-line-length" />
-        <error line="230" column="1" source="standard:max-line-length" />
-        <error line="244" column="1" source="standard:max-line-length" />
+        <error line="105" column="1" source="standard:max-line-length" />
+        <error line="140" column="1" source="standard:max-line-length" />
+        <error line="144" column="1" source="standard:max-line-length" />
+        <error line="155" column="1" source="standard:max-line-length" />
+        <error line="163" column="1" source="standard:max-line-length" />
+        <error line="182" column="1" source="standard:max-line-length" />
+        <error line="208" column="1" source="standard:max-line-length" />
+        <error line="215" column="1" source="standard:max-line-length" />
+        <error line="229" column="1" source="standard:max-line-length" />
+        <error line="243" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/widgets/MapleToggleSwitch.kt">
         <error line="52" column="1" source="standard:max-line-length" />

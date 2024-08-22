@@ -69,7 +69,7 @@ fun MapleServerFilePickerDialog(
         }
 
     MapleDialogBase(
-        isFullPopup = true,
+        requireFullFocus = false,
         heightType = 0,
         isCloseable = isUserRequested,
         onDismiss = onDismiss,

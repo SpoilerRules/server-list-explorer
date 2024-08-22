@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
+import com.spoiligaming.explorer.ConfigurationHandler
 import com.spoiligaming.explorer.SoftwareInformation
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.extensions.onHover
@@ -44,7 +44,7 @@ import com.spoiligaming.explorer.windowSize
 
 @Composable
 fun MapleDialogBase(
-    isFullPopup: Boolean,
+    requireFullFocus: Boolean,
     heightType: Int,
     isCloseable: Boolean,
     onDismiss: () -> Unit,
@@ -61,23 +61,29 @@ fun MapleDialogBase(
                     {}
                 }
             },
-        properties = PopupProperties(focusable = !isFullPopup),
+        properties = PopupProperties(focusable = requireFullFocus),
     ) {
         Box(
             modifier =
                 Modifier.run {
-                    when (isFullPopup) {
-                        true -> {
-                            fillMaxSize(.7f)
-                        }
-                        false -> {
-                            fillMaxHeight(0.85f)
-                            height(
-                                windowSize.second - 119.dp,
-                            ) // fixme: two height modifiers?
-                            offset(y = 14.dp)
-                            background(Color(0x90343434), RoundedCornerShape(16.dp))
-                        }
+                    when (requireFullFocus) {
+                        true ->
+                            Modifier
+                                .fillMaxSize()
+                                .background(Color(0x90343434), RoundedCornerShape(16.dp))
+                        false ->
+                            Modifier
+                                .fillMaxWidth()
+                                .fillMaxSize(
+                                    when (
+                                        ConfigurationHandler.getInstance().themeSettings.windowScale
+                                    ) {
+                                        "100%", "1f", "1.0f" -> 0.82f
+                                        "125%", "1.25f" -> 0.86f
+                                        "150%", "1.5f" -> 0.88f
+                                        else -> 0.86f
+                                    },
+                                )
                     }
                 }
                     .clickable(
