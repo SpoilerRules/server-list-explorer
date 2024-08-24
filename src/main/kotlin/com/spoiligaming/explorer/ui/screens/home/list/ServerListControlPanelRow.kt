@@ -11,6 +11,7 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +22,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -94,14 +98,15 @@ fun ServerListControlPanelRow() {
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
                         modifier = Modifier.padding(horizontal = 10.dp),
                     ) {
-                        Image(
-                            bitmap = IconFactory.magnifyingGlassIcon,
+                        Spacer(Modifier)
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            tint = MapleColorPalette.fadedText,
                             contentDescription = "Magnifying Glass Icon for Search Bar",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.size(18.dp),
+                            modifier = Modifier.size(24.dp),
                         )
 
                         val contextMenuRepresentation =
