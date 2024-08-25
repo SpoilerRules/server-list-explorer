@@ -227,49 +227,60 @@ object BackupController {
     ): String {
         val elapsedMillis = now.time - entryDate.time
         val secondsAgo = (elapsedMillis / 1000).toInt()
-        val minutesAgo = (secondsAgo / 60) % 60
-        val hoursAgo = (secondsAgo / 3600) % 24
-        val daysAgo = (secondsAgo / 86400) % 365
-        val yearsAgo = (secondsAgo / (365 * 86400))
+        val minutesAgo = (secondsAgo / 60)
+        val hoursAgo = (minutesAgo / 60)
+        val daysAgo = (hoursAgo / 24)
+        val yearsAgo = (daysAgo / 365)
 
         return buildString {
             when {
                 yearsAgo > 0 -> {
                     val yearWord = if (yearsAgo == 1) "year" else "years"
                     append("$yearsAgo $yearWord")
-                    if (daysAgo > 0) {
-                        append(", ")
-                        append("$daysAgo ${if (daysAgo == 1) "day" else "days"}")
+                    if (daysAgo % 365 > 0) {
+                        append(", ${daysAgo % 365} ${if (daysAgo % 365 == 1) "day" else "days"}")
                     }
                     append(" ago")
                 }
                 daysAgo > 0 -> {
-                    val dayWord = if (daysAgo == 1) "day" else "days"
-                    append("$daysAgo $dayWord")
-                    if (hoursAgo > 0) {
-                        append(", ")
-                        append("$hoursAgo ${if (hoursAgo == 1) "hour" else "hours"}")
+                    append("$daysAgo ${if (daysAgo == 1) "day" else "days"}")
+                    val remainingHours = hoursAgo % 24
+                    val remainingMinutes = minutesAgo % 60
+                    val parts = mutableListOf<String>()
+                    if (remainingHours > 0) {
+                        parts.add("$remainingHours ${if (remainingHours == 1) "hour" else "hours"}")
                     }
-                    if (minutesAgo > 0) {
-                        if (hoursAgo > 0) append(", ")
-                        append("$minutesAgo ${if (minutesAgo == 1) "minute" else "minutes"}")
+                    if (remainingMinutes > 0) {
+                        parts.add(
+                            "$remainingMinutes ${
+                                if (remainingMinutes == 1) "minute" else "minutes"
+                            }",
+                        )
+                    }
+                    if (parts.isNotEmpty()) {
+                        append(", ${parts.joinToString(", ")}")
                     }
                     append(" ago")
                 }
                 hoursAgo > 0 -> {
-                    append("$hoursAgo ${if (hoursAgo == 1) "hour" else "hours"}")
-                    if (minutesAgo > 0) {
+                    append("${hoursAgo % 24} ${if (hoursAgo % 24 == 1) "hour" else "hours"}")
+                    if (minutesAgo % 60 > 0) {
                         append(
-                            " and $minutesAgo ${if (minutesAgo == 1) "minute" else "minutes"} ago",
+                            ", ${minutesAgo % 60} ${
+                                if (minutesAgo % 60 == 1) "minute" else "minutes"
+                            } ago",
                         )
                     } else {
                         append(" ago")
                     }
                 }
-                minutesAgo > 0 ->
+                minutesAgo > 0 -> {
                     append(
-                        "$minutesAgo ${if (minutesAgo == 1) "minute" else "minutes"} ago",
+                        "${minutesAgo % 60} ${
+                            if (minutesAgo % 60 == 1) "minute" else "minutes"
+                        } ago",
                     )
+                }
                 else -> append("just now")
             }
         }
