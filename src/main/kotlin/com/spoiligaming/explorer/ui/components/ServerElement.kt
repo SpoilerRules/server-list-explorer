@@ -193,7 +193,7 @@ fun ServerElement(
                             width = 2.dp,
                             color =
                                 if (isSelected) {
-                                    MapleColorPalette.secondary.copy(alpha = 0.75f)
+                                    MapleColorPalette.secondaryControl
                                 } else {
                                     Color.Transparent
                                 },
