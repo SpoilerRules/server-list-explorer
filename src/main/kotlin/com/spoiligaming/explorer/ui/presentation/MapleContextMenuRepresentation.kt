@@ -3,7 +3,6 @@ package com.spoiligaming.explorer.ui.presentation
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.ContextMenuRepresentation
 import androidx.compose.foundation.ContextMenuState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,6 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -36,7 +35,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -71,7 +69,7 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
                     Modifier.shadow(16.dp)
                         .background(MapleColorPalette.menu, RoundedCornerShape(12.dp))
                         .padding(vertical = 5.dp)
-                        .width(MenuWidth.getWidth(MenuWidth.MAX).dp)
+                        .width(MenuWidth.getWidth(MenuWidth.EXPANDED).dp)
                         .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -84,10 +82,14 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
     }
 
     @Composable
-    private fun DisplayServerName(name: String) {
-        Box(
-            modifier = Modifier.width(MenuWidth.getWidth(MenuWidth.MID).dp),
-            contentAlignment = Alignment.Center,
+    private fun DisplayServerName(name: String) =
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+            modifier =
+                Modifier
+                    .width(MenuWidth.getWidth(MenuWidth.COMPACT).dp)
+                    .padding(vertical = 5.dp),
         ) {
             Text(
                 text = name,
@@ -101,15 +103,12 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
                         fontSize = 14.sp,
                     ),
             )
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = MapleColorPalette.control,
+                modifier = Modifier.width(MenuWidth.getWidth(MenuWidth.COMPACT).dp),
+            )
         }
-        Spacer(Modifier.height(5.dp))
-        HorizontalDivider(
-            thickness = 1.dp,
-            color = MapleColorPalette.control,
-            modifier = Modifier.width(MenuWidth.getWidth(MenuWidth.MIN).dp),
-        )
-        Spacer(Modifier.height(5.dp))
-    }
 
     @Composable
     private fun DisplayMenuItems(
@@ -124,43 +123,47 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
                     HorizontalDivider(
                         thickness = 1.dp,
                         color = MapleColorPalette.control,
-                        modifier = Modifier.width(MenuWidth.getWidth(MenuWidth.MIN).dp),
+                        modifier = Modifier.width(MenuWidth.getWidth(MenuWidth.COMPACT).dp),
                     )
                     Spacer(Modifier.height(5.dp))
                 }
 
                 MenuItemContent(
-                    itemHoverColor = Color(0xFF565656),
+                    itemHoverColor = MapleColorPalette.secondaryControl,
                     onClick = {
                         state.status = ContextMenuState.Status.Closed
                         item.onClick()
                     },
                 ) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
                         verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier,
                     ) {
-                        Spacer(Modifier.width(5.dp))
-                        IconForItem(item.label)?.let { bitmap ->
-                            Image(
-                                bitmap = bitmap,
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp),
-                                contentScale = ContentScale.Fit,
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(start = 10.dp),
+                        ) {
+                            IconForItem(item.label)?.let { bitmap ->
+                                Icon(
+                                    bitmap = bitmap,
+                                    contentDescription = null,
+                                    tint = MapleColorPalette.text,
+                                    modifier = Modifier.size(16.dp),
+                                )
+                            }
+                            Text(
+                                text = item.label,
+                                color = MapleColorPalette.text,
+                                style =
+                                    TextStyle(
+                                        fontFamily = FontFactory.comfortaaRegular,
+                                        fontWeight = FontWeight.Normal,
+                                        fontSize = 14.sp,
+                                    ),
                             )
                         }
-                        Text(
-                            text = item.label,
-                            color = MapleColorPalette.text,
-                            style =
-                                TextStyle(
-                                    fontFamily = FontFactory.comfortaaRegular,
-                                    fontWeight = FontWeight.Normal,
-                                    fontSize = 14.sp,
-                                ),
-                            modifier = Modifier.offset(y = 1.dp),
-                        )
-
                         DisplayShortcutText(item.label)
                     }
                 }
@@ -203,7 +206,7 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
                             fontWeight = FontWeight.Normal,
                             fontSize = 14.sp,
                         ),
-                    modifier = Modifier.offset(x = (-10).dp, y = 1.dp),
+                    modifier = Modifier.padding(end = 10.dp),
                 )
             }
         }
@@ -245,7 +248,7 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
 
         Row(
             modifier =
-                Modifier.width(MenuWidth.getWidth(MenuWidth.MID).dp)
+                Modifier.width(MenuWidth.getWidth(MenuWidth.COMPACT).dp)
                     .height(32.dp)
                     .onHover { isHovered = it }
                     .clip(RoundedCornerShape(10.dp))
@@ -265,9 +268,8 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
     }
 
     enum class MenuWidth(val shortcutWidth: Int, val noShortcutWidth: Int) {
-        MAX(290, 210),
-        MID(280, 200),
-        MIN(270, 190),
+        EXPANDED(290, 210),
+        COMPACT(280, 200),
         ;
 
         companion object {
