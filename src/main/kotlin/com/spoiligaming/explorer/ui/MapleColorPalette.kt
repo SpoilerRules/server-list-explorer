@@ -9,7 +9,7 @@ object MapleColorPalette {
     private val config = ConfigurationHandler.getInstance().themeSettings
 
     val defaultTertiary = Color(0xFF282828)
-    val defaultQuaternary = Color(0xFF353535)
+    val defaultQuaternary = Color(0xFF343434)
     val defaultMenu = Color(0xFF404040)
     val defaultControl = Color(0xFF4C4C4C)
     val defaultSecondaryControl = Color(0xFF595959)
