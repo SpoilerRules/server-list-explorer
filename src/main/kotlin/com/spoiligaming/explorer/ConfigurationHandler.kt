@@ -1,5 +1,8 @@
 package com.spoiligaming.explorer
 
+import androidx.compose.ui.graphics.Color
+import com.spoiligaming.explorer.ui.MapleColorPalette
+import com.spoiligaming.explorer.utils.toHex
 import com.spoiligaming.logging.Logger
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -22,15 +25,19 @@ data class SettingsTheme(
     var shortcutsInContextMenu: Boolean = true,
     var iconifiedDialogOptions: Boolean = false,
     var windowScale: String = "100%",
-    var accentColor: String = "#E85D9B",
-    var menuColor: String = "#404040",
-    var controlColor: String = "#4C4C4C",
-    var secondaryControlColor: String = "#595959",
-    var tertiaryControlColor: String = "#3F3F3F",
-    var secondaryColor: String = "#727272",
-    var tertiaryColor: String = "#282828",
-    var quaternaryColor: String = "#343434",
-)
+    var accentColor: String = formatColor(MapleColorPalette.defaultAccent),
+    var secondaryColor: String = formatColor(MapleColorPalette.defaultSecondary),
+    var secondaryControlColor: String = formatColor(MapleColorPalette.defaultSecondaryControl),
+    var controlColor: String = formatColor(MapleColorPalette.defaultControl),
+    var tertiaryControlColor: String = formatColor(MapleColorPalette.defaultTertiaryControl),
+    var menuColor: String = formatColor(MapleColorPalette.defaultMenu),
+    var quaternaryColor: String = formatColor(MapleColorPalette.defaultQuaternary),
+    var tertiaryColor: String = formatColor(MapleColorPalette.defaultTertiary),
+) {
+    companion object {
+        private fun formatColor(color: Color): String = "#" + color.toHex().dropLast(2)
+    }
+}
 
 @Serializable
 data class SettingsAdvanced(
