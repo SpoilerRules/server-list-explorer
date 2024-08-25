@@ -70,7 +70,12 @@ fun ServerListControlPanelRow() {
         animationSpec = tween(durationMillis = 74),
     )
     val searchBarColor by animateColorAsState(
-        targetValue = if (isSearchBarFocused) MapleColorPalette.tertiary else MapleColorPalette.secondary,
+        targetValue =
+            if (isSearchBarFocused) {
+                MapleColorPalette.tertiary
+            } else {
+                MapleColorPalette.secondary
+            },
         animationSpec = tween(durationMillis = 74),
     )
 
@@ -83,7 +88,12 @@ fun ServerListControlPanelRow() {
                         .fillMaxHeight()
                         .padding(horizontal = 2.dp, vertical = 2.dp).border(
                             width = 1.dp,
-                            color = if (isSearchBarFocused) MapleColorPalette.control else Color.Transparent,
+                            color =
+                                if (isSearchBarFocused) {
+                                    MapleColorPalette.control
+                                } else {
+                                    Color.Transparent
+                                },
                             shape = RoundedCornerShape(16.dp),
                         ),
                 contentAlignment = Alignment.Center,
@@ -183,7 +193,12 @@ fun ServerListControlPanelRow() {
 
                                 if (isSearchBarPlaceholderVisible) {
                                     Text(
-                                        text = if (isSearchBarFocused) "Search server entry by name" else "Search",
+                                        text =
+                                            if (isSearchBarFocused) {
+                                                "Search server entry by name"
+                                            } else {
+                                                "Search"
+                                            },
                                         color = MapleColorPalette.fadedText,
                                         style =
                                             TextStyle(

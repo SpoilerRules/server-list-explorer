@@ -42,11 +42,6 @@
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/screens/home/InformationContainer.kt">
         <error line="41" column="1" source="standard:max-line-length" />
     </file>
-    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/screens/home/list/ServerListControlPanelRow.kt">
-        <error line="69" column="1" source="standard:max-line-length" />
-        <error line="82" column="1" source="standard:max-line-length" />
-        <error line="181" column="1" source="standard:max-line-length" />
-    </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/screens/home/list/ServerListView.kt">
         <error line="79" column="1" source="standard:max-line-length" />
         <error line="80" column="1" source="standard:max-line-length" />
