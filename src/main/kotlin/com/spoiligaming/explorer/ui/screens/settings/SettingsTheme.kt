@@ -48,9 +48,9 @@ private val colorPickerStates =
         "Accent" to false,
         "Secondary" to false,
         "Secondary Control" to false,
-        "Tertiary Control" to false,
         "Control" to false,
         "Menu" to false,
+        "Tertiary Control" to false,
         "Quaternary" to false,
         "Tertiary" to false,
     )
@@ -67,8 +67,8 @@ fun SettingsTheme() {
                 "Secondary" to BasicTooltipState(),
                 "Secondary Control" to BasicTooltipState(),
                 "Control" to BasicTooltipState(),
-                "Tertiary Control" to BasicTooltipState(),
                 "Menu" to BasicTooltipState(),
+                "Tertiary Control" to BasicTooltipState(),
                 "Quaternary" to BasicTooltipState(),
                 "Tertiary" to BasicTooltipState(),
             )
@@ -80,8 +80,8 @@ fun SettingsTheme() {
             "Secondary" to MapleColorPalette.secondary,
             "Secondary Control" to MapleColorPalette.secondaryControl,
             "Control" to MapleColorPalette.control,
-            "Tertiary Control" to MapleColorPalette.tertiaryControl,
             "Menu" to MapleColorPalette.menu,
+            "Tertiary Control" to MapleColorPalette.tertiaryControl,
             "Quaternary" to MapleColorPalette.quaternary,
             "Tertiary" to MapleColorPalette.tertiary,
         )
@@ -151,8 +151,8 @@ fun SettingsTheme() {
                     "Secondary",
                     "Secondary Control",
                     "Control",
-                    "Tertiary Control",
                     "Menu",
+                    "Tertiary Control",
                     "Quaternary",
                     "Tertiary",
                 )
@@ -232,15 +232,15 @@ fun SettingsThemeOuter() {
     ) { newValue ->
         MapleColorPalette.control = newValue
     }
+    displayColorPicker("Menu", MapleColorPalette.menu, MapleColorPalette.defaultMenu) { newValue ->
+        MapleColorPalette.menu = newValue
+    }
     displayColorPicker(
         "Tertiary Control",
         MapleColorPalette.tertiaryControl,
         MapleColorPalette.defaultTertiaryControl,
     ) { newValue ->
         MapleColorPalette.tertiaryControl = newValue
-    }
-    displayColorPicker("Menu", MapleColorPalette.menu, MapleColorPalette.defaultMenu) { newValue ->
-        MapleColorPalette.menu = newValue
     }
     displayColorPicker(
         "Quaternary",
@@ -272,28 +272,66 @@ private fun displayColorPicker(
             defaultColor,
             { newValue ->
                 ConfigurationHandler.updateValue {
-                    when (key) {
-                        "Accent" ->
-                            themeSettings.accentColor =
-                                ColorPaletteUtility.getColorAsString(newValue)
-                        "Menu" ->
-                            themeSettings.menuColor = ColorPaletteUtility.getColorAsString(newValue)
-                        "Control" ->
-                            themeSettings.controlColor =
-                                ColorPaletteUtility.getColorAsString(newValue)
-                        "SecondaryControl" ->
-                            themeSettings.secondaryControlColor =
-                                ColorPaletteUtility.getColorAsString(newValue)
-                        "Secondary" ->
-                            themeSettings.secondaryColor =
-                                ColorPaletteUtility.getColorAsString(newValue)
-                        "Tertiary" ->
-                            themeSettings.tertiaryColor =
-                                ColorPaletteUtility.getColorAsString(newValue)
-                        "Quaternary" ->
-                            themeSettings.quaternaryColor =
-                                ColorPaletteUtility.getColorAsString(newValue)
-                    }
+                    themeSettings =
+                        when (key) {
+                            "Accent" ->
+                                themeSettings.copy(
+                                    accentColor =
+                                        ColorPaletteUtility.getColorAsString(
+                                            newValue,
+                                        ),
+                                )
+                            "Secondary" ->
+                                themeSettings.copy(
+                                    secondaryColor =
+                                        ColorPaletteUtility.getColorAsString(
+                                            newValue,
+                                        ),
+                                )
+                            "Secondary Control" ->
+                                themeSettings.copy(
+                                    secondaryControlColor =
+                                        ColorPaletteUtility.getColorAsString(
+                                            newValue,
+                                        ),
+                                )
+                            "Control" ->
+                                themeSettings.copy(
+                                    controlColor =
+                                        ColorPaletteUtility.getColorAsString(
+                                            newValue,
+                                        ),
+                                )
+                            "Tertiary Control" ->
+                                themeSettings.copy(
+                                    tertiaryControlColor =
+                                        ColorPaletteUtility.getColorAsString(
+                                            newValue,
+                                        ),
+                                )
+                            "Menu" ->
+                                themeSettings.copy(
+                                    menuColor =
+                                        ColorPaletteUtility.getColorAsString(
+                                            newValue,
+                                        ),
+                                )
+                            "Quaternary" ->
+                                themeSettings.copy(
+                                    quaternaryColor =
+                                        ColorPaletteUtility.getColorAsString(
+                                            newValue,
+                                        ),
+                                )
+                            "Tertiary" ->
+                                themeSettings.copy(
+                                    tertiaryColor =
+                                        ColorPaletteUtility.getColorAsString(
+                                            newValue,
+                                        ),
+                                )
+                            else -> throw IllegalArgumentException("Unexpected color key: $key")
+                        }
                     updateColor(newValue)
                 }
             },
