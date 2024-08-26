@@ -237,47 +237,46 @@ object BackupController {
                 yearsAgo > 0 -> {
                     val yearWord = if (yearsAgo == 1) "year" else "years"
                     append("$yearsAgo $yearWord")
-                    if (daysAgo % 365 > 0) {
-                        append(", ${daysAgo % 365} ${if (daysAgo % 365 == 1) "day" else "days"}")
+                    val remainingDays = daysAgo % 365
+                    if (remainingDays > 0) {
+                        append(", $remainingDays ${if (remainingDays == 1) "day" else "days"}")
                     }
                     append(" ago")
                 }
                 daysAgo > 0 -> {
                     append("$daysAgo ${if (daysAgo == 1) "day" else "days"}")
                     val remainingHours = hoursAgo % 24
-                    val remainingMinutes = minutesAgo % 60
-                    val parts = mutableListOf<String>()
                     if (remainingHours > 0) {
-                        parts.add("$remainingHours ${if (remainingHours == 1) "hour" else "hours"}")
-                    }
-                    if (remainingMinutes > 0) {
-                        parts.add(
-                            "$remainingMinutes ${
-                                if (remainingMinutes == 1) "minute" else "minutes"
-                            }",
-                        )
-                    }
-                    if (parts.isNotEmpty()) {
-                        append(", ${parts.joinToString(", ")}")
+                        append(", $remainingHours ${if (remainingHours == 1) "hour" else "hours"}")
                     }
                     append(" ago")
                 }
                 hoursAgo > 0 -> {
-                    append("${hoursAgo % 24} ${if (hoursAgo % 24 == 1) "hour" else "hours"}")
-                    if (minutesAgo % 60 > 0) {
+                    append(
+                        "${hoursAgo % 24} ${if (hoursAgo % 24 == 1) "hour" else "hours"}",
+                    )
+                    val remainingMinutes = minutesAgo % 60
+                    if (remainingMinutes > 0) {
                         append(
-                            ", ${minutesAgo % 60} ${
-                                if (minutesAgo % 60 == 1) "minute" else "minutes"
-                            } ago",
+                            ", $remainingMinutes ${
+                                if (remainingMinutes == 1) {
+                                    "minute"
+                                } else {
+                                    "minutes"
+                                }
+                            }",
                         )
-                    } else {
-                        append(" ago")
                     }
+                    append(" ago")
                 }
                 minutesAgo > 0 -> {
                     append(
                         "${minutesAgo % 60} ${
-                            if (minutesAgo % 60 == 1) "minute" else "minutes"
+                            if (minutesAgo % 60 == 1) {
+                                "minute"
+                            } else {
+                                "minutes"
+                            }
                         } ago",
                     )
                 }
