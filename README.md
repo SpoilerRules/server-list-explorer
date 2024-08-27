@@ -15,10 +15,11 @@
   <img src="https://i.imgur.com/TbeCvfW.png" width="250" alt="Screenshot 4">
   <img src="https://i.imgur.com/MALULZ6.png" width="250" alt="Screenshot 5">
   <img src="https://i.imgur.com/uIWROgP.png" width="250" alt="Screenshot 6">
-  <img src="https://i.ibb.co/74XkpTs/java-yp-Yvb-SNsai.png" width="250" alt="Screenshot 7">
-  <img src="https://i.imgur.com/vxgseoU.png" width="250" alt="Screenshot 2">
-  <img src="https://i.ibb.co/rFhGDdT/java-01-Xok-Ynq6-U.png" width="250" alt="Screenshot 8">
-  <img src="https://i.ibb.co/XVKZzjK/java-Hj-Vev9-W5-Nw.png" width="250" alt="Screenshot 9">
+  <img src="https://i.imgur.com/pawJ8B5.png" width="250" alt="Screenshot 9">
+  <img src="https://i.imgur.com/h86HkSZ.png" width="250" alt="Screenshot 7">
+  <img src="https://i.imgur.com/fu99YL2.png" width="250" alt="Screenshot 2">
+  <img src="https://i.imgur.com/g3eRtF2.png" width="250" alt="Screenshot 8">
+  <img src="https://i.ibb.co/XVKZzjK/java-Hj-Vev9-W5-Nw.png" width="250" alt="Screenshot 10">
 </div>
 
 ## Table of Contents
