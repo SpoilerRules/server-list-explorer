@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.0.20"
 compose = "1.7.0-alpha03"
-serialization = "1.7.1"
+serialization = "1.7.2"
 shadow = "8.3.0"
 ktlint = "12.1.1"
 colorPicker = "0.7.0"
