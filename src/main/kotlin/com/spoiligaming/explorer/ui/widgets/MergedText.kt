@@ -364,26 +364,22 @@ fun MergedText(
     firstTextColor: Color,
     firstTextWeight: FontWeight,
     content: @Composable () -> Unit,
-) {
-    Box(contentAlignment = Alignment.Center) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Row {
-                content()
+) = Box(contentAlignment = Alignment.Center) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+    ) {
+        content()
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = firstText,
-                    color = firstTextColor,
-                    style =
-                        TextStyle(
-                            fontFamily = FontFactory.comfortaaLight,
-                            fontWeight = firstTextWeight,
-                            fontSize = 15.sp,
-                        ),
-                    modifier = Modifier.offset(y = 3.dp),
-                )
-            }
-        }
+        Text(
+            text = firstText,
+            color = firstTextColor,
+            style =
+                TextStyle(
+                    fontFamily = FontFactory.comfortaaLight,
+                    fontWeight = firstTextWeight,
+                    fontSize = 15.sp,
+                ),
+            modifier = Modifier.offset(y = 2.65.dp),
+        )
     }
 }

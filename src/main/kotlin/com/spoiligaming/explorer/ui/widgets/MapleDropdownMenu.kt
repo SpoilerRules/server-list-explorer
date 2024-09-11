@@ -81,21 +81,21 @@ fun DropdownMenuWithLabel(
     currentValue: String,
     options: List<String>,
     onValueChange: (String) -> Unit,
+) = Row(
+    verticalAlignment = Alignment.CenterVertically,
+    horizontalArrangement = Arrangement.spacedBy(5.dp),
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        MapleDropdownMenu(currentValue, options) { newValue -> onValueChange(newValue) }
-        Spacer(modifier = Modifier.width(7.dp))
-        Text(
-            text = label,
-            color = MapleColorPalette.text,
-            style =
-                TextStyle(
-                    fontFamily = FontFactory.comfortaaLight,
-                    fontWeight = FontWeight.Light,
-                    fontSize = 15.sp,
-                ),
-        )
-    }
+    MapleDropdownMenu(currentValue, options) { newValue -> onValueChange(newValue) }
+    Text(
+        text = label,
+        color = MapleColorPalette.text,
+        style =
+            TextStyle(
+                fontFamily = FontFactory.comfortaaLight,
+                fontWeight = FontWeight.Light,
+                fontSize = 15.sp,
+            ),
+    )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
