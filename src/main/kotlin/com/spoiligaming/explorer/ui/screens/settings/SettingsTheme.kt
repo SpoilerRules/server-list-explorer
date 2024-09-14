@@ -126,12 +126,34 @@ fun SettingsTheme() {
         Box(contentAlignment = Alignment.Center) {
             DropdownMenuWithLabel(
                 label = "Window scale",
-                currentValue = ConfigurationHandler.getInstance().themeSettings.windowScale,
-                options = listOf("150%", "125%", "100%", "Resizable", "Maximized"),
+                currentValue = run {
+                    val currentScale = ConfigurationHandler.getInstance().themeSettings.windowScale
+
+                    when (currentScale) {
+                        "Resizable" -> "Resizable (unstable)"
+                        "Maximized" -> "Maximized (unstable)"
+                        else -> currentScale
+                    }
+                },
+                options =
+                    listOf(
+                        "150%",
+                        "125%",
+                        "100%",
+                        "Resizable (unstable)",
+                        "Maximized (unstable)",
+                    ),
             ) { newValue ->
+                val processedValue =
+                    when {
+                        newValue.contains("Resizable (unstable)") -> "Resizable"
+                        newValue.contains("Maximized (unstable)") -> "Maximized"
+                        else -> newValue
+                    }
+
                 val currentScale = ConfigurationHandler.getInstance().themeSettings.windowScale
 
-                if (newValue in listOf("Resizable", "Maximized") &&
+                if (processedValue in listOf("Resizable", "Maximized") &&
                     currentScale in WindowUtility.windowScaleMapping.keys
                 ) {
                     ConfigurationHandler.updateValue {
@@ -139,16 +161,16 @@ fun SettingsTheme() {
                     }
                 }
 
-                windowFrame.isResizable = newValue == "Resizable"
-                isWindowMaximized = newValue == "Maximized"
+                windowFrame.isResizable = processedValue == "Resizable"
+                isWindowMaximized = processedValue == "Maximized"
                 ConfigurationHandler.updateValue {
-                    windowProperties.wasPreviousScaleResizable = newValue == "Resizable"
+                    windowProperties.wasPreviousScaleResizable = processedValue == "Resizable"
                 }
 
                 ConfigurationHandler.updateValue {
-                    themeSettings.windowScale = newValue
+                    themeSettings.windowScale = processedValue
 
-                    when (newValue) {
+                    when (processedValue) {
                         "Maximized" -> {
                             if (currentScale != "Resizable") {
                                 windowProperties.previousScale = currentScale
@@ -166,18 +188,17 @@ fun SettingsTheme() {
                                     ConfigurationHandler.getInstance().let { config ->
                                         config.themeSettings.windowScale.let { scale ->
                                             WindowUtility.windowScaleMapping[scale]
-                                                ?: WindowUtility
-                                                    .windowScaleMapping[config.windowProperties.previousScale]
+                                                ?: WindowUtility.windowScaleMapping[
+                                                    config.windowProperties.previousScale,
+                                                ]
                                                 ?: scale.toFloatOrNull()
                                                 ?: 1f
                                         }.let { windowScale ->
                                             config.windowProperties.currentWindowSize?.let {
                                                     (width, height) ->
                                                 width to height
-                                            } ?: (800 * windowScale).toInt().let {
-                                                    width ->
-                                                (600 * windowScale).toInt().let {
-                                                        height ->
+                                            } ?: (800 * windowScale).toInt().let { width ->
+                                                (600 * windowScale).toInt().let { height ->
                                                     width to height
                                                 }
                                             }
@@ -186,7 +207,7 @@ fun SettingsTheme() {
                                 centerOnScreen()
                             }
                         in WindowUtility.windowScaleMapping.keys -> {
-                            val newScale = WindowUtility.windowScaleMapping[newValue]!!
+                            val newScale = WindowUtility.windowScaleMapping[processedValue]!!
 
                             ConfigurationHandler.updateValue {
                                 windowProperties.wasPreviousScaleResizable = false
@@ -198,7 +219,7 @@ fun SettingsTheme() {
                             }
                         }
                         else -> throw IllegalArgumentException(
-                            "Invalid window scale value: $newValue",
+                            "Invalid window scale value: $processedValue",
                         )
                     }
                 }
