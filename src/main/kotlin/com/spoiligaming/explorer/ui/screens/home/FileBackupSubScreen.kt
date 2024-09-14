@@ -89,7 +89,7 @@ fun FileBackupSubScreen() {
                 "100%", "1f", "1.0f" -> backupEntries.size > 4
                 "125%", "1.25f" -> backupEntries.size > 9
                 "150%", "1.5f" -> backupEntries.size > 12
-                else -> false
+                else -> backupEntries.size > 9
             }
 
     Box(
@@ -240,8 +240,24 @@ fun FileBackupSubScreen() {
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                                 modifier =
                                     Modifier.padding(
-                                        start = if (configuration.generalSettings.scrollBarVisibility == "Left Side" && shouldShowScrollbar) 15.dp else 0.dp,
-                                        end = if (configuration.generalSettings.scrollBarVisibility == "Right Side" && shouldShowScrollbar) 15.dp else 0.dp,
+                                        start =
+                                            if (
+                                                configuration.generalSettings.scrollBarVisibility == "Left Side" &&
+                                                shouldShowScrollbar
+                                            ) {
+                                                15.dp
+                                            } else {
+                                                0.dp
+                                            },
+                                        end =
+                                            if (
+                                                configuration.generalSettings.scrollBarVisibility == "Right Side" &&
+                                                shouldShowScrollbar
+                                            ) {
+                                                15.dp
+                                            } else {
+                                                0.dp
+                                            },
                                     ),
                             ) {
                                 itemsIndexed(backupEntries) { _, backup ->

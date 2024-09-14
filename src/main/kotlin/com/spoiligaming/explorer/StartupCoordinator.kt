@@ -85,7 +85,8 @@ object StartupCoordinator {
 
     // TODO: fix this getting invoked twice when called by `retryLoad` function
     private fun verifyServerFile() {
-        isServerDataLoaded = ServerFileHandler.initializeServerFileLocation() == ServerFileValidationResult.VALID
+        isServerDataLoaded =
+            ServerFileHandler.initializeServerFileLocation() == ServerFileValidationResult.VALID
 
         shouldShowFilePickerDialog = !isServerDataLoaded
     }

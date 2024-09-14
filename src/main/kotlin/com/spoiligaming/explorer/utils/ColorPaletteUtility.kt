@@ -33,8 +33,11 @@ object ColorPaletteUtility {
 fun Color.toHex(): String =
     String.format("%06X", toArgb() and 0x00FFFFFF) + String.format("%02X", (alpha * 255).toInt())
 
-fun Color.toHexRgba(): String =
-    "R:${(red * 255).toInt()}, G:${(green * 255).toInt()}, B:${(blue * 255).toInt()}, A:${(alpha * 255).toInt()}"
+fun Color.toHexRgba() =
+    "R:${(red * 255).toInt()}, " +
+        "G:${(green * 255).toInt()}, " +
+        "B:${(blue * 255).toInt()}, " +
+        "A:${(alpha * 255).toInt()}"
 
 fun Color.toNumericRgba(): String =
     "${formatFloat(
