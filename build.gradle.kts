@@ -28,6 +28,7 @@ dependencies {
     implementation(compose.desktop.macos_x64) // UNCONFIRMED
     implementation(compose.desktop.macos_arm64) // UNCONFIRMED
     implementation(compose.material3)
+    implementation(compose.materialIconsExtended)
 
     // Compose libraries
     implementation(libs.color.picker)
