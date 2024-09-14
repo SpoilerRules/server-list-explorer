@@ -25,7 +25,10 @@ fun BoxScope.MapleVerticalScrollbar(
     scrollState: Any,
     modifier: Modifier = Modifier,
 ) {
-    if (ConfigurationHandler.getInstance().generalSettings.scrollBarVisibility == "Disabled" || !visible) {
+    if (
+        ConfigurationHandler.getInstance().generalSettings.scrollBarVisibility == "Disabled" ||
+        !visible
+    ) {
         return
     }
 
@@ -44,7 +47,11 @@ fun BoxScope.MapleVerticalScrollbar(
             modifier.clip(
                 RoundedCornerShape(12.dp),
             ).background(
-                if (ConfigurationHandler.getInstance().themeSettings.showScrollbarBackground) MapleColorPalette.tertiaryControl else Color.Transparent,
+                if (ConfigurationHandler.getInstance().themeSettings.showScrollbarBackground) {
+                    MapleColorPalette.tertiaryControl
+                } else {
+                    Color.Transparent
+                },
                 RoundedCornerShape(12.dp),
             ).align(
                 when (ConfigurationHandler.getInstance().generalSettings.scrollBarVisibility) {
