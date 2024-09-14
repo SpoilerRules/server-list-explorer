@@ -13,19 +13,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowDecoration
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.state.DialogController
+import com.spoiligaming.explorer.utils.WindowUtility
+import com.spoiligaming.explorer.utils.WindowUtility.centerOnScreen
 import com.spoiligaming.logging.Logger
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.hostOs
+import java.awt.GraphicsEnvironment
 import java.awt.Toolkit
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 import javax.swing.JFrame
 
 val controlButtonAsString: String =
@@ -36,6 +43,9 @@ val controlButtonAsString: String =
 
 lateinit var windowFrame: JFrame
 lateinit var windowSize: Pair<Dp, Dp>
+var isWindowMaximized by mutableStateOf(
+    ConfigurationHandler.getInstance().windowProperties.isMaximized,
+)
 
 var disableIconIndexing = false
 var disableServerInfoIndexing = false
@@ -79,56 +89,117 @@ fun main(args: Array<String>) {
 
     args.forEach { argumentActions[it]?.invoke() }
 
-    val windowScale by mutableStateOf(
-        ConfigurationHandler.getInstance().themeSettings.windowScale.run {
-            when (this) {
-                "150%" -> 1.5f
-                "125%" -> 1.25f
-                "100%" -> 1f
-                else ->
-                    toFloatOrNull()
-                        ?: 1f.also {
-                            Logger.printWarning(
-                                "Invalid window scale value. Falling back to 100%.",
-                            )
-                        }
-            }
-        },
-    )
-    val screenSize = Toolkit.getDefaultToolkit().screenSize
-    val windowWidth = (800 * windowScale).toInt().dp
-    val windowHeight = (600 * windowScale).toInt().dp
-
     application {
-        val state =
+        val windowScale by mutableStateOf(
+            ConfigurationHandler.getInstance().themeSettings.windowScale.let { scale ->
+                WindowUtility.windowScaleMapping[scale]
+                    ?: WindowUtility.windowScaleMapping[
+                        ConfigurationHandler.getInstance()
+                            .windowProperties.previousScale,
+                    ]
+                    ?: scale.toFloatOrNull()
+                    ?: 1f
+            },
+        )
+
+        val (defaultWidth, defaultHeight) =
+            (800 * windowScale).toInt() to (600 * windowScale).toInt()
+
+        val (windowWidth, windowHeight) =
+            when (ConfigurationHandler.getInstance().themeSettings.windowScale) {
+                "Maximized" -> WindowUtility.getUsableScreenSize().also { isWindowMaximized = true }
+                "Resizable" ->
+                    ConfigurationHandler.getInstance().windowProperties.currentWindowSize?.let {
+                        it.first to it.second
+                    } ?: (defaultWidth to defaultHeight)
+                else -> defaultWidth to defaultHeight
+            }
+
+        val screenSize = Toolkit.getDefaultToolkit().screenSize
+
+        val windowState =
             rememberWindowState(
-                width = windowWidth,
-                height = windowHeight,
+                width = windowWidth.dp,
+                height = windowHeight.dp,
                 position =
-                    WindowPosition(
-                        ((screenSize.width - windowWidth.value.toInt()) / 2).dp,
-                        ((screenSize.height - windowHeight.value.toInt()) / 2).dp,
-                    ),
+                    if (isWindowMaximized) {
+                        WindowPosition.PlatformDefault
+                    } else {
+                        WindowPosition(
+                            ((screenSize.width - windowWidth.dp.value) / 2).dp,
+                            ((screenSize.height - windowHeight.dp.value) / 2).dp,
+                        )
+                    },
             )
 
         Window(
             onCloseRequest = ::exitApplication,
             visible = true,
             title = "Server List Explorer",
-            resizable = false,
-            undecorated = true,
+            decoration = WindowDecoration.Undecorated(8.dp),
             transparent = true,
-            state = state,
+            state = windowState,
         ) {
+            if (ConfigurationHandler.getInstance().themeSettings.windowScale == "Resizable") {
+                window.isResizable = true
+            }
             windowFrame = window
-            windowSize = remember { Pair(state.size.width, state.size.height) }
+            windowSize =
+                if (
+                    ConfigurationHandler.getInstance().themeSettings.windowScale in
+                    listOf("Resizable", "Maximized")
+                ) {
+                    with(LocalDensity.current) {
+                        Pair(window.size.width.toDp(), window.size.height.toDp())
+                    }
+                } else {
+                    remember {
+                        Pair(windowState.size.width, windowState.size.height)
+                    }
+                }
 
+            window.isResizable =
+                ConfigurationHandler.getInstance().themeSettings.windowScale == "Resizable"
+            window.apply {
+                val screenInsets =
+                    Toolkit.getDefaultToolkit()
+                        .getScreenInsets(
+                            GraphicsEnvironment.getLocalGraphicsEnvironment()
+                                .defaultScreenDevice.defaultConfiguration,
+                        )
+
+                if (ConfigurationHandler.getInstance().themeSettings.windowScale == "Maximized") {
+                    setLocation(screenInsets.left, screenInsets.top)
+                } else {
+                    centerOnScreen()
+                }
+                addComponentListener(
+                    object : ComponentAdapter() {
+                        override fun componentResized(event: ComponentEvent) {
+                            if (
+                                ConfigurationHandler.getInstance()
+                                    .themeSettings
+                                    .windowScale == "Resizable"
+                            ) {
+                                val newSize = event.component.size
+                                ConfigurationHandler.updateValue {
+                                    windowProperties.currentWindowSize =
+                                        newSize.width to newSize.height
+                                }
+                            }
+                        }
+                    },
+                )
+            }
+
+            val roundedCornerShape =
+                RoundedCornerShape(if (isWindowMaximized) 0.dp else 24.dp)
             Surface(
                 modifier =
                     Modifier
                         .fillMaxSize()
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(Color.Transparent, RoundedCornerShape(24.dp)),
+                        .clip(roundedCornerShape)
+                        .background(Color.Transparent, roundedCornerShape),
                 color = MapleColorPalette.menu,
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {

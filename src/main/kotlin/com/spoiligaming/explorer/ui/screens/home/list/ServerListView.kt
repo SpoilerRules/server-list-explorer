@@ -45,7 +45,7 @@ fun ServerListView() {
                 "100%", "1f", "1.0f" -> ContemporaryServerEntryListData.serverNameList.size > 4
                 "125%", "1.25f" -> ContemporaryServerEntryListData.serverNameList.size > 6
                 "150%", "1.5f" -> ContemporaryServerEntryListData.serverNameList.size > 8
-                else -> false
+                else -> ContemporaryServerEntryListData.serverNameList.size > 8
             }
 
     val serverItems =
@@ -76,8 +76,24 @@ fun ServerListView() {
                                 Modifier
                                     .fillMaxWidth()
                                     .padding(
-                                        start = if (configuration.generalSettings.scrollBarVisibility == "Left Side" && shouldShowScrollbar) 15.dp else 0.dp,
-                                        end = if (configuration.generalSettings.scrollBarVisibility == "Right Side" && shouldShowScrollbar) 15.dp else 0.dp,
+                                        start =
+                                            if (
+                                                configuration.generalSettings.scrollBarVisibility == "Left Side" &&
+                                                shouldShowScrollbar
+                                            ) {
+                                                15.dp
+                                            } else {
+                                                0.dp
+                                            },
+                                        end =
+                                            if (
+                                                configuration.generalSettings.scrollBarVisibility == "Right Side" &&
+                                                shouldShowScrollbar
+                                            ) {
+                                                15.dp
+                                            } else {
+                                                0.dp
+                                            },
                                     ),
                         ) {
                             items(filteredServerItems.size) { index ->

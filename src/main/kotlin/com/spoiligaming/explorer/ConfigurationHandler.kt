@@ -40,10 +40,19 @@ data class SettingsAdvanced(
 )
 
 @Serializable
+data class PropertiesWindow(
+    var previousScale: String = "100%",
+    var wasPreviousScaleResizable: Boolean = false,
+    var isMaximized: Boolean = false,
+    var currentWindowSize: Pair<Int, Int>? = null,
+)
+
+@Serializable
 data class ConfigurationHandler(
     @SerialName("General") var generalSettings: SettingsGeneral = SettingsGeneral(),
     @SerialName("Theme") var themeSettings: SettingsTheme = SettingsTheme(),
     @SerialName("Advanced") var advancedSettings: SettingsAdvanced = SettingsAdvanced(),
+    @SerialName("WindowProperties") var windowProperties: PropertiesWindow = PropertiesWindow(),
 ) {
     companion object {
         private var configFactoryInstance: ConfigurationHandler? = null

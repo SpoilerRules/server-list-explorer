@@ -15,7 +15,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Fullscreen
+import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,13 +30,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.spoiligaming.explorer.ConfigurationHandler
 import com.spoiligaming.explorer.SoftwareInformation
 import com.spoiligaming.explorer.isBackupRestoreInProgress
+import com.spoiligaming.explorer.isWindowMaximized
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.fonts.FontFactory
 import com.spoiligaming.explorer.ui.icons.IconFactory
 import com.spoiligaming.explorer.ui.navigation.NavigationController
 import com.spoiligaming.explorer.ui.navigation.Screen
+import com.spoiligaming.explorer.utils.WindowUtility
 import com.spoiligaming.explorer.windowFrame
 import java.awt.Cursor
 import javax.swing.JFrame
@@ -82,6 +89,7 @@ fun WindowHeaderView(allowNavigation: Boolean) {
                     Spacer(Modifier.weight(1f))
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         ControlButton(ActionType.MINIMIZE)
+                        ControlButton(ActionType.MAXIMIZE)
                         ControlButton(ActionType.EXIT)
                     }
                 }
@@ -100,10 +108,31 @@ fun WindowHeaderView(allowNavigation: Boolean) {
 private fun ControlButton(type: ActionType) =
     Button(
         onClick = {
-            if (type == ActionType.MINIMIZE) {
-                windowFrame.extendedState = JFrame.ICONIFIED
-            } else {
-                exitProcess(0)
+            when (type) {
+                ActionType.EXIT -> exitProcess(0)
+                ActionType.MAXIMIZE -> {
+                    val currentScale = ConfigurationHandler.getInstance().themeSettings.windowScale
+
+                    if (isWindowMaximized) {
+                        WindowUtility.restoreWindowSize(
+                            ConfigurationHandler.getInstance().windowProperties.wasPreviousScaleResizable,
+                        )
+                    } else {
+                        ConfigurationHandler.updateValue {
+                            themeSettings.windowScale = "Maximized"
+                            if (currentScale != "Resizable") {
+                                windowProperties.previousScale = currentScale
+                                if (currentScale != "Maximized") {
+                                    windowProperties.wasPreviousScaleResizable = false
+                                }
+                            } else {
+                                windowProperties.wasPreviousScaleResizable = true
+                            }
+                        }
+                        WindowUtility.maximizeWindow()
+                    }
+                }
+                ActionType.MINIMIZE -> windowFrame.extendedState = JFrame.ICONIFIED
             }
         },
         modifier = Modifier.size(60.dp, 40.dp).pointerHoverIcon(PointerIcon.Hand),
@@ -114,17 +143,31 @@ private fun ControlButton(type: ActionType) =
                 contentColor = MapleColorPalette.fadedText,
             ),
     ) {
-        Text(
-            text = if (type == ActionType.MINIMIZE) "_" else "x",
-            color = MapleColorPalette.fadedText,
-            style =
-                TextStyle(
-                    fontFamily = FontFactory.comfortaaMedium,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 17.sp,
-                ),
-            modifier = Modifier.padding(horizontal = 10.dp),
-        )
+        if (type != ActionType.MAXIMIZE) {
+            Text(
+                text = if (type == ActionType.MINIMIZE) "_" else "x",
+                color = MapleColorPalette.fadedText,
+                style =
+                    TextStyle(
+                        fontFamily = FontFactory.comfortaaMedium,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 17.sp,
+                    ),
+                modifier = Modifier.padding(horizontal = 10.dp),
+            )
+        } else {
+            Icon(
+                imageVector =
+                    if (isWindowMaximized) {
+                        Icons.Filled.FullscreenExit
+                    } else {
+                        Icons.Filled.Fullscreen
+                    },
+                contentDescription = "Icon for window maximize/restore button",
+                tint = MapleColorPalette.fadedText,
+                modifier = Modifier.size(17.dp),
+            )
+        }
     }
 
 @Composable
@@ -190,5 +233,6 @@ private fun WindowTitle() =
 
 enum class ActionType {
     EXIT,
+    MAXIMIZE,
     MINIMIZE,
 }

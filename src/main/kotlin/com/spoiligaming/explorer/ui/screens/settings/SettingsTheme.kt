@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupPositionProvider
 import com.spoiligaming.explorer.ConfigurationHandler
+import com.spoiligaming.explorer.isWindowMaximized
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.SettingsViewModel
 import com.spoiligaming.explorer.ui.components.MapleColorInformation
@@ -39,6 +40,8 @@ import com.spoiligaming.explorer.ui.widgets.DropdownMenuWithLabel
 import com.spoiligaming.explorer.ui.widgets.LabeledMapleToggleSwitch
 import com.spoiligaming.explorer.ui.widgets.MergedText
 import com.spoiligaming.explorer.utils.ColorPaletteUtility
+import com.spoiligaming.explorer.utils.WindowUtility
+import com.spoiligaming.explorer.utils.WindowUtility.centerOnScreen
 import com.spoiligaming.explorer.windowFrame
 import kotlinx.coroutines.launch
 import java.awt.Dimension
@@ -124,22 +127,80 @@ fun SettingsTheme() {
             DropdownMenuWithLabel(
                 label = "Window scale",
                 currentValue = ConfigurationHandler.getInstance().themeSettings.windowScale,
-                options = listOf("150%", "125%", "100%"),
+                options = listOf("150%", "125%", "100%", "Resizable", "Maximized"),
             ) { newValue ->
-                val newScale =
-                    when (newValue) {
-                        "150%" -> 1.5f
-                        "125%" -> 1.25f
-                        "100%" -> 1f
-                        else ->
-                            throw IllegalArgumentException(
-                                "Invalid window scale value: $newValue",
-                            )
+                val currentScale = ConfigurationHandler.getInstance().themeSettings.windowScale
+
+                if (newValue in listOf("Resizable", "Maximized") &&
+                    currentScale in WindowUtility.windowScaleMapping.keys
+                ) {
+                    ConfigurationHandler.updateValue {
+                        windowProperties.previousScale = currentScale
                     }
+                }
+
+                windowFrame.isResizable = newValue == "Resizable"
+                isWindowMaximized = newValue == "Maximized"
+                ConfigurationHandler.updateValue {
+                    windowProperties.wasPreviousScaleResizable = newValue == "Resizable"
+                }
+
                 ConfigurationHandler.updateValue {
                     themeSettings.windowScale = newValue
-                    windowFrame.size =
-                        Dimension((800 * newScale).toInt(), (600 * newScale).toInt())
+
+                    when (newValue) {
+                        "Maximized" -> {
+                            if (currentScale != "Resizable") {
+                                windowProperties.previousScale = currentScale
+                                if (currentScale != "Maximized") {
+                                    windowProperties.wasPreviousScaleResizable = false
+                                }
+                            } else {
+                                windowProperties.wasPreviousScaleResizable = true
+                            }
+                            WindowUtility.maximizeWindow()
+                        }
+                        "Resizable" ->
+                            windowFrame.apply {
+                                size =
+                                    ConfigurationHandler.getInstance().let { config ->
+                                        config.themeSettings.windowScale.let { scale ->
+                                            WindowUtility.windowScaleMapping[scale]
+                                                ?: WindowUtility
+                                                    .windowScaleMapping[config.windowProperties.previousScale]
+                                                ?: scale.toFloatOrNull()
+                                                ?: 1f
+                                        }.let { windowScale ->
+                                            config.windowProperties.currentWindowSize?.let {
+                                                    (width, height) ->
+                                                width to height
+                                            } ?: (800 * windowScale).toInt().let {
+                                                    width ->
+                                                (600 * windowScale).toInt().let {
+                                                        height ->
+                                                    width to height
+                                                }
+                                            }
+                                        }.let { Dimension(it.first, it.second) }
+                                    }
+                                centerOnScreen()
+                            }
+                        in WindowUtility.windowScaleMapping.keys -> {
+                            val newScale = WindowUtility.windowScaleMapping[newValue]!!
+
+                            ConfigurationHandler.updateValue {
+                                windowProperties.wasPreviousScaleResizable = false
+                            }
+
+                            windowFrame.apply {
+                                size = Dimension((800 * newScale).toInt(), (600 * newScale).toInt())
+                                centerOnScreen()
+                            }
+                        }
+                        else -> throw IllegalArgumentException(
+                            "Invalid window scale value: $newValue",
+                        )
+                    }
                 }
             }
         }
