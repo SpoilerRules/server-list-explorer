@@ -3,9 +3,11 @@ package com.spoiligaming.explorer.ui.dialogs.dialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,9 +27,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,7 +44,6 @@ import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.extensions.onHover
 import com.spoiligaming.explorer.ui.fonts.FontFactory
 import com.spoiligaming.explorer.ui.widgets.MapleHyperlink
-import com.spoiligaming.explorer.windowSize
 
 @Composable
 fun MapleDialogBase(
@@ -186,78 +189,87 @@ fun MapleDialogBase(
     if (!isCloseable) {
         Box(
             modifier =
-                Modifier.fillMaxWidth()
-                    .height(windowSize.second - 73.dp)
-                    .offset(y = 107.dp)
+                Modifier
+                    .fillMaxSize()
                     .background(Color.Transparent)
+                    .padding(bottom = 10.dp)
                     .zIndex(1f),
             contentAlignment = Alignment.BottomCenter,
         ) {
-            Surface(
+            Column(
                 modifier =
-                    Modifier.size(550.dp, 74.dp).offset(y = (-50).dp).onHover {
-                        isHovered = it
-                    },
-                color = MapleColorPalette.quaternary,
-                shape = RoundedCornerShape(20.dp),
-                shadowElevation = 0.dp,
+                    Modifier
+                        .width(550.dp)
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(MapleColorPalette.quaternary, RoundedCornerShape(18.dp)),
             ) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-                    Surface(
-                        modifier = Modifier.fillMaxWidth().height(36.dp),
-                        color = MapleColorPalette.tertiary,
-                        shadowElevation = 20.dp,
+                Surface(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(36.dp),
+                    color = MapleColorPalette.tertiary,
+                    shadowElevation = 6.dp,
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.TopCenter,
                     ) {
-                        Box(
-                            Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center,
+                        Surface(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(36.dp),
+                            color = MapleColorPalette.tertiary,
+                            shadowElevation = 20.dp,
                         ) {
-                            Text(
-                                text = "Attention!",
-                                color = MapleColorPalette.accent,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                style =
-                                    TextStyle(
-                                        fontFamily = FontFactory.comfortaaMedium,
-                                        fontWeight = FontWeight.Normal,
-                                        fontSize = 16.sp,
-                                    ),
-                            )
-                        }
-                    }
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Box(
-                            Modifier.fillMaxSize().offset(y = 18.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(vertical = 8.dp),
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Text(
-                                    text = "Looking for assistance? Join our ",
-                                    color = MapleColorPalette.text,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
+                                    text = "Attention!",
+                                    color = MapleColorPalette.accent,
                                     style =
                                         TextStyle(
-                                            fontFamily = FontFactory.comfortaaLight,
-                                            fontWeight = FontWeight.Normal,
-                                            fontSize = 14.sp,
+                                            fontFamily = FontFactory.comfortaaMedium,
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 16.sp,
                                         ),
-                                )
-                                MapleHyperlink(
-                                    "Discord server",
-                                    MapleColorPalette.accent,
-                                    14.sp,
-                                    FontFactory.comfortaaMedium,
-                                    FontWeight.Normal,
-                                    SoftwareInformation.DISCORD_SERVER_LINK,
                                 )
                             }
                         }
                     }
+                }
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp),
+                ) {
+                    Text(
+                        text = "Looking for assistance? Join our ",
+                        color = MapleColorPalette.text,
+                        maxLines = 1,
+                        textAlign = TextAlign.Center,
+                        overflow = TextOverflow.Ellipsis,
+                        style =
+                            TextStyle(
+                                fontFamily = FontFactory.comfortaaLight,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 14.sp,
+                            ),
+                    )
+                    MapleHyperlink(
+                        "Discord server",
+                        MapleColorPalette.accent,
+                        14.sp,
+                        FontFactory.comfortaaMedium,
+                        FontWeight.Normal,
+                        SoftwareInformation.DISCORD_SERVER_LINK,
+                    )
                 }
             }
         }
