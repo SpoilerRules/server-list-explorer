@@ -27,12 +27,14 @@ dependencies {
     implementation(compose.desktop.linux_arm64) // UNCONFIRMED
     implementation(compose.desktop.macos_x64) // UNCONFIRMED
     implementation(compose.desktop.macos_arm64) // UNCONFIRMED
+    implementation(compose.components.resources)
     implementation(compose.material3)
     implementation(compose.materialIconsExtended)
 
     // Compose libraries
     implementation(libs.color.picker)
     implementation(libs.file.kit)
+    // implementation("io.github.dzirbel:compose-material-context-menu:0.2.0") WILL BE USED LATER
 
     // Other libraries
     implementation(files("libraries/mcserverping-1.0.7.jar"))
@@ -63,8 +65,8 @@ tasks {
     }
 }
 
-compose.desktop {
-    application {
+compose {
+    desktop.application {
         mainClass = mainFunction
 
         javaHome = System.getenv("JDK_17")
@@ -79,6 +81,16 @@ compose.desktop {
         nativeDistributions {
             licenseFile.set(project.file("LICENSE"))
         }
+    }
+
+    resources {
+        publicResClass = false
+        generateResClass = always
+
+        customDirectory(
+            sourceSetName = "kotlin",
+            directoryProvider = provider { layout.projectDirectory.dir("composeResources") },
+        )
     }
 }
 
