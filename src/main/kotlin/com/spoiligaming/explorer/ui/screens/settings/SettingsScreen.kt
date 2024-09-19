@@ -1,6 +1,5 @@
 package com.spoiligaming.explorer.ui.screens.settings
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -21,7 +20,12 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -29,26 +33,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.fonts.FontFactory
-import com.spoiligaming.explorer.ui.icons.IconFactory
 import com.spoiligaming.explorer.ui.widgets.MergedInfoText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 data class SettingsCategory(
     val title: String,
-    val icon: ImageBitmap,
+    val icon: ImageVector,
     val index: Int,
     val content: @Composable () -> Unit,
     val outerContent: (@Composable () -> Unit)? = null,
@@ -58,20 +59,20 @@ private val categories =
     listOf(
         SettingsCategory(
             title = "General",
-            icon = IconFactory.generalSettingsIcon,
+            icon = Icons.Filled.Tune,
             index = 0,
             content = { SettingsGeneral() },
         ),
         SettingsCategory(
             title = "Theme",
-            icon = IconFactory.themeSettingsIcon,
+            icon = Icons.Filled.Palette,
             index = 1,
             content = { SettingsTheme() },
             outerContent = { SettingsThemeOuter() },
         ),
         SettingsCategory(
             title = "Advanced",
-            icon = IconFactory.advancedSettingsIcon,
+            icon = Icons.Filled.Code,
             index = 2,
             content = { SettingsAdvanced() },
         ),
@@ -176,47 +177,43 @@ private fun SettingsCategoryButton(
     category: SettingsCategory,
     listState: LazyListState,
     coroutineScope: CoroutineScope,
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-
-    Box(
-        modifier =
-            Modifier.width(136.dp)
-                .height(40.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = ripple(color = Color.White),
-                ) {
-                    coroutineScope.launch { listState.animateScrollToItem(category.index) }
-                }
-                .pointerHoverIcon(PointerIcon.Hand)
-                .background(MapleColorPalette.secondary, RoundedCornerShape(8.dp)),
-        contentAlignment = Alignment.CenterStart,
-    ) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(10.dp),
+) = Box(
+    modifier =
+        Modifier
+            .width(133.dp)
+            .height(40.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = ripple(color = Color.White),
             ) {
-                Image(
-                    bitmap = category.icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp),
-                    contentScale = ContentScale.Fit,
-                )
-                Text(
-                    text = category.title,
-                    color = MapleColorPalette.fadedText,
-                    style =
-                        TextStyle(
-                            fontFamily = FontFactory.comfortaaRegular,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 16.sp,
-                        ),
-                )
+                coroutineScope.launch { listState.animateScrollToItem(category.index) }
             }
+            .pointerHoverIcon(PointerIcon.Hand)
+            .background(MapleColorPalette.secondary, RoundedCornerShape(8.dp)),
+    contentAlignment = Alignment.CenterStart,
+) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(10.dp),
+        ) {
+            Icon(
+                imageVector = category.icon,
+                tint = MapleColorPalette.fadedText,
+                contentDescription = null,
+                modifier = Modifier.size(28.dp),
+            )
+            Text(
+                text = category.title,
+                color = MapleColorPalette.fadedText,
+                style =
+                    TextStyle(
+                        fontFamily = FontFactory.comfortaaRegular,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp,
+                    ),
+            )
         }
     }
 }
