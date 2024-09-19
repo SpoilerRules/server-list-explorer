@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -43,6 +44,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.isMetaPressed
@@ -51,7 +53,6 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -68,8 +69,13 @@ import com.spoiligaming.explorer.ui.state.DialogController
 import com.spoiligaming.explorer.ui.widgets.SelectableInteractiveText
 import com.spoiligaming.explorer.ui.widgets.ServerIconImage
 import com.spoiligaming.explorer.utils.ClipboardUtility
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
+import server_list_explorer.generated.resources.Res
+import server_list_explorer.generated.resources.chevron_up
+import server_list_explorer.generated.resources.small_chevron_down
+import server_list_explorer.generated.resources.trash_can
 
 @Composable
 fun ServerElement(
@@ -524,25 +530,21 @@ fun ServerElement(
 
                     val createClickableIcon:
                         @Composable
-                        (ImageBitmap, String, () -> Unit) -> Unit =
-                        { iconBitmap, iconDescription, onClick ->
+                        (Painter, String, () -> Unit) -> Unit =
+                        { icon, iconDescription, onClick ->
                             ClickableIcon(
-                                boxSize = 28.dp,
-                                boxCornerRadius = 4.dp,
-                                hoverColor = MapleColorPalette.secondary,
-                                unhoverColor = Color.Transparent,
-                                hoverColorAlpha = 1f,
-                                hoverColorAnimationSpec = tween(durationMillis = 200),
-                                iconBitmap = iconBitmap,
-                                iconDescription = iconDescription,
-                                iconHoverSize = 22.dp,
-                                iconHoverSizeAnimationSpec = tween(durationMillis = 100),
-                                null,
-                                null,
-                                iconDefaultSize = 18.dp,
-                                iconUnpressSize = 20.dp,
-                                iconPressSizeAnimationSpec = tween(durationMillis = 5),
-                                onClick = onClick,
+                                size = 28.dp,
+                                cornerRadius = 4.dp,
+                                hoverBackgroundColor = MapleColorPalette.secondary,
+                                hoverColorAnimation = tween(durationMillis = 200),
+                                icon = icon,
+                                contentDescription = iconDescription,
+                                hoverIconSize = 22.dp,
+                                hoverIconSizeAnimation = tween(durationMillis = 100),
+                                defaultIconSize = 18.dp,
+                                pressedIconSize = 20.dp,
+                                pressedIconSizeAnimation = tween(durationMillis = 5),
+                                onClick = onClick
                             )
                         }
                     Box(
@@ -572,7 +574,7 @@ fun ServerElement(
                                         Arrangement.Center,
                                 ) {
                                     createClickableIcon(
-                                        IconFactory.deleteIcon,
+                                        painterResource(Res.drawable.trash_can),
                                         "Delete Icon for Deleting Server Item",
                                     ) {
                                         DialogController
@@ -582,13 +584,13 @@ fun ServerElement(
                                             )
                                     }
                                     createClickableIcon(
-                                        IconFactory.chevronUp,
+                                        painterResource(Res.drawable.chevron_up),
                                         "Up Arrow Icon for Moving Server Up",
                                     ) {
                                         onMoveUp(serverPositionInList)
                                     }
                                     createClickableIcon(
-                                        IconFactory.chevronDown,
+                                        painterResource(Res.drawable.small_chevron_down),
                                         "Down Arrow Icon for Moving Server Down",
                                     ) {
                                         onMoveDown(serverPositionInList)
@@ -605,95 +607,68 @@ fun ServerElement(
 
 @Composable
 private fun ClickableIcon(
-    boxSize: Dp,
-    boxCornerRadius: Dp,
-    hoverColor: Color,
-    unhoverColor: Color = Color.Transparent,
-    hoverColorAlpha: Float,
-    hoverColorAnimationSpec: AnimationSpec<Float> = tween(durationMillis = 200),
-    iconBitmap: ImageBitmap,
-    iconDescription: String,
-    iconHoverSize: Dp? = null,
-    iconHoverSizeAnimationSpec: AnimationSpec<Dp>?,
-    iconHoverAlpha: Float? = null,
-    iconHoverAlphaAnimationSpec: AnimationSpec<Float>?,
-    iconDefaultSize: Dp,
-    iconUnpressSize: Dp? = null,
-    iconPressSizeAnimationSpec: AnimationSpec<Dp>?,
-    onClick: () -> Unit,
+    size: Dp,
+    cornerRadius: Dp,
+    hoverBackgroundColor: Color,
+    hoverColorAnimation: AnimationSpec<Float> = tween(200),
+    icon: Painter,
+    contentDescription: String,
+    hoverIconSize: Dp? = null,
+    hoverIconSizeAnimation: AnimationSpec<Dp>? = null,
+    defaultIconSize: Dp,
+    pressedIconSize: Dp? = null,
+    pressedIconSizeAnimation: AnimationSpec<Dp>? = null,
+    onClick: () -> Unit
 ) {
     var isHovered by remember { mutableStateOf(false) }
     var isPressed by remember { mutableStateOf(false) }
 
-    val iconAlpha by
-        animateFloatAsState(
-            targetValue = if (isHovered) iconHoverAlpha ?: 1f else 0f,
-            animationSpec = iconHoverAlphaAnimationSpec ?: tween(durationMillis = 300),
-        )
+    val backgroundAlpha by animateFloatAsState(
+        targetValue = if (isHovered) 1f else 0f,
+        animationSpec = hoverColorAnimation
+    )
 
-    val boxAlpha by
-        animateFloatAsState(
-            targetValue = if (isHovered) hoverColorAlpha else 0f,
-            animationSpec = hoverColorAnimationSpec,
-        )
-
-    val iconSize by
-        animateDpAsState(
-            targetValue =
-                when {
-                    isPressed -> iconDefaultSize
-                    isHovered && iconHoverSize != null -> iconHoverSize
-                    else -> iconUnpressSize ?: iconDefaultSize
-                },
-            animationSpec =
-                when {
-                    isPressed -> iconPressSizeAnimationSpec ?: tween(durationMillis = 50)
-                    isHovered && iconHoverSizeAnimationSpec != null -> iconHoverSizeAnimationSpec
-                    else -> tween(durationMillis = 50)
-                },
-        )
+    val animatedIconSize by animateDpAsState(
+        targetValue = when {
+            isPressed -> pressedIconSize ?: defaultIconSize
+            isHovered && hoverIconSize != null -> hoverIconSize
+            else -> defaultIconSize
+        },
+        animationSpec = when {
+            isPressed -> pressedIconSizeAnimation ?: tween(50)
+            isHovered -> hoverIconSizeAnimation ?: tween(50)
+            else -> tween(50)
+        }
+    )
 
     Box(
-        modifier =
-            Modifier.size(boxSize)
-                .pointerHoverIcon(PointerIcon.Hand)
-                .background(
-                    color = if (isHovered) hoverColor.copy(alpha = boxAlpha) else unhoverColor,
-                    shape = RoundedCornerShape(boxCornerRadius),
+        modifier = Modifier
+            .size(size)
+            .pointerHoverIcon(PointerIcon.Hand)
+            .background(
+                color = if (isHovered) hoverBackgroundColor.copy(alpha = backgroundAlpha) else Color.Transparent,
+                shape = RoundedCornerShape(cornerRadius)
+            )
+            .onHover { isHovered = it }
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        isPressed = true
+                        tryAwaitRelease()
+                        isPressed = false
+                        onClick()
+                    }
                 )
-                .onHover { isHovered = it }
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onPress = {
-                            isPressed = true
-                            tryAwaitRelease()
-                            isPressed = false
-                            onClick()
-                        },
-                    )
-                },
-        contentAlignment = Alignment.Center,
+            },
+        contentAlignment = Alignment.Center
     ) {
-        Image(
-            bitmap = iconBitmap,
-            contentDescription = iconDescription,
-            modifier =
-                Modifier.size(
-                    if (iconUnpressSize != null && iconPressSizeAnimationSpec != null) {
-                        iconSize
-                    } else {
-                        iconDefaultSize
-                    },
-                )
-                    .background(color = Color.Transparent)
-                    .alpha(
-                        if (iconHoverAlpha != null && iconHoverAlphaAnimationSpec != null) {
-                            iconAlpha
-                        } else {
-                            1f
-                        },
-                    ),
-            contentScale = ContentScale.Fit,
+        Icon(
+            painter = icon,
+            contentDescription = contentDescription,
+            tint = MapleColorPalette.fadedText,
+            modifier = Modifier
+                .size(animatedIconSize)
         )
     }
 }
+

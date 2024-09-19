@@ -5,7 +5,6 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,6 +26,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -51,7 +51,6 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalInputModeManager
@@ -71,7 +70,9 @@ import androidx.compose.ui.window.PopupProperties
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.extensions.onHover
 import com.spoiligaming.explorer.ui.fonts.FontFactory
-import com.spoiligaming.explorer.ui.icons.IconFactory
+import org.jetbrains.compose.resources.painterResource
+import server_list_explorer.generated.resources.Res
+import server_list_explorer.generated.resources.chevron_down
 import kotlin.math.max
 import kotlin.math.min
 
@@ -152,11 +153,11 @@ fun MapleDropdownMenu(
             )
 
             Box(modifier = Modifier.size(16.dp), contentAlignment = Alignment.Center) {
-                Image(
-                    bitmap = IconFactory.chevronDownWhite,
+                Icon(
+                    painter = painterResource(Res.drawable.chevron_down),
+                    tint = MapleColorPalette.text,
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
-                    contentScale = ContentScale.Fit,
                 )
             }
         }

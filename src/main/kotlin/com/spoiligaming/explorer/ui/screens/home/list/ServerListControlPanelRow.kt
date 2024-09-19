@@ -4,7 +4,6 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.LocalContextMenuRepresentation
 import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
@@ -47,17 +46,18 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.fonts.FontFactory
-import com.spoiligaming.explorer.ui.icons.IconFactory
 import com.spoiligaming.explorer.ui.navigation.NavigationController
 import com.spoiligaming.explorer.ui.navigation.Screen
 import com.spoiligaming.explorer.ui.presentation.MapleContextMenuRepresentation
+import org.jetbrains.compose.resources.painterResource
+import server_list_explorer.generated.resources.Res
+import server_list_explorer.generated.resources.trash_can
 
 @Preview
 @Composable
@@ -238,10 +238,10 @@ fun ServerListControlPanelRow() {
                                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Image(
-                                    bitmap = IconFactory.deleteIcon,
+                                Icon(
+                                    painter = painterResource(Res.drawable.trash_can),
                                     contentDescription = null,
-                                    contentScale = ContentScale.Fit,
+                                    tint = MapleColorPalette.fadedText,
                                     modifier = Modifier.size(18.dp),
                                 )
                                 Text(

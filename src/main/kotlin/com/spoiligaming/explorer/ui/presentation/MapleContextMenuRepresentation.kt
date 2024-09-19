@@ -20,6 +20,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Brush
+import androidx.compose.material.icons.filled.ContentCut
+import androidx.compose.material.icons.filled.Key
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -35,6 +39,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -145,13 +151,33 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.padding(start = 10.dp),
                         ) {
-                            IconForItem(item.label)?.let { bitmap ->
-                                Icon(
-                                    bitmap = bitmap,
-                                    contentDescription = null,
-                                    tint = MapleColorPalette.text,
-                                    modifier = Modifier.size(16.dp),
-                                )
+                            IconForItem(item.label)?.let { icon ->
+                                when (icon) {
+                                    is Painter ->
+                                        Icon(
+                                            painter = icon,
+                                            contentDescription = null,
+                                            tint = MapleColorPalette.text,
+                                            modifier = Modifier.size(16.dp),
+                                        )
+                                    is ImageBitmap ->
+                                        Icon(
+                                            bitmap = icon,
+                                            contentDescription = null,
+                                            tint = MapleColorPalette.text,
+                                            modifier = Modifier.size(16.dp),
+                                        )
+                                    is ImageVector ->
+                                        Icon(
+                                            imageVector = icon,
+                                            contentDescription = null,
+                                            tint = MapleColorPalette.text,
+                                            modifier = Modifier.size(16.dp),
+                                        )
+                                    else -> throw IllegalStateException(
+                                        "Unexpected icon type: ${icon::class.simpleName}",
+                                    )
+                                }
                             }
                             Text(
                                 text = item.label,
@@ -213,11 +239,11 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
     }
 
     @Composable
-    private fun IconForItem(label: String): ImageBitmap? =
+    private fun IconForItem(label: String): Any? =
         when (label) {
             "Rename" -> IconFactory.editIcon
-            "Modify Address" -> IconFactory.keyIcon
-            "Change Icon" -> IconFactory.editPaperIcon
+            "Modify Address" -> Icons.Filled.Key
+            "Change Icon" -> Icons.Filled.Brush
             "Erase Icon" -> IconFactory.eraserIcon
             "Delete Entry" -> IconFactory.deleteIconWhite
             else ->
@@ -231,7 +257,7 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
                     -> IconFactory.copyIconRegular
                     "Navigate to Directory" -> IconFactory.arrowRightIcon
                     "Copy" -> if (type == 1) IconFactory.copyIconRegular else null
-                    "Cut" -> IconFactory.scissorIcon
+                    "Cut" -> Icons.Filled.ContentCut
                     "Paste" -> IconFactory.pasteIcon
                     else -> null
                 }
