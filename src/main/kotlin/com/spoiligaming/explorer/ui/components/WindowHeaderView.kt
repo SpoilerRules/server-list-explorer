@@ -89,7 +89,7 @@ fun WindowHeaderView(allowNavigation: Boolean) {
                     Spacer(Modifier.weight(1f))
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         ControlButton(ActionType.MINIMIZE)
-                      //  ControlButton(ActionType.MAXIMIZE) temporarily disabled until dynamic focus allocation for focus demanding dialogs implemented.
+                        //  ControlButton(ActionType.MAXIMIZE) temporarily disabled until dynamic focus allocation for focus demanding dialogs implemented.
                         ControlButton(ActionType.EXIT)
                     }
                 }

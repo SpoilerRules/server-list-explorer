@@ -126,15 +126,17 @@ fun SettingsTheme() {
         Box(contentAlignment = Alignment.Center) {
             DropdownMenuWithLabel(
                 label = "Window scale",
-                currentValue = run {
-                    val currentScale = ConfigurationHandler.getInstance().themeSettings.windowScale
-
-                    when (currentScale) {
-                        "Resizable" -> "Resizable (unstable)"
-                        "Maximized" -> "Maximized (unstable)"
-                        else -> currentScale
-                    }
-                },
+                currentValue =
+                    run {
+                        when (
+                            val currentScale =
+                                ConfigurationHandler.getInstance().themeSettings.windowScale
+                        ) {
+                            "Resizable" -> "Resizable (unstable)"
+                            "Maximized" -> "Maximized (unstable)"
+                            else -> currentScale
+                        }
+                    },
                 options =
                     listOf(
                         "150%",
