@@ -9,6 +9,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -41,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -72,10 +74,18 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
         ) {
             Column(
                 modifier =
-                    Modifier.shadow(16.dp)
+                    Modifier
+                        .width(IntrinsicSize.Max)
+                        .then(Modifier.layout { measurable, constraints ->
+                            with(measurable.measure(constraints)) {
+                                layout(width + 10.dp.roundToPx(), height) {
+                                    placeRelative(0, 0)
+                                }
+                            }
+                        })
+                        .shadow(16.dp)
                         .background(MapleColorPalette.menu, RoundedCornerShape(12.dp))
                         .padding(vertical = 5.dp)
-                        .width(MenuWidth.getWidth(MenuWidth.EXPANDED).dp)
                         .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -94,7 +104,6 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
             verticalArrangement = Arrangement.spacedBy(5.dp),
             modifier =
                 Modifier
-                    .width(MenuWidth.getWidth(MenuWidth.COMPACT).dp)
                     .padding(vertical = 5.dp),
         ) {
             Text(
@@ -112,7 +121,7 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
             HorizontalDivider(
                 thickness = 1.dp,
                 color = MapleColorPalette.control,
-                modifier = Modifier.width(MenuWidth.getWidth(MenuWidth.COMPACT).dp),
+                modifier = Modifier.padding(horizontal = 5.dp),
             )
         }
 
@@ -120,7 +129,7 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
     private fun DisplayMenuItems(
         state: ContextMenuState,
         items: List<ContextMenuItem>,
-    ) = Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    ) = Column(modifier = Modifier.padding(horizontal = 5.dp)) {
         items
             .distinctBy { it.label }
             .forEach { item ->
@@ -129,8 +138,8 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
                     HorizontalDivider(
                         thickness = 1.dp,
                         color = MapleColorPalette.control,
-                        modifier = Modifier.width(MenuWidth.getWidth(MenuWidth.COMPACT).dp),
-                    )
+              //          modifier = Modifier.padding(horizontal = 5.dp),
+                        )
                     Spacer(Modifier.height(5.dp))
                 }
 
@@ -144,7 +153,6 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier,
                     ) {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -205,20 +213,20 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
             val shortcutText =
                 when (label) {
-                    "Copy Address" -> "$controlButtonAsString + C"
-                    "Delete Entry" -> "Delete"
-                    "Erase Icon" -> "$controlButtonAsString + Delete"
+                    "Copy Address" -> "$controlButtonAsString+C"
+                    "Delete Entry" -> "Delele"
+                    "Erase Icon" -> "$controlButtonAsString+Delele"
                     "Navigate to Directory" -> "L-Click"
                     "Copy File Path" -> "Double L-Click"
-                    "Copy" -> if (type == 1) "$controlButtonAsString + C" else null
-                    "Cut" -> "$controlButtonAsString + X"
-                    "Paste" -> "$controlButtonAsString + V"
-                    "Select All" -> "$controlButtonAsString + A"
-                    "Rename" -> "$controlButtonAsString + R"
-                    "Modify Address" -> "$controlButtonAsString + M"
-                    "Change Icon" -> "$controlButtonAsString + I"
-                    "Copy as Toml" -> "$controlButtonAsString + T"
-                    "Copy Name" -> "$controlButtonAsString + N"
+                    "Copy" -> if (type == 1) "$controlButtonAsString+C" else null
+                    "Cut" -> "$controlButtonAsString+X"
+                    "Paste" -> "$controlButtonAsString+V"
+                    "Select All" -> "$controlButtonAsString+A"
+                    "Rename" -> "$controlButtonAsString+R"
+                    "Modify Address" -> "$controlButtonAsString+M"
+                    "Change Icon" -> "$controlButtonAsString+I"
+                    "Copy as Toml" -> "$controlButtonAsString+T"
+                    "Copy Name" -> "$controlButtonAsString+N"
                     else -> null
                 }
 
@@ -274,7 +282,8 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
 
         Row(
             modifier =
-                Modifier.width(MenuWidth.getWidth(MenuWidth.COMPACT).dp)
+                Modifier
+                    .fillMaxWidth()
                     .height(32.dp)
                     .onHover { isHovered = it }
                     .clip(RoundedCornerShape(10.dp))
@@ -290,21 +299,6 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
             verticalAlignment = Alignment.CenterVertically,
         ) {
             content()
-        }
-    }
-
-    enum class MenuWidth(val shortcutWidth: Int, val noShortcutWidth: Int) {
-        EXPANDED(290, 210),
-        COMPACT(280, 200),
-        ;
-
-        companion object {
-            fun getWidth(type: MenuWidth) =
-                if (SettingsViewModel.displayShortcutsInContextMenu) {
-                    type.shortcutWidth
-                } else {
-                    type.noShortcutWidth
-                }
         }
     }
 }
