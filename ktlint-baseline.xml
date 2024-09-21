@@ -25,9 +25,6 @@
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/StationaryView.kt">
         <error line="77" column="1" source="standard:max-line-length" />
     </file>
-    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/WindowHeaderView.kt">
-        <error line="118" column="1" source="standard:max-line-length" />
-    </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/dialogs/MapleValueReplacementDialog.kt">
         <error line="82" column="1" source="standard:max-line-length" />
         <error line="92" column="1" source="standard:max-line-length" />
@@ -48,9 +45,6 @@
         <error line="112" column="1" source="standard:max-line-length" />
         <error line="114" column="1" source="standard:max-line-length" />
         <error line="124" column="1" source="standard:max-line-length" />
-    </file>
-    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/screens/settings/SettingsTheme.kt">
-        <error line="170" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/state/DialogController.kt">
         <error line="105" column="1" source="standard:max-line-length" />

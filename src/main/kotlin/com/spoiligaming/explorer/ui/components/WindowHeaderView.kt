@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -53,38 +52,40 @@ fun WindowHeaderView(allowNavigation: Boolean) {
         WindowTitle()
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Box(Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(10.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (allowNavigation && !isBackupRestoreInProgress) {
-                        if (currentScreen is Screen.FileBackupScreen) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                                SettingsButton(
-                                    currentScreen = Screen.Settings,
-                                ) {
-                                    NavigationController.navigateTo(Screen.Home)
-                                }
-                                SettingsButton(
-                                    currentScreen = Screen.Home,
-                                ) {
-                                    NavigationController.navigateTo(Screen.Settings)
-                                }
-                            }
-                        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(start = 10.dp, top = 10.dp, end = 10.dp),
+            ) {
+                if (allowNavigation && !isBackupRestoreInProgress) {
+                    if (currentScreen is Screen.FileBackupScreen) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                             SettingsButton(
-                                currentScreen = currentScreen,
-                                onClick = {
-                                    NavigationController.navigateTo(
-                                        if (currentScreen is Screen.Settings) {
-                                            Screen.Home
-                                        } else {
-                                            Screen.Settings
-                                        },
-                                    )
-                                },
-                            )
+                                currentScreen = Screen.Settings,
+                            ) {
+                                NavigationController.navigateTo(Screen.Home)
+                            }
+                            SettingsButton(
+                                currentScreen = Screen.Home,
+                            ) {
+                                NavigationController.navigateTo(Screen.Settings)
+                            }
                         }
+                    } else {
+                        SettingsButton(
+                            currentScreen = currentScreen,
+                            onClick = {
+                                NavigationController.navigateTo(
+                                    if (currentScreen is Screen.Settings) {
+                                        Screen.Home
+                                    } else {
+                                        Screen.Settings
+                                    },
+                                )
+                            },
+                        )
                     }
                     Spacer(Modifier.weight(1f))
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -98,7 +99,7 @@ fun WindowHeaderView(allowNavigation: Boolean) {
             HorizontalDivider(
                 color = MapleColorPalette.control,
                 thickness = 1.dp,
-                modifier = Modifier.fillMaxWidth(0.98f),
+                modifier = Modifier.padding(horizontal = 7.5.dp),
             )
         }
     }
@@ -115,7 +116,8 @@ private fun ControlButton(type: ActionType) =
 
                     if (isWindowMaximized) {
                         WindowUtility.restoreWindowSize(
-                            ConfigurationHandler.getInstance().windowProperties.wasPreviousScaleResizable,
+                            ConfigurationHandler.getInstance()
+                                .windowProperties.wasPreviousScaleResizable,
                         )
                     } else {
                         ConfigurationHandler.updateValue {
