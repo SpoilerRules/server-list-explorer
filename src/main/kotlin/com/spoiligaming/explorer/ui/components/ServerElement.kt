@@ -544,7 +544,7 @@ fun ServerElement(
                                 defaultIconSize = 18.dp,
                                 pressedIconSize = 20.dp,
                                 pressedIconSizeAnimation = tween(durationMillis = 5),
-                                onClick = onClick
+                                onClick = onClick,
                             )
                         }
                     Box(
@@ -618,57 +618,67 @@ private fun ClickableIcon(
     defaultIconSize: Dp,
     pressedIconSize: Dp? = null,
     pressedIconSizeAnimation: AnimationSpec<Dp>? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     var isHovered by remember { mutableStateOf(false) }
     var isPressed by remember { mutableStateOf(false) }
 
     val backgroundAlpha by animateFloatAsState(
         targetValue = if (isHovered) 1f else 0f,
-        animationSpec = hoverColorAnimation
+        animationSpec = hoverColorAnimation,
     )
 
     val animatedIconSize by animateDpAsState(
-        targetValue = when {
-            isPressed -> pressedIconSize ?: defaultIconSize
-            isHovered && hoverIconSize != null -> hoverIconSize
-            else -> defaultIconSize
-        },
-        animationSpec = when {
-            isPressed -> pressedIconSizeAnimation ?: tween(50)
-            isHovered -> hoverIconSizeAnimation ?: tween(50)
-            else -> tween(50)
-        }
+        targetValue =
+            when {
+                isPressed -> pressedIconSize ?: defaultIconSize
+                isHovered && hoverIconSize != null -> hoverIconSize
+                else -> defaultIconSize
+            },
+        animationSpec =
+            when {
+                isPressed -> pressedIconSizeAnimation ?: tween(50)
+                isHovered -> hoverIconSizeAnimation ?: tween(50)
+                else -> tween(50)
+            },
     )
 
     Box(
-        modifier = Modifier
-            .size(size)
-            .pointerHoverIcon(PointerIcon.Hand)
-            .background(
-                color = if (isHovered) hoverBackgroundColor.copy(alpha = backgroundAlpha) else Color.Transparent,
-                shape = RoundedCornerShape(cornerRadius)
-            )
-            .onHover { isHovered = it }
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onPress = {
-                        isPressed = true
-                        tryAwaitRelease()
-                        isPressed = false
-                        onClick()
-                    }
+        modifier =
+            Modifier
+                .size(size)
+                .pointerHoverIcon(PointerIcon.Hand)
+                .background(
+                    color =
+                        if (isHovered) {
+                            hoverBackgroundColor.copy(
+                                alpha = backgroundAlpha,
+                            )
+                        } else {
+                            Color.Transparent
+                        },
+                    shape = RoundedCornerShape(cornerRadius),
                 )
-            },
-        contentAlignment = Alignment.Center
+                .onHover { isHovered = it }
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onPress = {
+                            isPressed = true
+                            tryAwaitRelease()
+                            isPressed = false
+                            onClick()
+                        },
+                    )
+                },
+        contentAlignment = Alignment.Center,
     ) {
         Icon(
             painter = icon,
             contentDescription = contentDescription,
             tint = MapleColorPalette.fadedText,
-            modifier = Modifier
-                .size(animatedIconSize)
+            modifier =
+                Modifier
+                    .size(animatedIconSize),
         )
     }
 }
-

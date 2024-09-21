@@ -76,13 +76,15 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
                 modifier =
                     Modifier
                         .width(IntrinsicSize.Max)
-                        .then(Modifier.layout { measurable, constraints ->
-                            with(measurable.measure(constraints)) {
-                                layout(width + 10.dp.roundToPx(), height) {
-                                    placeRelative(0, 0)
+                        .then(
+                            Modifier.layout { measurable, constraints ->
+                                with(measurable.measure(constraints)) {
+                                    layout(width + 10.dp.roundToPx(), height) {
+                                        placeRelative(0, 0)
+                                    }
                                 }
-                            }
-                        })
+                            },
+                        )
                         .shadow(16.dp)
                         .background(MapleColorPalette.menu, RoundedCornerShape(12.dp))
                         .padding(vertical = 5.dp)
@@ -138,8 +140,7 @@ class MapleContextMenuRepresentation(private val serverName: String?, private va
                     HorizontalDivider(
                         thickness = 1.dp,
                         color = MapleColorPalette.control,
-              //          modifier = Modifier.padding(horizontal = 5.dp),
-                        )
+                    )
                     Spacer(Modifier.height(5.dp))
                 }
 
