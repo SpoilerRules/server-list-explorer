@@ -19,6 +19,7 @@ import com.spoiligaming.explorer.server.ContemporaryServerEntryListData
 import com.spoiligaming.explorer.server.ServerFileHandler
 import com.spoiligaming.explorer.server.ServerFileValidationResult
 import com.spoiligaming.explorer.ui.MapleColorPalette
+import com.spoiligaming.explorer.ui.components.NavigationRail
 import com.spoiligaming.explorer.ui.components.WindowHeaderView
 import com.spoiligaming.explorer.ui.navigation.NavigationComponent
 import com.spoiligaming.explorer.ui.navigation.NavigationController
@@ -34,22 +35,31 @@ object StartupCoordinator {
 
     @Composable
     fun Coordinate() =
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            WindowHeaderView(isServerDataLoaded)
-
+        NavigationRail {
             Box(
                 modifier =
                     Modifier
                         .fillMaxSize(),
+                contentAlignment = Alignment.Center,
             ) {
-                if (shouldShowFilePickerDialog) {
-                    DialogController.showServerFilePickerDialog(false)
-                } else {
-                    Content()
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    WindowHeaderView(isServerDataLoaded)
+
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxSize(),
+                    ) {
+                        if (shouldShowFilePickerDialog) {
+                            DialogController.showServerFilePickerDialog(false)
+                        } else {
+                            Content()
+                        }
+                    }
                 }
             }
         }

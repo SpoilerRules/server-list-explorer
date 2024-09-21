@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,10 +17,14 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -45,6 +48,11 @@ import java.awt.Cursor
 import javax.swing.JFrame
 import kotlin.system.exitProcess
 
+import androidx.compose.material3.Button as M3Button
+import androidx.compose.material3.ButtonDefaults as M3ButtonDefaults
+
+var isNavigationRailVisible by mutableStateOf(false)
+
 @Composable
 fun WindowHeaderView(allowNavigation: Boolean) {
     val currentScreen = NavigationController.currentScreen
@@ -53,56 +61,89 @@ fun WindowHeaderView(allowNavigation: Boolean) {
         WindowTitle()
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Box(Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(10.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (allowNavigation && !isBackupRestoreInProgress) {
-                        if (currentScreen is Screen.FileBackupScreen) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                                SettingsButton(
-                                    currentScreen = Screen.Settings,
-                                ) {
-                                    NavigationController.navigateTo(Screen.Home)
-                                }
-                                SettingsButton(
-                                    currentScreen = Screen.Home,
-                                ) {
-                                    NavigationController.navigateTo(Screen.Settings)
-                                }
-                            }
-                        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier =
+                    Modifier.fillMaxWidth().padding(
+                        start = 10.dp,
+                        top = 10.dp,
+                        end = 10.dp,
+                    ),
+            ) {
+                if (allowNavigation && !isBackupRestoreInProgress) {
+                    if (currentScreen is Screen.FileBackupScreen) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                             SettingsButton(
-                                currentScreen = currentScreen,
-                                onClick = {
-                                    NavigationController.navigateTo(
-                                        if (currentScreen is Screen.Settings) {
-                                            Screen.Home
-                                        } else {
-                                            Screen.Settings
-                                        },
-                                    )
-                                },
-                            )
+                                currentScreen = Screen.Settings,
+                            ) {
+                                NavigationController.navigateTo(Screen.Home)
+                            }
+                            SettingsButton(
+                                currentScreen = Screen.Home,
+                            ) {
+                                NavigationController.navigateTo(Screen.Settings)
+                            }
                         }
+                    } else {
+                        SettingsButton(
+                            currentScreen = currentScreen,
+                            onClick = {
+                                NavigationController.navigateTo(
+                                    if (currentScreen is Screen.Settings) {
+                                        Screen.Home
+                                    } else {
+                                        Screen.Settings
+                                    },
+                                )
+                            },
+                        )
                     }
-                    Spacer(Modifier.weight(1f))
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        ControlButton(ActionType.MINIMIZE)
-                        //  ControlButton(ActionType.MAXIMIZE) temporarily disabled until dynamic focus allocation for focus demanding dialogs implemented.
-                        ControlButton(ActionType.EXIT)
-                    }
+                }
+                MenuButton { isNavigationRailVisible = !isNavigationRailVisible }
+                Spacer(Modifier.weight(1f))
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    ControlButton(ActionType.MINIMIZE)
+                    //  ControlButton(ActionType.MAXIMIZE) temporarily disabled until dynamic focus allocation for focus demanding dialogs implemented.
+                    ControlButton(ActionType.EXIT)
                 }
             }
 
             HorizontalDivider(
                 color = MapleColorPalette.control,
                 thickness = 1.dp,
-                modifier = Modifier.fillMaxWidth(0.98f),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
             )
         }
     }
 }
+
+@Composable
+private fun MenuButton(onMenuClick: () -> Unit) = M3Button(
+        onClick = onMenuClick,
+        colors =
+            M3ButtonDefaults.buttonColors(
+                containerColor = MapleColorPalette.menu,
+            ),
+        shape = RoundedCornerShape(12.dp),
+        elevation = M3ButtonDefaults.elevatedButtonElevation(
+                defaultElevation = 2.dp,
+                pressedElevation = 8.dp,
+                hoveredElevation = 4.dp,
+            ),
+        modifier =
+            Modifier
+                .height(40.dp)
+                .pointerHoverIcon(PointerIcon.Hand),
+    ) {
+        Icon(
+            Icons.Filled.Menu,
+            contentDescription = "Open Menu",
+            tint = MapleColorPalette.fadedText,
+            modifier = Modifier.size(17.dp),
+        )
+    }
 
 @Composable
 private fun ControlButton(type: ActionType) =
@@ -220,7 +261,7 @@ private fun WindowTitle() =
         contentAlignment = Alignment.BottomCenter,
     ) {
         Text(
-            text = "Server List Explorer - ${SoftwareInformation.VERSION}",
+            text = SoftwareInformation.WINDOW_TITLE,
             color = MapleColorPalette.accent,
             style =
                 TextStyle(
