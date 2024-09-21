@@ -60,23 +60,19 @@ fun WindowHeaderView(allowNavigation: Boolean) {
                 modifier = Modifier.padding(start = 10.dp, top = 10.dp, end = 10.dp),
             ) {
                 if (allowNavigation && !isBackupRestoreInProgress) {
-                    if (currentScreen is Screen.FileBackupScreen) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                            SettingsButton(
-                                currentScreen = Screen.Settings,
-                            ) {
-                                NavigationController.navigateTo(Screen.Home)
-                            }
-                            SettingsButton(
-                                currentScreen = Screen.Home,
-                            ) {
-                                NavigationController.navigateTo(Screen.Settings)
+                    when (currentScreen) {
+                        is Screen.FileBackupScreen -> {
+                            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                SettingsButton(
+                                    Screen.Settings,
+                                ) { NavigationController.navigateTo(Screen.Home) }
+                                SettingsButton(
+                                    Screen.Home,
+                                ) { NavigationController.navigateTo(Screen.Settings) }
                             }
                         }
-                    } else {
-                        SettingsButton(
-                            currentScreen = currentScreen,
-                            onClick = {
+                        else -> {
+                            SettingsButton(currentScreen) {
                                 NavigationController.navigateTo(
                                     if (currentScreen is Screen.Settings) {
                                         Screen.Home
@@ -84,8 +80,8 @@ fun WindowHeaderView(allowNavigation: Boolean) {
                                         Screen.Settings
                                     },
                                 )
-                            },
-                        )
+                            }
+                        }
                     }
                     Spacer(Modifier.weight(1f))
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
