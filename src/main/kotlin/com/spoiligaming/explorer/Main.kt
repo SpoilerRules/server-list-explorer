@@ -24,7 +24,6 @@ import androidx.compose.ui.window.rememberWindowState
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.state.DialogController
 import com.spoiligaming.explorer.utils.WindowUtility
-import com.spoiligaming.explorer.utils.WindowUtility.centerOnScreen
 import com.spoiligaming.logging.Logger
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkiaLayer
@@ -89,46 +88,49 @@ fun main(args: Array<String>) {
 
     args.forEach { argumentActions[it]?.invoke() }
 
+    val themeSettings = ConfigurationHandler.getInstance().themeSettings
+    val windowProperties = ConfigurationHandler.getInstance().windowProperties
+    val screenSize = Toolkit.getDefaultToolkit().screenSize
+
     application {
-        val windowScale by mutableStateOf(
-            ConfigurationHandler.getInstance().themeSettings.windowScale.let { scale ->
-                WindowUtility.windowScaleMapping[scale]
-                    ?: WindowUtility.windowScaleMapping[
-                        ConfigurationHandler.getInstance()
-                            .windowProperties.previousScale,
-                    ]
-                    ?: scale.toFloatOrNull()
-                    ?: 1f
-            },
-        )
+        val density = LocalDensity.current
+
+        /*
+        Note: The following three variables are currently not cached because
+        it is unclear whether they need to be dynamic.
+         */
+        val windowScale =
+            WindowUtility.windowScaleMapping[themeSettings.windowScale]
+                ?: WindowUtility.windowScaleMapping[windowProperties.previousScale]
+                ?: themeSettings.windowScale.toFloatOrNull()
+                ?: 1f
 
         val (defaultWidth, defaultHeight) =
             (800 * windowScale).toInt() to (600 * windowScale).toInt()
 
         val (windowWidth, windowHeight) =
-            when (ConfigurationHandler.getInstance().themeSettings.windowScale) {
+            when (themeSettings.windowScale) {
                 "Maximized" -> WindowUtility.getUsableScreenSize().also { isWindowMaximized = true }
                 "Resizable" ->
-                    ConfigurationHandler.getInstance().windowProperties.currentWindowSize?.let {
-                        it.first to it.second
-                    } ?: (defaultWidth to defaultHeight)
+                    windowProperties.currentWindowSize?.let { it.first to it.second }
+                        ?: (defaultWidth to defaultHeight)
                 else -> defaultWidth to defaultHeight
             }
-
-        val screenSize = Toolkit.getDefaultToolkit().screenSize
 
         val windowState =
             rememberWindowState(
                 width = windowWidth.dp,
                 height = windowHeight.dp,
                 position =
-                    if (isWindowMaximized) {
-                        WindowPosition.PlatformDefault
-                    } else {
-                        WindowPosition(
-                            ((screenSize.width - windowWidth.dp.value) / 2).dp,
-                            ((screenSize.height - windowHeight.dp.value) / 2).dp,
-                        )
+                    remember(isWindowMaximized) {
+                        if (isWindowMaximized) {
+                            WindowPosition.PlatformDefault
+                        } else {
+                            WindowPosition(
+                                ((screenSize.width - windowWidth) / 2).dp,
+                                ((screenSize.height - windowHeight) / 2).dp,
+                            )
+                        }
                     },
             )
 
@@ -140,47 +142,34 @@ fun main(args: Array<String>) {
             transparent = true,
             state = windowState,
         ) {
-            if (ConfigurationHandler.getInstance().themeSettings.windowScale == "Resizable") {
-                window.isResizable = true
-            }
+            window.isResizable = themeSettings.windowScale == "Resizable"
             windowFrame = window
             windowSize =
-                if (
-                    ConfigurationHandler.getInstance().themeSettings.windowScale in
-                    listOf("Resizable", "Maximized")
-                ) {
-                    with(LocalDensity.current) {
+                if (themeSettings.windowScale in listOf("Resizable", "Maximized")) {
+                    with(density) {
                         Pair(window.size.width.toDp(), window.size.height.toDp())
                     }
                 } else {
-                    remember {
-                        Pair(windowState.size.width, windowState.size.height)
-                    }
+                    Pair(windowState.size.width, windowState.size.height)
                 }
 
-            window.isResizable =
-                ConfigurationHandler.getInstance().themeSettings.windowScale == "Resizable"
             window.apply {
                 val screenInsets =
-                    Toolkit.getDefaultToolkit()
-                        .getScreenInsets(
+                    remember {
+                        Toolkit.getDefaultToolkit().getScreenInsets(
                             GraphicsEnvironment.getLocalGraphicsEnvironment()
                                 .defaultScreenDevice.defaultConfiguration,
                         )
+                    }
 
-                if (ConfigurationHandler.getInstance().themeSettings.windowScale == "Maximized") {
+                if (themeSettings.windowScale == "Maximized") {
                     setLocation(screenInsets.left, screenInsets.top)
-                } else {
-                    centerOnScreen()
                 }
+
                 addComponentListener(
                     object : ComponentAdapter() {
                         override fun componentResized(event: ComponentEvent) {
-                            if (
-                                ConfigurationHandler.getInstance()
-                                    .themeSettings
-                                    .windowScale == "Resizable"
-                            ) {
+                            if (themeSettings.windowScale == "Resizable") {
                                 val newSize = event.component.size
                                 ConfigurationHandler.updateValue {
                                     windowProperties.currentWindowSize =
@@ -193,7 +182,10 @@ fun main(args: Array<String>) {
             }
 
             val roundedCornerShape =
-                RoundedCornerShape(if (isWindowMaximized) 0.dp else 24.dp)
+                remember(isWindowMaximized) {
+                    RoundedCornerShape(if (isWindowMaximized) 0.dp else 24.dp)
+                }
+
             Surface(
                 modifier =
                     Modifier
