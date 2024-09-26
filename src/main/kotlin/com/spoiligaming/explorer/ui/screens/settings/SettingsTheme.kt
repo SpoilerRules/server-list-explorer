@@ -13,6 +13,8 @@ import androidx.compose.foundation.onClick
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,17 +48,22 @@ import com.spoiligaming.explorer.windowFrame
 import kotlinx.coroutines.launch
 import java.awt.Dimension
 
-private val colorPickerStates =
-    mutableStateMapOf(
-        "Accent" to false,
-        "Secondary" to false,
-        "Secondary Control" to false,
-        "Control" to false,
-        "Menu" to false,
-        "Tertiary Control" to false,
-        "Quaternary" to false,
-        "Tertiary" to false,
+val colorKeys =
+    listOf(
+        "Accent",
+        "Secondary",
+        "Secondary Control",
+        "Control",
+        "Menu",
+        "Tertiary Control",
+        "Quaternary",
+        "Tertiary",
     )
+
+private val colorPickerStates =
+    mutableStateMapOf<String, Boolean>().apply {
+        colorKeys.forEach { key -> this[key] = false }
+    }
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -65,29 +72,25 @@ fun SettingsTheme() {
 
     val tooltipStates =
         remember {
-            mutableStateMapOf(
-                "Accent" to BasicTooltipState(),
-                "Secondary" to BasicTooltipState(),
-                "Secondary Control" to BasicTooltipState(),
-                "Control" to BasicTooltipState(),
-                "Menu" to BasicTooltipState(),
-                "Tertiary Control" to BasicTooltipState(),
-                "Quaternary" to BasicTooltipState(),
-                "Tertiary" to BasicTooltipState(),
-            )
+            colorKeys.associateWith { BasicTooltipState() }
         }
 
-    val colorPaletteMap =
-        mutableMapOf(
-            "Accent" to MapleColorPalette.accent,
-            "Secondary" to MapleColorPalette.secondary,
-            "Secondary Control" to MapleColorPalette.secondaryControl,
-            "Control" to MapleColorPalette.control,
-            "Menu" to MapleColorPalette.menu,
-            "Tertiary Control" to MapleColorPalette.tertiaryControl,
-            "Quaternary" to MapleColorPalette.quaternary,
-            "Tertiary" to MapleColorPalette.tertiary,
-        )
+    val colorPaletteMap by remember {
+        derivedStateOf {
+            colorKeys.zip(
+                listOf(
+                    MapleColorPalette.accent,
+                    MapleColorPalette.secondary,
+                    MapleColorPalette.secondaryControl,
+                    MapleColorPalette.control,
+                    MapleColorPalette.menu,
+                    MapleColorPalette.tertiaryControl,
+                    MapleColorPalette.quaternary,
+                    MapleColorPalette.tertiary,
+                ),
+            ).toMap()
+        }
+    }
 
     tooltipStates.forEach { (key, tooltipState) ->
         LaunchedEffect(colorPickerStates[key]) {
@@ -229,17 +232,6 @@ fun SettingsTheme() {
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            val colorKeys =
-                listOf(
-                    "Accent",
-                    "Secondary",
-                    "Secondary Control",
-                    "Control",
-                    "Menu",
-                    "Tertiary Control",
-                    "Quaternary",
-                    "Tertiary",
-                )
             colorKeys.forEach { key ->
                 MergedText("$key color", MapleColorPalette.text, FontWeight.Light, 2.49988774.dp) {
                     Box(
