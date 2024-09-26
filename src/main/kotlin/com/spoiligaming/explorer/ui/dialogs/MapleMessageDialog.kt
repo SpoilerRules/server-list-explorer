@@ -57,62 +57,60 @@ private fun MapleMessageDialog(
     description: String,
     onAccept: () -> Unit,
     onDismiss: () -> Unit,
+) = MapleDialogBase(
+    false,
+    0,
+    true,
+    onDismiss,
 ) {
-    MapleDialogBase(
-        false,
-        0,
-        true,
-        onDismiss,
+    Column(
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = title,
-                    color = MapleColorPalette.text,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style =
-                        TextStyle(
-                            fontFamily = FontFactory.comfortaaMedium,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 16.sp,
-                        ),
-                )
-                Text(
-                    text = description,
-                    color = MapleColorPalette.fadedText,
-                    maxLines = 7,
-                    overflow = TextOverflow.Ellipsis,
-                    style =
-                        TextStyle(
-                            fontFamily = FontFactory.comfortaaMedium,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 15.sp,
-                        ),
-                    textAlign = TextAlign.Center,
-                )
-            }
+            Text(
+                text = title,
+                color = MapleColorPalette.text,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style =
+                    TextStyle(
+                        fontFamily = FontFactory.comfortaaMedium,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp,
+                    ),
+            )
+            Text(
+                text = description,
+                color = MapleColorPalette.fadedText,
+                maxLines = 7,
+                overflow = TextOverflow.Ellipsis,
+                style =
+                    TextStyle(
+                        fontFamily = FontFactory.comfortaaMedium,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 15.sp,
+                    ),
+                textAlign = TextAlign.Center,
+            )
+        }
 
-            Box(modifier = Modifier.padding(bottom = 66.dp)) {
-                if (SettingsViewModel.experimentalIconifiedDialogOptions) {
-                    ExperimentalButtons(
-                        dismissOnly = isInformationOnly,
-                        onAccept = onAccept,
-                        onDismiss = onDismiss,
-                    )
-                } else {
-                    Buttons(
-                        dismissOnly = isInformationOnly,
-                        onAccept = onAccept,
-                        onDismiss = onDismiss,
-                    )
-                }
+        Box(modifier = Modifier.padding(bottom = 66.dp)) {
+            if (SettingsViewModel.experimentalIconifiedDialogOptions) {
+                ExperimentalButtons(
+                    dismissOnly = isInformationOnly,
+                    onAccept = onAccept,
+                    onDismiss = onDismiss,
+                )
+            } else {
+                Buttons(
+                    dismissOnly = isInformationOnly,
+                    onAccept = onAccept,
+                    onDismiss = onDismiss,
+                )
             }
         }
     }

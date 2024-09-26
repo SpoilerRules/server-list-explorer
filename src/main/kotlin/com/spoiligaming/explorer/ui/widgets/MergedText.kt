@@ -86,31 +86,29 @@ fun MergedText(
     secondTextFontFamily: FontFamily = FontFactory.comfortaaRegular,
     secondTextWeight: FontWeight,
     modifier: Modifier = Modifier,
-) {
-    Row(modifier) {
-        Text(
-            text = firstText,
-            color = firstTextColor,
-            style =
-                TextStyle(
-                    fontFamily = firstTextFontFamily,
-                    fontWeight = firstTextWeight,
-                    fontSize = 16.sp,
-                ),
-        )
-        Text(
-            text = secondText,
-            color = secondTextColor,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style =
-                TextStyle(
-                    fontFamily = secondTextFontFamily,
-                    fontWeight = secondTextWeight,
-                    fontSize = 16.sp,
-                ),
-        )
-    }
+) = Row(modifier) {
+    Text(
+        text = firstText,
+        color = firstTextColor,
+        style =
+            TextStyle(
+                fontFamily = firstTextFontFamily,
+                fontWeight = firstTextWeight,
+                fontSize = 16.sp,
+            ),
+    )
+    Text(
+        text = secondText,
+        color = secondTextColor,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        style =
+            TextStyle(
+                fontFamily = secondTextFontFamily,
+                fontWeight = secondTextWeight,
+                fontSize = 16.sp,
+            ),
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -166,31 +164,29 @@ fun MergedInfoText(
     secondText: String,
     secondTextColor: Color,
     rowModifier: Modifier = Modifier,
-) {
-    Row(rowModifier) {
-        Text(
-            text = firstText,
-            color = MapleColorPalette.fadedText,
-            style =
-                TextStyle(
-                    fontFamily = FontFactory.comfortaaMedium,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                ),
-        )
-        Text(
-            text = secondText,
-            color = secondTextColor,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
-            style =
-                TextStyle(
-                    fontFamily = FontFactory.comfortaaRegular,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 16.sp,
-                ),
-        )
-    }
+) = Row(rowModifier) {
+    Text(
+        text = firstText,
+        color = MapleColorPalette.fadedText,
+        style =
+            TextStyle(
+                fontFamily = FontFactory.comfortaaMedium,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+            ),
+    )
+    Text(
+        text = secondText,
+        color = secondTextColor,
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 1,
+        style =
+            TextStyle(
+                fontFamily = FontFactory.comfortaaRegular,
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp,
+            ),
+    )
 }
 
 @Composable
@@ -334,26 +330,24 @@ fun MergedText(
     firstTextWeight: FontWeight,
     firstTextOffset: Dp = 2.49988774.dp,
     content: @Composable () -> Unit,
-) {
-    Box(contentAlignment = Alignment.Center) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Row {
-                content()
+) = Box(contentAlignment = Alignment.Center) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Row {
+            content()
 
-                Spacer(modifier = Modifier.width(7.dp))
+            Spacer(modifier = Modifier.width(7.dp))
 
-                Text(
-                    modifier = Modifier.offset(x = firstTextOffset),
-                    text = firstText,
-                    color = firstTextColor,
-                    style =
-                        TextStyle(
-                            fontFamily = FontFactory.comfortaaLight,
-                            fontWeight = firstTextWeight,
-                            fontSize = 15.sp,
-                        ),
-                )
-            }
+            Text(
+                modifier = Modifier.offset(x = firstTextOffset),
+                text = firstText,
+                color = firstTextColor,
+                style =
+                    TextStyle(
+                        fontFamily = FontFactory.comfortaaLight,
+                        fontWeight = firstTextWeight,
+                        fontSize = 15.sp,
+                    ),
+            )
         }
     }
 }
