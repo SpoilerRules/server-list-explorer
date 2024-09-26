@@ -45,10 +45,12 @@ fun MapleServerEntryValueReplacementDialog(
 ) {
     var value by remember { mutableStateOf("") }
     val placeholderValue =
-        when (type) {
-            ValueReplacementType.NAME -> serverName
-            ValueReplacementType.ADDRESS -> serverAddress
-            ValueReplacementType.ICON -> "aHR0cHM6Ly95b3V0dS5iZS9paWsyNXdxSXVGbw=="
+        remember {
+            when (type) {
+                ValueReplacementType.NAME -> serverName
+                ValueReplacementType.ADDRESS -> serverAddress
+                ValueReplacementType.ICON -> "aHR0cHM6Ly95b3V0dS5iZS9paWsyNXdxSXVGbw=="
+            }
         }
 
     MapleDialogBase(
@@ -79,7 +81,12 @@ fun MapleServerEntryValueReplacementDialog(
                         )
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             MergedText(
-                                "${if (type == ValueReplacementType.NAME) "Current" else "Server"} Name: ",
+                                "${if (type == ValueReplacementType.NAME) {
+                                    "Current"
+                                } else {
+                                    "Server"
+                                }
+                                } Name: ",
                                 MapleColorPalette.fadedText,
                                 FontFactory.comfortaaMedium,
                                 FontWeight.Bold,
@@ -89,7 +96,12 @@ fun MapleServerEntryValueReplacementDialog(
                                 FontWeight.Normal,
                             )
                             MergedText(
-                                "${if (type == ValueReplacementType.ADDRESS) "Current" else "Server"} Address: ",
+                                "${if (type == ValueReplacementType.ADDRESS) {
+                                    "Current"
+                                } else {
+                                    "Server"
+                                }
+                                } Address: ",
                                 MapleColorPalette.fadedText,
                                 FontFactory.comfortaaMedium,
                                 FontWeight.Bold,

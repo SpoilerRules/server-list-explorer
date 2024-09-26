@@ -3,6 +3,7 @@ package com.spoiligaming.explorer.ui.state
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import com.spoiligaming.explorer.isBackupRestoreInProgress
@@ -117,13 +118,15 @@ object DialogController {
                         description =
                             "The process took ${
                                 buildString {
-                                    val totalSeconds = dialogData.duration / 1000
+                                    val totalSeconds = remember { dialogData.duration / 1000 }
                                     val (hours, minutes, remainingSeconds) =
-                                        listOf(
-                                            totalSeconds / 3600,
-                                            (totalSeconds % 3600) / 60,
-                                            totalSeconds % 60,
-                                        )
+                                        remember {
+                                            listOf(
+                                                totalSeconds / 3600,
+                                                (totalSeconds % 3600) / 60,
+                                                totalSeconds % 60,
+                                            )
+                                        }
 
                                     if (hours > 0) {
                                         append(
