@@ -42,7 +42,6 @@ import com.spoiligaming.explorer.ConfigurationHandler
 import com.spoiligaming.explorer.isBackupRestoreInProgress
 import com.spoiligaming.explorer.server.BackupController
 import com.spoiligaming.explorer.ui.MapleColorPalette
-import com.spoiligaming.explorer.ui.SettingsViewModel
 import com.spoiligaming.explorer.ui.components.FileElement
 import com.spoiligaming.explorer.ui.fonts.FontFactory
 import com.spoiligaming.explorer.ui.state.DialogController
@@ -69,13 +68,22 @@ fun FileBackupSubScreen() {
             backupEntries =
                 BackupController.getBackups().let { entries ->
                     when (currentSortOrder) {
-                        "Newest" -> entries.sortedByDescending { parseDateFromFileName(it.fileName) }
-                        "Oldest" -> entries.sortedBy { parseDateFromFileName(it.fileName) }
+                        "Newest" ->
+                            entries.sortedByDescending {
+                                parseDateFromFileName(it.fileName)
+                            }
+                        "Oldest" ->
+                            entries.sortedBy {
+                                parseDateFromFileName(it.fileName)
+                            }
                         "Largest Size" ->
                             entries.sortedByDescending {
                                 parseSizeFromHumanReadableFormat(it.formattedFileSize)
                             }
-                        "Smallest Size" -> entries.sortedBy { parseSizeFromHumanReadableFormat(it.formattedFileSize) }
+                        "Smallest Size" ->
+                            entries.sortedBy {
+                                parseSizeFromHumanReadableFormat(it.formattedFileSize)
+                            }
                         else -> entries
                     }
                 }
@@ -84,13 +92,18 @@ fun FileBackupSubScreen() {
     }
 
     val shouldShowScrollbar =
-        SettingsViewModel.scrollbarVisibility != "Disabled" &&
-            when (configuration.themeSettings.windowScale) {
-                "100%", "1f", "1.0f" -> backupEntries.size > 4
-                "125%", "1.25f" -> backupEntries.size > 9
-                "150%", "1.5f" -> backupEntries.size > 12
-                else -> backupEntries.size > 9
-            }
+        remember(
+            configuration.generalSettings.scrollBarVisibility,
+            configuration.themeSettings.windowScale,
+        ) {
+            configuration.generalSettings.scrollBarVisibility != "Disabled" &&
+                when (configuration.themeSettings.windowScale) {
+                    "100%", "1f", "1.0f" -> backupEntries.size > 4
+                    "125%", "1.25f" -> backupEntries.size > 9
+                    "150%", "1.5f" -> backupEntries.size > 12
+                    else -> backupEntries.size > 9
+                }
+        }
 
     Box(
         modifier =
@@ -123,7 +136,8 @@ fun FileBackupSubScreen() {
                         )
                         if (isBackupRestoreInProgress) {
                             Text(
-                                text = "Backup restoration in progress.\nPlease wait while we complete the operation.",
+                                text = "Backup restoration in progress." +
+                                "\nPlease wait while we complete the operation.",
                                 maxLines = 2,
                                 color = MapleColorPalette.fadedText,
                                 style =

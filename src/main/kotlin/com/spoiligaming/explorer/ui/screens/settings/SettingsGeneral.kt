@@ -25,7 +25,6 @@ fun SettingsGeneral() =
             options = listOf("Right Side", "Left Side", "Disabled"),
         ) { newValue ->
             ConfigurationHandler.updateValue { generalSettings.scrollBarVisibility = newValue }
-            SettingsViewModel.scrollbarVisibility = newValue
         }
 
         DropdownMenuWithLabel(

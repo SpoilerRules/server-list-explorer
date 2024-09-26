@@ -8,8 +8,6 @@ import com.spoiligaming.explorer.ConfigurationHandler
 object SettingsViewModel {
     private val configurationHandler = ConfigurationHandler.getInstance()
 
-    var scrollbarVisibility by
-        mutableStateOf(configurationHandler.generalSettings.scrollBarVisibility)
     var controlPanelPosition by
         mutableStateOf(configurationHandler.generalSettings.controlPanelPosition)
     var displayShortcutsInContextMenu by

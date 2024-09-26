@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,24 +42,35 @@ fun ServerListView() {
     val configuration = ConfigurationHandler.getInstance()
 
     val shouldShowScrollbar =
-        SettingsViewModel.scrollbarVisibility != "Disabled" &&
-            when (configuration.themeSettings.windowScale) {
-                "100%", "1f", "1.0f" -> ContemporaryServerEntryListData.serverNameList.size > 4
-                "125%", "1.25f" -> ContemporaryServerEntryListData.serverNameList.size > 6
-                "150%", "1.5f" -> ContemporaryServerEntryListData.serverNameList.size > 8
-                else -> ContemporaryServerEntryListData.serverNameList.size > 8
-            }
+        remember(
+            configuration.generalSettings.scrollBarVisibility,
+            configuration.themeSettings.windowScale,
+        ) {
+            configuration.generalSettings.scrollBarVisibility != "Disabled" &&
+                when (configuration.themeSettings.windowScale) {
+                    "100%", "1f", "1.0f" -> ContemporaryServerEntryListData.serverNameList.size > 4
+                    "125%", "1.25f" -> ContemporaryServerEntryListData.serverNameList.size > 6
+                    "150%", "1.5f" -> ContemporaryServerEntryListData.serverNameList.size > 8
+                    else -> ContemporaryServerEntryListData.serverNameList.size > 8
+                }
+        }
 
-    val serverItems =
-        ContemporaryServerEntryListData.serverNameList.zip(
-            ContemporaryServerEntryListData.serverAddressList,
-        )
-            .mapIndexed { index, pair -> ServerItem(index, pair.first, pair.second) }
+    val serverItems by remember {
+        derivedStateOf {
+            ContemporaryServerEntryListData.serverNameList.zip(
+                ContemporaryServerEntryListData.serverAddressList,
+            ).mapIndexed { index, pair ->
+                ServerItem(index, pair.first, pair.second)
+            }
+        }
+    }
 
     val filteredServerItems =
-        serverListSearchQuery?.let { query ->
-            serverItems.filter { it.name.contains(query, ignoreCase = true) }
-        } ?: serverItems
+        remember(serverListSearchQuery, serverItems) {
+            serverListSearchQuery?.let { query ->
+                serverItems.filter { it.name.contains(query, ignoreCase = true) }
+            } ?: serverItems
+        }
 
     disableServerInfoIndexing
         .takeIf { !it }
@@ -67,7 +80,9 @@ fun ServerListView() {
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    if (SettingsViewModel.controlPanelPosition == "Top") ServerListControlPanelRow()
+                    if (SettingsViewModel.controlPanelPosition == "Top") {
+                        ServerListControlPanelRow()
+                    }
                     Box(modifier = Modifier.weight(1f)) {
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(5.dp),
@@ -78,7 +93,8 @@ fun ServerListView() {
                                     .padding(
                                         start =
                                             if (
-                                                configuration.generalSettings.scrollBarVisibility == "Left Side" &&
+                                                configuration.generalSettings.scrollBarVisibility ==
+                                                "Left Side" &&
                                                 shouldShowScrollbar
                                             ) {
                                                 15.dp
@@ -87,7 +103,8 @@ fun ServerListView() {
                                             },
                                         end =
                                             if (
-                                                configuration.generalSettings.scrollBarVisibility == "Right Side" &&
+                                                configuration.generalSettings.scrollBarVisibility
+                                                == "Right Side" &&
                                                 shouldShowScrollbar
                                             ) {
                                                 15.dp
@@ -109,9 +126,12 @@ fun ServerListView() {
                                     serverName = item.name,
                                     serverAddress = item.address,
                                     serverPositionInList = item.originalIndex,
-                                    isSelected = item.originalIndex == ContemporaryServerEntryListData.selectedServer,
+                                    isSelected =
+                                        item.originalIndex ==
+                                            ContemporaryServerEntryListData.selectedServer,
                                     onClick = {
-                                        ContemporaryServerEntryListData.selectedServer = item.originalIndex
+                                        ContemporaryServerEntryListData.selectedServer =
+                                            item.originalIndex
                                     },
                                     onMoveUp = { moveServerUp(item.originalIndex) },
                                     onMoveDown = { moveServerDown(item.originalIndex) },
@@ -121,7 +141,9 @@ fun ServerListView() {
 
                         MapleVerticalScrollbar(shouldShowScrollbar, scrollState)
                     }
-                    if (SettingsViewModel.controlPanelPosition == "Bottom") ServerListControlPanelRow()
+                    if (SettingsViewModel.controlPanelPosition == "Bottom") {
+                        ServerListControlPanelRow()
+                    }
                 }
             }
         }
