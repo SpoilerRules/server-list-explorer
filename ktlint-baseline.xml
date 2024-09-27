@@ -25,19 +25,23 @@
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/StationaryView.kt">
         <error line="77" column="1" source="standard:max-line-length" />
     </file>
+    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/screens/home/FileBackupSubScreen.kt">
+        <error line="260" column="1" source="standard:max-line-length" />
+        <error line="269" column="1" source="standard:max-line-length" />
+    </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/screens/home/InformationContainer.kt">
         <error line="41" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/state/DialogController.kt">
-        <error line="105" column="1" source="standard:max-line-length" />
-        <error line="140" column="1" source="standard:max-line-length" />
-        <error line="144" column="1" source="standard:max-line-length" />
-        <error line="155" column="1" source="standard:max-line-length" />
-        <error line="163" column="1" source="standard:max-line-length" />
-        <error line="182" column="1" source="standard:max-line-length" />
-        <error line="208" column="1" source="standard:max-line-length" />
-        <error line="215" column="1" source="standard:max-line-length" />
-        <error line="229" column="1" source="standard:max-line-length" />
-        <error line="243" column="1" source="standard:max-line-length" />
+        <error line="106" column="1" source="standard:max-line-length" />
+        <error line="143" column="1" source="standard:max-line-length" />
+        <error line="147" column="1" source="standard:max-line-length" />
+        <error line="158" column="1" source="standard:max-line-length" />
+        <error line="166" column="1" source="standard:max-line-length" />
+        <error line="185" column="1" source="standard:max-line-length" />
+        <error line="211" column="1" source="standard:max-line-length" />
+        <error line="218" column="1" source="standard:max-line-length" />
+        <error line="232" column="1" source="standard:max-line-length" />
+        <error line="246" column="1" source="standard:max-line-length" />
     </file>
 </baseline>

@@ -136,8 +136,9 @@ fun FileBackupSubScreen() {
                         )
                         if (isBackupRestoreInProgress) {
                             Text(
-                                text = "Backup restoration in progress." +
-                                "\nPlease wait while we complete the operation.",
+                                text =
+                                    "Backup restoration in progress." +
+                                        "\nPlease wait while we complete the operation.",
                                 maxLines = 2,
                                 color = MapleColorPalette.fadedText,
                                 style =
