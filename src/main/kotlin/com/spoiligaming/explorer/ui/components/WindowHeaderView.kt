@@ -1,6 +1,5 @@
 package com.spoiligaming.explorer.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -195,7 +194,12 @@ private fun SettingsButton(
             ),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(bitmap = icon, contentDescription = null, modifier = Modifier.size(16.dp))
+            Icon(
+                bitmap = icon,
+                contentDescription = null,
+                tint = MapleColorPalette.fadedText,
+                modifier = Modifier.size(16.dp),
+            )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = buttonText,
