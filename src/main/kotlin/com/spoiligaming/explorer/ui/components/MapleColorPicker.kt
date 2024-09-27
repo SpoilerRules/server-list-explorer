@@ -1,13 +1,15 @@
 package com.spoiligaming.explorer.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -52,12 +54,14 @@ fun MapleColorPicker(
         Box(
             modifier =
                 Modifier.width(300.dp)
-                    .height(326.dp)
+                    .height(IntrinsicSize.Min)
                     .background(MapleColorPalette.menu, shape = RoundedCornerShape(18.dp)),
         ) {
-            Column {
-                Spacer(modifier = Modifier.height(7.dp))
-                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                Box(
+                    Modifier.fillMaxWidth().padding(top = 5.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
                     Text(
                         text = settingName,
                         color = MapleColorPalette.text,
@@ -69,11 +73,13 @@ fun MapleColorPicker(
                             ),
                     )
                 }
-                Spacer(modifier = Modifier.height(3.dp))
                 ClassicColorPicker(
                     modifier =
-                        Modifier.fillMaxWidth(0.95f)
-                            .height(201.dp)
+                        Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 200.dp)
+                            .weight(1f)
+                            .padding(horizontal = 5.dp)
                             .align(Alignment.CenterHorizontally),
                     color = currentColor,
                     onColorChanged = { newValue ->
@@ -81,7 +87,6 @@ fun MapleColorPicker(
                         onValueUpdate(newValue.toColor())
                     },
                 )
-                Spacer(modifier = Modifier.height(9.dp))
                 ColorInfoSection(currentColor, defaultColor, onValueUpdate, onDismiss)
             }
         }
@@ -94,20 +99,17 @@ private fun ColorInfoSection(
     defaultColor: Color,
     onValueUpdate: (Color) -> Unit,
     onDismiss: () -> Unit,
-) = Column {
+) = Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
     ColorDetails(currentColor)
-    Spacer(modifier = Modifier.height(3.dp))
     ResetButton(defaultColor, onValueUpdate, onDismiss)
 }
 
 @Composable
 private fun ColorDetails(color: Color) =
-    Box(modifier = Modifier.fillMaxWidth(0.95f), contentAlignment = Alignment.CenterStart) {
-        Column(modifier = Modifier.offset(x = 5.dp)) {
-            ColorDetailRow(label = "Hex: ", value = "#${color.toHex()}")
-            ColorDetailRow(label = "HexRGBA: ", value = color.toHexRgba())
-            ColorDetailRow(label = "NumericRGBA: ", value = color.toNumericRgba())
-        }
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)) {
+        ColorDetailRow(label = "Hex: ", value = "#${color.toHex()}")
+        ColorDetailRow(label = "HexRGBA: ", value = color.toHexRgba())
+        ColorDetailRow(label = "NumericRGBA: ", value = color.toNumericRgba())
     }
 
 @Composable
@@ -145,7 +147,7 @@ private fun ResetButton(
     onValueUpdate: (Color) -> Unit,
     onDismiss: () -> Unit,
 ) = Box(
-    modifier = Modifier.fillMaxWidth(0.97f).offset(x = 5.25.dp),
+    modifier = Modifier.fillMaxWidth().padding(start = 5.dp, end = 5.dp, bottom = 5.dp),
     contentAlignment = Alignment.Center,
 ) {
     MapleButton(
