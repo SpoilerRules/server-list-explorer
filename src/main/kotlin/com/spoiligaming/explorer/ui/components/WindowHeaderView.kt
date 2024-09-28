@@ -58,6 +58,7 @@ fun WindowHeaderView(allowNavigation: Boolean) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(start = 10.dp, top = 10.dp, end = 10.dp),
             ) {
+                println(currentScreen)
                 if (allowNavigation && !isBackupRestoreInProgress) {
                     when (currentScreen) {
                         is Screen.FileBackupScreen -> {
@@ -82,12 +83,12 @@ fun WindowHeaderView(allowNavigation: Boolean) {
                             }
                         }
                     }
-                    Spacer(Modifier.weight(1f))
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        ControlButton(ActionType.MINIMIZE)
-                        //  ControlButton(ActionType.MAXIMIZE) temporarily disabled until dynamic focus allocation for focus demanding dialogs implemented.
-                        ControlButton(ActionType.EXIT)
-                    }
+                }
+                Spacer(Modifier.weight(1f))
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    ControlButton(ActionType.MINIMIZE)
+                    //  ControlButton(ActionType.MAXIMIZE) temporarily disabled until dynamic focus allocation for focus demanding dialogs implemented.
+                    ControlButton(ActionType.EXIT)
                 }
             }
 
