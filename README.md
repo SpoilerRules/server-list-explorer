@@ -10,16 +10,18 @@
 ## User Interface Preview
 
 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 0fr)); gap: 10px; justify-content: center;">
-  <img src="https://i.ibb.co/yB7SV7B/java-qcie-Is-Na1-L.png" width="250" alt="Screenshot 1">
-  <img src="https://i.imgur.com/5QUawrT.png" width="250" alt="Screenshot 3">
-  <img src="https://i.imgur.com/TbeCvfW.png" width="250" alt="Screenshot 4">
-  <img src="https://i.imgur.com/MALULZ6.png" width="250" alt="Screenshot 5">
-  <img src="https://i.imgur.com/uIWROgP.png" width="250" alt="Screenshot 6">
-  <img src="https://i.imgur.com/pawJ8B5.png" width="250" alt="Screenshot 9">
-  <img src="https://i.imgur.com/h86HkSZ.png" width="250" alt="Screenshot 7">
-  <img src="https://i.imgur.com/fu99YL2.png" width="250" alt="Screenshot 2">
-  <img src="https://i.imgur.com/g3eRtF2.png" width="250" alt="Screenshot 8">
-  <img src="https://i.ibb.co/XVKZzjK/java-Hj-Vev9-W5-Nw.png" width="250" alt="Screenshot 10">
+  <img src="https://i.imgur.com/hbuQYUy.png" width="250" alt="Screenshot 1">
+  <img src="https://i.imgur.com/lSPgLur.png" width="250" alt="Screenshot 2">
+  <img src="https://i.imgur.com/3DIxn7c.png" width="250" alt="Screenshot 3">
+  <img src="https://i.imgur.com/tcIHRDb.png" width="250" alt="Screenshot 4">
+  <img src="https://i.imgur.com/uqIy4nC.png" width="250" alt="Screenshot 5">
+  <img src="https://i.imgur.com/StRBnvS.png" width="250" alt="Screenshot 6">
+  <img src="https://i.imgur.com/PrkZPnH.png" width="250" alt="Screenshot 7">
+  <img src="https://i.imgur.com/XtVdbEB.png" width="250" alt="Screenshot 8">
+  <img src="https://i.imgur.com/w22c4vu.png" width="250" alt="Screenshot 9">
+  <img src="https://i.imgur.com/XWyCGdV.png" width="250" alt="Screenshot 10">
+  <img src="https://i.imgur.com/mdt8g5D.png" width="250" alt="Screenshot 11">
+  <img src="https://i.imgur.com/thhpRfq.png" width="250" alt="Screenshot 12">
 </div>
 
 ## Table of Contents
