@@ -90,7 +90,7 @@ fun DropdownMenuWithLabel(
     MapleDropdownMenu(
         false,
         currentValue,
-        options
+        options,
     ) { newValue ->
         onValueChange(newValue)
     }
