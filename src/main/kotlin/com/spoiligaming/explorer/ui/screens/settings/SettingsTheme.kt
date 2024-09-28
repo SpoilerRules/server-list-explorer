@@ -50,7 +50,9 @@ import java.awt.Dimension
 
 val colorKeys =
     listOf(
+        "Text",
         "Accent",
+        "Faded Text",
         "Secondary",
         "Secondary Control",
         "Control",
@@ -79,7 +81,9 @@ fun SettingsTheme() {
         derivedStateOf {
             colorKeys.zip(
                 listOf(
+                    MapleColorPalette.text,
                     MapleColorPalette.accent,
+                    MapleColorPalette.fadedText,
                     MapleColorPalette.secondary,
                     MapleColorPalette.secondaryControl,
                     MapleColorPalette.control,
@@ -244,9 +248,14 @@ fun SettingsTheme() {
                                             ?: Color.Transparent,
                                     shape = RoundedCornerShape(4.dp),
                                 )
-                                .onClick { colorPickerStates[key] = true }
+                                .onClick {
+                                    tooltipStates[key]?.dismiss()
+                                    colorPickerStates[key] = true
+                                }
                                 .onPointerEvent(PointerEventType.Enter) {
-                                    coroutineScope.launch { tooltipStates[key]?.show() }
+                                    if (colorPickerStates[key] == false) {
+                                        coroutineScope.launch { tooltipStates[key]?.show() }
+                                    }
                                 }
                                 .onPointerEvent(PointerEventType.Exit) {
                                     tooltipStates[key]?.dismiss()
@@ -254,7 +263,11 @@ fun SettingsTheme() {
                     ) {
                         BasicTooltipBox(
                             tooltip = {
-                                MapleColorInformation(colorPaletteMap[key] ?: Color.Transparent)
+                                colorPickerStates[key]?.takeIf { !it }?.let {
+                                    colorPaletteMap[key]?.let { color ->
+                                        MapleColorInformation(color)
+                                    }
+                                }
                             },
                             positionProvider =
                                 object : PopupPositionProvider {
@@ -281,11 +294,25 @@ fun SettingsTheme() {
 @Composable
 fun SettingsThemeOuter() {
     displayColorPicker(
+        "Text",
+        MapleColorPalette.text,
+        MapleColorPalette.defaultText,
+    ) { newValue ->
+        MapleColorPalette.text = newValue
+    }
+    displayColorPicker(
         "Accent",
         MapleColorPalette.accent,
         MapleColorPalette.defaultAccent,
     ) { newValue ->
         MapleColorPalette.accent = newValue
+    }
+    displayColorPicker(
+        "Faded Text",
+        MapleColorPalette.fadedText,
+        MapleColorPalette.defaultFadedText,
+    ) { newValue ->
+        MapleColorPalette.fadedText = newValue
     }
     displayColorPicker(
         "Secondary",
@@ -350,9 +377,23 @@ private fun displayColorPicker(
                 ConfigurationHandler.updateValue {
                     themeSettings =
                         when (key) {
+                            "Text" ->
+                                themeSettings.copy(
+                                    textColor =
+                                        ColorPaletteUtility.getColorAsString(
+                                            newValue,
+                                        ),
+                                )
                             "Accent" ->
                                 themeSettings.copy(
                                     accentColor =
+                                        ColorPaletteUtility.getColorAsString(
+                                            newValue,
+                                        ),
+                                )
+                            "Faded Text" ->
+                                themeSettings.copy(
+                                    fadedTextColor =
                                         ColorPaletteUtility.getColorAsString(
                                             newValue,
                                         ),

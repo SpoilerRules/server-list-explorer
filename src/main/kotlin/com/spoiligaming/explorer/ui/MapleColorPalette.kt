@@ -15,7 +15,16 @@ object MapleColorPalette {
     val defaultSecondaryControl = Color(0xFF595959)
     val defaultTertiaryControl = Color(0xFF3F3F3F)
     val defaultSecondary = Color(0xFF727272)
+    val defaultFadedText = Color(0xFFCCCCCC)
     val defaultAccent = Color(0xFFE85D9B)
+    val defaultText = Color(0xFFFFFFFF)
+
+    private val _text = mutableStateOf(Color.White)
+    var text: Color
+        get() = _text.value
+        set(value) {
+            _text.value = value
+        }
 
     private val _accent =
         mutableStateOf(ColorPaletteUtility.convertStringToColor(config.accentColor))
@@ -23,6 +32,13 @@ object MapleColorPalette {
         get() = _accent.value
         set(value) {
             _accent.value = value
+        }
+
+    private val _fadedText = mutableStateOf(Color(0xFFCCCCCC))
+    var fadedText: Color
+        get() = _fadedText.value
+        set(value) {
+            _fadedText.value = value
         }
 
     private val _menu = mutableStateOf(ColorPaletteUtility.convertStringToColor(config.menuColor))
@@ -84,6 +100,4 @@ object MapleColorPalette {
     val mapleOutdated = Color(0xFFFE4501) // not modifiable
     val mapleWebsiteOutdated = Color(0xFFFAC800) // not modifiable
     val mapleDetected = Color.Red // not modifiable
-    val text = Color.White // not modifiable
-    val fadedText = Color(0xFFCCCCCC) // not modifiable
 }

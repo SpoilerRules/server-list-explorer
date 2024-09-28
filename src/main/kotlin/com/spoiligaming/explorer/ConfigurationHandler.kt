@@ -30,6 +30,8 @@ data class SettingsTheme(
     var secondaryColor: String = "#727272",
     var tertiaryColor: String = "#282828",
     var quaternaryColor: String = "#343434",
+    var textColor: String = "#FFFFFF",
+    var fadedTextColor: String = "#CCCCCC",
 )
 
 @Serializable
