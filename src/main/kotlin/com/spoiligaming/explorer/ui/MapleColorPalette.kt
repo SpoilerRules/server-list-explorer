@@ -19,7 +19,8 @@ object MapleColorPalette {
     val defaultAccent = Color(0xFFE85D9B)
     val defaultText = Color(0xFFFFFFFF)
 
-    private val _text = mutableStateOf(Color.White)
+    private val _text =
+        mutableStateOf(ColorPaletteUtility.convertStringToColor(config.textColor))
     var text: Color
         get() = _text.value
         set(value) {
@@ -34,7 +35,8 @@ object MapleColorPalette {
             _accent.value = value
         }
 
-    private val _fadedText = mutableStateOf(Color(0xFFCCCCCC))
+    private val _fadedText =
+        mutableStateOf(ColorPaletteUtility.convertStringToColor(config.fadedTextColor))
     var fadedText: Color
         get() = _fadedText.value
         set(value) {
