@@ -40,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
@@ -86,7 +87,13 @@ fun DropdownMenuWithLabel(
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(5.dp),
 ) {
-    MapleDropdownMenu(currentValue, options) { newValue -> onValueChange(newValue) }
+    MapleDropdownMenu(
+        false,
+        currentValue,
+        options
+    ) { newValue ->
+        onValueChange(newValue)
+    }
     Text(
         text = label,
         color = MapleColorPalette.text,
@@ -102,6 +109,7 @@ fun DropdownMenuWithLabel(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MapleDropdownMenu(
+    elevation: Boolean,
     defaultValue: String,
     options: List<String>,
     onValueUpdate: (String) -> Unit,
@@ -197,6 +205,7 @@ fun MapleDropdownMenu(
                     expandedState = dropdownExpandedState,
                     transformOriginState = transformOriginState,
                     scrollState = rememberScrollState(),
+                    elevation = elevation,
                     modifier =
                         Modifier.width(255.dp)
                             .clip(RoundedCornerShape(12.dp))
@@ -266,6 +275,7 @@ private fun DropdownMenuContent(
     expandedState: MutableTransitionState<Boolean>,
     transformOriginState: MutableState<TransformOrigin>,
     scrollState: ScrollState,
+    elevation: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -313,10 +323,16 @@ private fun DropdownMenuContent(
                 0f
             }
         }
+
     Box(
         modifier =
-            Modifier.clip(RoundedCornerShape(12.dp))
-                .background(color = MapleColorPalette.secondaryControl, RoundedCornerShape(12.dp))
+            Modifier
+                .shadow(
+                    elevation = if (elevation) 2.dp else 0.dp,
+                    shape = RoundedCornerShape(12.dp),
+                )
+                .clip(RoundedCornerShape(12.dp))
+                .background(MapleColorPalette.secondaryControl, RoundedCornerShape(12.dp))
                 .graphicsLayer {
                     scaleX = scale
                     scaleY = scale
@@ -325,7 +341,10 @@ private fun DropdownMenuContent(
                 },
     ) {
         Column(
-            modifier = modifier.width(IntrinsicSize.Max).verticalScroll(scrollState),
+            modifier =
+                modifier
+                    .width(IntrinsicSize.Max)
+                    .verticalScroll(scrollState),
         ) {
             Spacer(Modifier.height(5.dp))
             content()

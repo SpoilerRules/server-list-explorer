@@ -218,6 +218,7 @@ fun FileBackupSubScreen() {
                                     ),
                             )
                             MapleDropdownMenu(
+                                true,
                                 currentSortOrder,
                                 options =
                                     listOf(

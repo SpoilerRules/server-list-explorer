@@ -26,8 +26,8 @@
         <error line="77" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/screens/home/FileBackupSubScreen.kt">
-        <error line="260" column="1" source="standard:max-line-length" />
-        <error line="269" column="1" source="standard:max-line-length" />
+        <error line="261" column="1" source="standard:max-line-length" />
+        <error line="270" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/screens/home/InformationContainer.kt">
         <error line="41" column="1" source="standard:max-line-length" />
