@@ -58,7 +58,6 @@ fun WindowHeaderView(allowNavigation: Boolean) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(start = 10.dp, top = 10.dp, end = 10.dp),
             ) {
-                println(currentScreen)
                 if (allowNavigation && !isBackupRestoreInProgress) {
                     when (currentScreen) {
                         is Screen.FileBackupScreen -> {
