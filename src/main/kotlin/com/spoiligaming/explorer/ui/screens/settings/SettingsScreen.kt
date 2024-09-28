@@ -91,6 +91,7 @@ fun SettingsScreen() {
                 .padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
         contentAlignment = Alignment.TopCenter,
     ) {
+        categories.forEach { category -> category.outerContent?.invoke() }
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp),
             modifier =
@@ -102,7 +103,6 @@ fun SettingsScreen() {
                     )
                     .padding(10.dp),
         ) {
-            categories.forEach { category -> category.outerContent?.invoke() }
             SettingsCategoryBar(listState, coroutineScope)
 
             LazyColumn(
