@@ -8,7 +8,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.ContextMenuState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.LocalContextMenuRepresentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -385,7 +384,7 @@ fun ServerElement(
                         modifier =
                             Modifier
                                 .size(48.dp, 48.dp)
-                                .background(Color.Transparent, shape = RoundedCornerShape(4.dp))
+                                .background(Color.Transparent)
                                 .onHover { isIconHovered = it },
                     ) {
                         ServerIconImage(
@@ -402,30 +401,26 @@ fun ServerElement(
                         Box(
                             modifier =
                                 Modifier.fillMaxSize()
-                                    .clip(RoundedCornerShape(4.dp))
                                     .background(
                                         MapleColorPalette.quaternary.copy(
                                             alpha = overlayAlpha,
                                         ),
-                                        shape = RoundedCornerShape(8.dp),
                                     ),
                             contentAlignment = Alignment.Center,
                         ) {
                             Box(
                                 modifier =
-                                    Modifier.size(28.dp)
-                                        .clip(RoundedCornerShape(4.dp))
+                                    Modifier.size(30.dp)
                                         .pointerHoverIcon(PointerIcon.Hand)
                                         .background(
-                                            color =
-                                                if (isOverlayHovered) {
-                                                    MapleColorPalette.fadedText.copy(
-                                                        alpha = secondaryColorAlpha,
-                                                    )
-                                                } else {
-                                                    Color.Transparent
-                                                },
-                                            shape = RoundedCornerShape(4.dp),
+                                            if (isOverlayHovered) {
+                                                MapleColorPalette.fadedText.copy(
+                                                    alpha = secondaryColorAlpha,
+                                                )
+                                            } else {
+                                                Color.Transparent
+                                            },
+                                            RoundedCornerShape(6.dp),
                                         )
                                         .onHover { isOverlayHovered = it }
                                         .pointerInput(Unit) {
@@ -442,12 +437,14 @@ fun ServerElement(
                                         },
                                 contentAlignment = Alignment.Center,
                             ) {
-                                Image(
+                                Icon(
                                     bitmap = IconFactory.copyIcon,
                                     contentDescription =
                                         "Copy Icon for $serverName",
+                                    tint = MapleColorPalette.fadedText,
                                     modifier =
-                                        Modifier.size(iconSize)
+                                        Modifier
+                                            .size(iconSize)
                                             .background(Color.Transparent)
                                             .alpha(copyIconAlpha),
                                 )
