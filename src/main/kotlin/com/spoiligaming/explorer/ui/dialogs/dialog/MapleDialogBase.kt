@@ -6,7 +6,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -43,6 +41,7 @@ import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.extensions.onHover
 import com.spoiligaming.explorer.ui.fonts.FontFactory
 import com.spoiligaming.explorer.ui.widgets.MapleHyperlink
+import com.spoiligaming.explorer.ui.widgets.MapleSectionLayout
 
 @Composable
 fun MapleDialogBase(
@@ -195,58 +194,14 @@ fun MapleDialogBase(
                     .zIndex(1f),
             contentAlignment = Alignment.BottomCenter,
         ) {
-            Column(
-                modifier =
-                    Modifier
-                        .width(550.dp)
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(MapleColorPalette.quaternary, RoundedCornerShape(18.dp)),
-            ) {
-                Surface(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(36.dp),
-                    color = MapleColorPalette.tertiary,
-                    shadowElevation = 6.dp,
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.TopCenter,
-                    ) {
-                        Surface(
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .height(36.dp),
-                            color = MapleColorPalette.tertiary,
-                            shadowElevation = 20.dp,
-                        ) {
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Text(
-                                    text = "Attention!",
-                                    color = MapleColorPalette.accent,
-                                    style =
-                                        TextStyle(
-                                            fontFamily = FontFactory.comfortaaMedium,
-                                            fontWeight = FontWeight.Medium,
-                                            fontSize = 16.sp,
-                                        ),
-                                )
-                            }
-                        }
-                    }
-                }
+            MapleSectionLayout(modifier = Modifier.width(IntrinsicSize.Max), title = "Attention!") {
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 10.dp),
+                            .padding(vertical = 10.dp, horizontal = 20.dp),
                 ) {
                     Text(
                         text = "Looking for assistance? Join our ",
