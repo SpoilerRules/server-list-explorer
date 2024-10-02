@@ -11,6 +11,7 @@ import com.spoiligaming.explorer.server.BackupController
 import com.spoiligaming.explorer.server.ContemporaryServerEntryListData
 import com.spoiligaming.explorer.server.ServerFileHandler
 import com.spoiligaming.explorer.ui.dialogs.MapleConfirmationDialog
+import com.spoiligaming.explorer.ui.dialogs.MapleIndexMoveDialog
 import com.spoiligaming.explorer.ui.dialogs.MapleInformationDialog
 import com.spoiligaming.explorer.ui.dialogs.MapleServerEntryCreationDialog
 import com.spoiligaming.explorer.ui.dialogs.MapleServerEntryValueReplacementDialog
@@ -59,6 +60,8 @@ sealed class DialogData {
     data object ExternalModification : DialogData()
 
     data object IconDecodeFailure : DialogData()
+
+    data object MoveServerByIndex : DialogData()
 }
 
 object DialogController {
@@ -254,6 +257,9 @@ object DialogController {
                         onDismiss = { currentDialogData = null },
                     )
                 }
+                DialogData.MoveServerByIndex -> {
+                    MapleIndexMoveDialog { currentDialogData = null }
+                }
             }
         }
 
@@ -333,5 +339,9 @@ object DialogController {
 
     fun showBackupWipeConfirmationDialog(onWipe: () -> Unit) {
         currentDialogData = DialogData.BackupWipeConfirmation(onWipe)
+    }
+
+    fun showMoveServerByIndexDialog() {
+        currentDialogData = DialogData.MoveServerByIndex
     }
 }
