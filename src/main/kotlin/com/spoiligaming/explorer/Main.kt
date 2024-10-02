@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -61,6 +62,7 @@ var isBackupRestoreInProgress by mutableStateOf(false)
  *     - `--no-index-icon`: Disables loading icons for indexed servers.
  *     - `--no-index-serverinfo`: Disables loading the server list.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 fun main(args: Array<String>) {
     System.setProperty(
         "skiko.renderApi",
