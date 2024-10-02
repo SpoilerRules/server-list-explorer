@@ -7,20 +7,17 @@
         <error line="260" column="1" source="standard:max-line-length" />
         <error line="360" column="1" source="standard:max-line-length" />
     </file>
-    <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/InformationalServerElement.kt">
-        <error line="1" column="1" source="standard:no-empty-file" />
-    </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/MapleColorInformation.kt">
         <error line="47" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/ServerInformationView.kt">
-        <error line="169" column="1" source="standard:max-line-length" />
+        <error line="168" column="1" source="standard:max-line-length" />
+        <error line="241" column="1" source="standard:max-line-length" />
         <error line="242" column="1" source="standard:max-line-length" />
-        <error line="243" column="1" source="standard:max-line-length" />
+        <error line="267" column="1" source="standard:max-line-length" />
         <error line="268" column="1" source="standard:max-line-length" />
-        <error line="269" column="1" source="standard:max-line-length" />
-        <error line="287" column="1" source="standard:max-line-length" />
-        <error line="342" column="1" source="standard:max-line-length" />
+        <error line="286" column="1" source="standard:max-line-length" />
+        <error line="341" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/StationaryView.kt">
         <error line="77" column="1" source="standard:max-line-length" />
@@ -33,15 +30,15 @@
         <error line="41" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/state/DialogController.kt">
-        <error line="106" column="1" source="standard:max-line-length" />
-        <error line="143" column="1" source="standard:max-line-length" />
-        <error line="147" column="1" source="standard:max-line-length" />
-        <error line="158" column="1" source="standard:max-line-length" />
-        <error line="166" column="1" source="standard:max-line-length" />
-        <error line="185" column="1" source="standard:max-line-length" />
-        <error line="211" column="1" source="standard:max-line-length" />
-        <error line="218" column="1" source="standard:max-line-length" />
-        <error line="232" column="1" source="standard:max-line-length" />
-        <error line="246" column="1" source="standard:max-line-length" />
+        <error line="109" column="1" source="standard:max-line-length" />
+        <error line="146" column="1" source="standard:max-line-length" />
+        <error line="150" column="1" source="standard:max-line-length" />
+        <error line="161" column="1" source="standard:max-line-length" />
+        <error line="169" column="1" source="standard:max-line-length" />
+        <error line="188" column="1" source="standard:max-line-length" />
+        <error line="214" column="1" source="standard:max-line-length" />
+        <error line="221" column="1" source="standard:max-line-length" />
+        <error line="235" column="1" source="standard:max-line-length" />
+        <error line="249" column="1" source="standard:max-line-length" />
     </file>
 </baseline>
