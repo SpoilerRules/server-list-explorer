@@ -95,12 +95,10 @@ compose {
 }
 
 ktlint {
-    android = true
-
     debug.set(false)
     verbose.set(false)
     android.set(false)
-    ignoreFailures.set(true)
+    ignoreFailures.set(false)
     enableExperimentalRules.set(true)
     baseline.set(file("ktlint-baseline.xml"))
 
