@@ -3,3 +3,7 @@ Please avoid modifying Advanced Settings unless you have a clear understanding o
 Settings related to the compression of the `server.dat` file should only be adjusted if you are undertaking advanced tasks.
 ^_^
 When the "Compress Server File on Save" setting is enabled, an uncompressed version of the server file is automatically saved to the 'backup' folder within the application's directory.
+^_^
+To edit the server address or name, simply perform a long press (left-click) on the desired text.
+^_^
+You can open the "Move Server Entry by Index" dialog using the keyboard shortcut Ctrl (or Meta) + J. 
