@@ -54,7 +54,7 @@ fun MapleServerEntryValueReplacementDialog(
         }
 
     MapleDialogBase(
-        false,
+        true,
         3,
         true,
         onDismiss,
