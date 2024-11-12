@@ -97,11 +97,7 @@ fun main(args: Array<String>) {
     application {
         val density = LocalDensity.current
 
-        /*
-         * Note:
-         * The following three variables are not currently cached because it is unclear
-         * whether they need to be dynamic.
-         */
+        // Note: The following three variables are not cached as it's unclear whether they need to be dynamic.
         val windowScale =
             WindowUtility.windowScaleMapping[themeSettings.windowScale]
                 ?: WindowUtility.windowScaleMapping[windowProperties.previousScale]
