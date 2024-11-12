@@ -1,11 +1,11 @@
 [versions]
-kotlin = "2.0.20"
-compose = "1.7.0-rc01"
+kotlin = "2.0.21"
+compose = "1.7.0"
 serialization = "1.7.3"
-shadow = "8.3.3"
+shadow = "8.3.5"
 ktlint = "12.1.1"
 colorPicker = "0.7.0"
-fileKit = "0.8.2"
+fileKit = "0.8.7"
 nbt = "6.1"
 s4lfj-nop = "2.0.16"
 
