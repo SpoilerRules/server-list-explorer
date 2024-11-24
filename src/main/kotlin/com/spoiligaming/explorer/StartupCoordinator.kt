@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -28,12 +29,38 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+class StartupCoordinatorViewModel {
+    var isServerDataLoaded by mutableStateOf(false)
+        private set
+
+    var shouldShowFilePickerDialog by mutableStateOf(false)
+        private set
+
+    fun verifyServerFile() {
+        isServerDataLoaded = (
+            ServerFileHandler.initializeServerFileLocation()
+                == ServerFileValidationResult.VALID
+        )
+        shouldShowFilePickerDialog = !isServerDataLoaded
+    }
+
+    fun reloadServerFile() =
+        CoroutineScope(Dispatchers.IO).launch {
+            isServerDataLoaded = false
+            verifyServerFile()
+        }
+}
+
 object StartupCoordinator {
-    private var isServerDataLoaded by mutableStateOf(false)
-    private var shouldShowFilePickerDialog by mutableStateOf(false)
+    private val viewModel = StartupCoordinatorViewModel()
 
     @Composable
-    fun Coordinate() =
+    fun Coordinate() {
+        val isServerDataLoaded by remember { derivedStateOf { viewModel.isServerDataLoaded } }
+        val shouldShowFilePickerDialog by remember {
+            derivedStateOf { viewModel.shouldShowFilePickerDialog }
+        }
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -41,23 +68,20 @@ object StartupCoordinator {
         ) {
             WindowHeaderView(isServerDataLoaded)
 
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxSize(),
-            ) {
+            Box(modifier = Modifier.fillMaxSize()) {
                 if (shouldShowFilePickerDialog) {
                     DialogController.showServerFilePickerDialog(false)
                 } else {
-                    Content()
+                    Content(isServerDataLoaded)
                 }
             }
         }
+    }
 
     @Composable
-    private fun Content() {
+    private fun Content(isServerDataLoaded: Boolean) {
         LaunchedEffect(Unit) {
-            verifyServerFile()
+            viewModel.verifyServerFile()
         }
 
         if (isServerDataLoaded) {
@@ -71,29 +95,32 @@ object StartupCoordinator {
 
     @Composable
     private fun DisplayMainContent() {
-        val names = remember { ServerFileHandler.loadNames() }
-        val addresses = remember { ServerFileHandler.loadAddresses() }
+        val serverDataLoaded = remember { mutableStateOf(false) }
 
-        ContemporaryServerEntryListData.initialize(
-            mutableStateListOf(*names.toTypedArray()),
-            mutableStateListOf(*addresses.toTypedArray()),
-        )
+        LaunchedEffect(Unit) {
+            // those variables MUSTN'T be cached and should be recomposed, although they're somewhat performance expensive.
+            val names = ServerFileHandler.loadNames()
+            val addresses = ServerFileHandler.loadAddresses()
 
-        NavigationComponent()
-        NavigationController.navigateTo(Screen.Home)
-    }
+            ContemporaryServerEntryListData.initialize(
+                mutableStateListOf(*names.toTypedArray()),
+                mutableStateListOf(*addresses.toTypedArray()),
+            )
 
-    // TODO: fix this getting invoked twice when called by `retryLoad` function
-    private fun verifyServerFile() {
-        isServerDataLoaded =
-            ServerFileHandler.initializeServerFileLocation() == ServerFileValidationResult.VALID
-
-        shouldShowFilePickerDialog = !isServerDataLoaded
-    }
-
-    fun retryLoad() =
-        CoroutineScope(Dispatchers.IO).launch {
-            isServerDataLoaded = false
-            verifyServerFile()
+            serverDataLoaded.value = true
         }
+
+        if (serverDataLoaded.value) {
+            NavigationComponent()
+            NavigationController.navigateTo(Screen.Home)
+        } else {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = MapleColorPalette.accent)
+            }
+        }
+    }
+
+    fun retryLoad() {
+        viewModel.reloadServerFile()
+    }
 }

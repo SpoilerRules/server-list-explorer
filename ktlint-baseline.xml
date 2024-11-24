@@ -11,20 +11,20 @@
         <error line="47" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/ServerInformationView.kt">
-        <error line="168" column="1" source="standard:max-line-length" />
-        <error line="241" column="1" source="standard:max-line-length" />
+        <error line="169" column="1" source="standard:max-line-length" />
         <error line="242" column="1" source="standard:max-line-length" />
-        <error line="267" column="1" source="standard:max-line-length" />
+        <error line="243" column="1" source="standard:max-line-length" />
         <error line="268" column="1" source="standard:max-line-length" />
-        <error line="286" column="1" source="standard:max-line-length" />
-        <error line="341" column="1" source="standard:max-line-length" />
+        <error line="269" column="1" source="standard:max-line-length" />
+        <error line="287" column="1" source="standard:max-line-length" />
+        <error line="342" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/StationaryView.kt">
         <error line="77" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/screens/home/FileBackupSubScreen.kt">
-        <error line="261" column="1" source="standard:max-line-length" />
-        <error line="270" column="1" source="standard:max-line-length" />
+        <error line="269" column="1" source="standard:max-line-length" />
+        <error line="278" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/screens/home/InformationContainer.kt">
         <error line="41" column="1" source="standard:max-line-length" />

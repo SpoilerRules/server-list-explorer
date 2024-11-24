@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.0.21"
-compose = "1.7.0"
+compose = "1.7.1"
 serialization = "1.7.3"
 shadow = "8.3.5"
 ktlint = "12.1.1"
