@@ -166,7 +166,7 @@ object DialogController {
                     MapleInformationDialog(
                         title = "Icon Refresh Started",
                         description =
-                            "The server icon refresh process has begun. Please avoid moving or deleting servers during this time. You will be notified when the process is complete.",
+                            "The server icon refresh process has begun.\nPlease avoid moving or deleting servers during this time.\nYou will be notified when the process is complete.",
                         onDismiss = { currentDialogData = null },
                     )
                 }
