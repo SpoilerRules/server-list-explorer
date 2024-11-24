@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -245,7 +245,7 @@ private fun ActionButton(
     shape = RoundedCornerShape(12.dp),
     colors =
         ButtonDefaults.buttonColors(
-            backgroundColor = MapleColorPalette.menu,
+            containerColor = MapleColorPalette.menu,
             contentColor = MapleColorPalette.fadedText,
         ),
 ) {

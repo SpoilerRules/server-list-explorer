@@ -11,11 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -39,9 +39,9 @@ import com.spoiligaming.explorer.ui.navigation.NavigationController
 import com.spoiligaming.explorer.ui.navigation.Screen
 import com.spoiligaming.explorer.utils.WindowUtility
 import com.spoiligaming.explorer.windowFrame
-import java.awt.Cursor
 import javax.swing.JFrame
 import kotlin.system.exitProcess
+import java.awt.Cursor
 
 @Composable
 fun WindowHeaderView(allowNavigation: Boolean) {
@@ -136,7 +136,7 @@ private fun ControlButton(type: ActionType) =
         shape = RoundedCornerShape(12.dp),
         colors =
             ButtonDefaults.buttonColors(
-                backgroundColor = MapleColorPalette.menu,
+                containerColor = MapleColorPalette.menu,
                 contentColor = MapleColorPalette.fadedText,
             ),
     ) {
@@ -189,7 +189,7 @@ private fun SettingsButton(
         shape = RoundedCornerShape(12.dp),
         colors =
             ButtonDefaults.buttonColors(
-                backgroundColor = MapleColorPalette.menu,
+                containerColor = MapleColorPalette.menu,
                 contentColor = MapleColorPalette.fadedText,
             ),
     ) {
