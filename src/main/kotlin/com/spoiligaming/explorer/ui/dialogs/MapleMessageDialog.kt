@@ -1,6 +1,7 @@
 package com.spoiligaming.explorer.ui.dialogs
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,8 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.FormatColorReset
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.layout.ContentScale
@@ -37,7 +44,9 @@ import com.spoiligaming.explorer.ui.dialogs.dialog.MapleDialogBase
 import com.spoiligaming.explorer.ui.extensions.onHover
 import com.spoiligaming.explorer.ui.fonts.FontFactory
 import com.spoiligaming.explorer.ui.icons.IconFactory
+import com.spoiligaming.explorer.ui.widgets.MapleTooltip
 import com.spoiligaming.explorer.ui.widgets.MergedText
+import com.spoiligaming.explorer.utils.ClipboardUtility
 import com.spoiligaming.explorer.utils.MinecraftTextUtils
 
 @Composable
@@ -138,25 +147,77 @@ fun MapleMOTDDialog(
                     FontWeight.Normal,
                 )
             }
-            Surface(
-                color = MapleColorPalette.control,
-                shape = RoundedCornerShape(8.dp),
-                shadowElevation = 2.dp,
-            ) {
-                Text(
-                    text = MinecraftTextUtils.parseMinecraftMOTD(motd),
-                    style =
-                        TextStyle(
-                            fontFamily = FontFactory.comfortaaMedium,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 24.sp,
-                        ),
-                    maxLines = 2,
-                    lineHeight = 36.sp,
-                    modifier =
-                        Modifier
-                            .padding(16.dp),
-                )
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Surface(
+                    color = MapleColorPalette.control,
+                    shape = RoundedCornerShape(8.dp),
+                    shadowElevation = 2.dp,
+                ) {
+                    Text(
+                        text = MinecraftTextUtils.parseMinecraftMOTD(motd),
+                        style =
+                            TextStyle(
+                                fontFamily = FontFactory.comfortaaMedium,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 24.sp,
+                            ),
+                        maxLines = 2,
+                        lineHeight = 36.sp,
+                        modifier =
+                            Modifier
+                                .padding(16.dp),
+                    )
+                }
+                Row(
+                    Modifier.shadow(
+                        2.dp,
+                        RoundedCornerShape(8.dp),
+                    ).background(MapleColorPalette.defaultQuaternary, RoundedCornerShape(8.dp)),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    IconButton(
+                        modifier =
+                            Modifier.pointerHoverIcon(
+                                PointerIcon.Hand,
+                            ),
+                        onClick = {
+                            ClipboardUtility.copy(motd)
+                        },
+                    ) {
+                        MapleTooltip(
+                            tooltip = "Copy MOTD",
+                            tooltipDelay = 3000,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ContentCopy,
+                                tint = MapleColorPalette.fadedText,
+                                contentDescription = "Copy",
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
+                    }
+                    IconButton(
+                        modifier =
+                            Modifier.pointerHoverIcon(
+                                PointerIcon.Hand,
+                            ),
+                        onClick = {
+                            ClipboardUtility.copy(motd, true)
+                        },
+                    ) {
+                        MapleTooltip(
+                            tooltip = "Copy stripped MOTD (without color codes)",
+                            tooltipDelay = 3000,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.FormatColorReset,
+                                tint = MapleColorPalette.fadedText,
+                                contentDescription = "Stripped Copy",
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
+                    }
+                }
             }
         }
         DialogActionButtons(true, {}, onDismiss)
