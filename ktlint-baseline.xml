@@ -3,9 +3,9 @@
     <file name="src/main/kotlin/com/spoiligaming/explorer/server/ServerFileHandler.kt">
         <error line="72" column="1" source="standard:max-line-length" />
         <error line="138" column="1" source="standard:max-line-length" />
-        <error line="252" column="1" source="standard:max-line-length" />
-        <error line="260" column="1" source="standard:max-line-length" />
-        <error line="360" column="1" source="standard:max-line-length" />
+        <error line="254" column="1" source="standard:max-line-length" />
+        <error line="262" column="1" source="standard:max-line-length" />
+        <error line="362" column="1" source="standard:max-line-length" />
     </file>
     <file name="src/main/kotlin/com/spoiligaming/explorer/ui/components/MapleColorInformation.kt">
         <error line="47" column="1" source="standard:max-line-length" />
