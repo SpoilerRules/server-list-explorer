@@ -98,7 +98,7 @@ object StartupCoordinator {
         val serverDataLoaded = remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
-            // those variables MUSTN'T be cached and should be recomposed, although they're somewhat performance expensive.
+            // these variables should not be cached and must trigger recomposition on change, even though they may have some performance overhead
             val names = ServerFileHandler.loadNames()
             val addresses = ServerFileHandler.loadAddresses()
 
