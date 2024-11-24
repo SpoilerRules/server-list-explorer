@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
-import com.spoiligaming.explorer.ConfigurationHandler
 import com.spoiligaming.explorer.SoftwareInformation
+import com.spoiligaming.explorer.isWindowMaximized
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.extensions.onHover
 import com.spoiligaming.explorer.ui.fonts.FontFactory
@@ -45,7 +45,6 @@ import com.spoiligaming.explorer.ui.widgets.MapleSectionLayout
 
 @Composable
 fun MapleDialogBase(
-    requireFullFocus: Boolean,
     heightType: Int,
     isCloseable: Boolean,
     onDismiss: () -> Unit,
@@ -62,31 +61,16 @@ fun MapleDialogBase(
                     {}
                 }
             },
-        properties = PopupProperties(focusable = requireFullFocus),
+        properties = PopupProperties(focusable = true),
     ) {
         Box(
             modifier =
-                Modifier.run {
-                    when (requireFullFocus) {
-                        true ->
-                            Modifier
-                                .fillMaxSize()
-                                .background(Color(0x90343434), RoundedCornerShape(16.dp))
-                        false ->
-                            Modifier
-                                .fillMaxWidth()
-                                .fillMaxSize(
-                                    when (
-                                        ConfigurationHandler.getInstance().themeSettings.windowScale
-                                    ) {
-                                        "100%", "1f", "1.0f" -> 0.82f
-                                        "125%", "1.25f" -> 0.86f
-                                        "150%", "1.5f" -> 0.88f
-                                        else -> 0.86f
-                                    },
-                                )
-                    }
-                }
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        Color(0x80000000),
+                        RoundedCornerShape(if (isWindowMaximized) 0.dp else 24.dp),
+                    )
                     .clickable(
                         onClick = { if (!isHovered && isCloseable) onDismiss() },
                         indication = null,

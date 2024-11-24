@@ -17,7 +17,6 @@ import com.spoiligaming.explorer.ui.dialogs.dialog.MapleDialogBase
 @Composable
 fun MapleIndexMoveDialog(onDismiss: () -> Unit) =
     MapleDialogBase(
-        false,
         0,
         true,
         onDismiss,

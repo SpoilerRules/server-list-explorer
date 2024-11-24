@@ -58,7 +58,6 @@ private fun MapleMessageDialog(
     onAccept: () -> Unit,
     onDismiss: () -> Unit,
 ) = MapleDialogBase(
-    false,
     0,
     true,
     onDismiss,
