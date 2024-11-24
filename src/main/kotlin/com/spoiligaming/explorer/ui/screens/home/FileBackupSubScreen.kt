@@ -49,8 +49,7 @@ import com.spoiligaming.explorer.ui.widgets.MapleDropdownMenu
 import com.spoiligaming.explorer.ui.widgets.MapleVerticalScrollbar
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 @Composable
 fun FileBackupSubScreen() {
@@ -242,49 +241,58 @@ fun FileBackupSubScreen() {
                             .background(MapleColorPalette.quaternary, RoundedCornerShape(16.dp)),
                     contentAlignment = Alignment.TopStart,
                 ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Box(
-                            modifier =
-                                Modifier
-                                    .fillMaxSize()
-                                    .padding(10.dp),
-                        ) {
-                            LazyVerticalGrid(
-                                columns = GridCells.Adaptive(minSize = 280.dp),
-                                state = scrollState,
-                                verticalArrangement = Arrangement.spacedBy(10.dp),
-                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    if (backupEntries.isEmpty()) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text(
+                                "No backups available",
+                                style = TextStyle(color = MapleColorPalette.text, fontSize = 24.sp),
+                            )
+                        }
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Box(
                                 modifier =
-                                    Modifier.padding(
-                                        start =
-                                            if (
-                                                configuration.generalSettings.scrollBarVisibility == "Left Side" &&
-                                                shouldShowScrollbar
-                                            ) {
-                                                15.dp
-                                            } else {
-                                                0.dp
-                                            },
-                                        end =
-                                            if (
-                                                configuration.generalSettings.scrollBarVisibility == "Right Side" &&
-                                                shouldShowScrollbar
-                                            ) {
-                                                15.dp
-                                            } else {
-                                                0.dp
-                                            },
-                                    ),
+                                    Modifier
+                                        .fillMaxSize()
+                                        .padding(10.dp),
                             ) {
-                                itemsIndexed(backupEntries) { _, backup ->
-                                    FileElement(backup) {
-                                        // onDelete:
-                                        isLoading = true
+                                LazyVerticalGrid(
+                                    columns = GridCells.Adaptive(minSize = 280.dp),
+                                    state = scrollState,
+                                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    modifier =
+                                        Modifier.padding(
+                                            start =
+                                                if (
+                                                    configuration.generalSettings.scrollBarVisibility == "Left Side" &&
+                                                    shouldShowScrollbar
+                                                ) {
+                                                    15.dp
+                                                } else {
+                                                    0.dp
+                                                },
+                                            end =
+                                                if (
+                                                    configuration.generalSettings.scrollBarVisibility == "Right Side" &&
+                                                    shouldShowScrollbar
+                                                ) {
+                                                    15.dp
+                                                } else {
+                                                    0.dp
+                                                },
+                                        ),
+                                ) {
+                                    itemsIndexed(backupEntries) { _, backup ->
+                                        FileElement(backup) {
+                                            // onDelete:
+                                            isLoading = true
+                                        }
                                     }
                                 }
-                            }
 
-                            MapleVerticalScrollbar(shouldShowScrollbar, scrollState)
+                                MapleVerticalScrollbar(shouldShowScrollbar, scrollState)
+                            }
                         }
                     }
                 }
