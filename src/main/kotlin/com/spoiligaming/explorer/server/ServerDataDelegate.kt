@@ -16,6 +16,7 @@ object ServerDataDelegate {
         val maxPlayerCount: String,
         val onlinePlayerCount: String,
         val icon: String,
+        val motd: String,
     )
 
     sealed class ServerDelegateResult {
@@ -66,7 +67,8 @@ object ServerDataDelegate {
                                     ping = it.ping.toString(),
                                     maxPlayerCount = it.players.max.toString(),
                                     onlinePlayerCount = it.players.online.toString(),
-                                    icon = it.favicon.toString(),
+                                    icon = it.favicon,
+                                    motd = it.description.text,
                                 )
                             }
                     cache = Cache(serverAddress, serverData, Instant.now())

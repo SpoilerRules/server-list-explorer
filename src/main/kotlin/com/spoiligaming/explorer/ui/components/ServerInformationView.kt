@@ -235,13 +235,16 @@ fun ServerInformationView(
                                         ) {
                                             fetchServerInfo(true)
                                         }
-                                        DisabledMapleButton(
+                                        MapleButton(
                                             Modifier.weight(1f).height(26.dp),
                                             text = "View MOTD",
-                                            hoverTooltipText =
-                                                "This feature is under consideration for future updates." +
-                                                    "\n\nIts availability will depend on project growth and user demand.",
-                                        )
+                                        ) {
+                                            DialogController.showServerMOTDDialog(
+                                                serverName,
+                                                serverAddress,
+                                                serverInfo!!.motd,
+                                            )
+                                        }
                                         MapleButton(
                                             modifier = Modifier.weight(1f).height(26.dp),
                                             text = "Refresh Icon",

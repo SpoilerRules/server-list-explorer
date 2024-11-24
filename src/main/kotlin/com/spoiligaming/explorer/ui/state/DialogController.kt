@@ -13,6 +13,7 @@ import com.spoiligaming.explorer.server.ServerFileHandler
 import com.spoiligaming.explorer.ui.dialogs.MapleConfirmationDialog
 import com.spoiligaming.explorer.ui.dialogs.MapleIndexMoveDialog
 import com.spoiligaming.explorer.ui.dialogs.MapleInformationDialog
+import com.spoiligaming.explorer.ui.dialogs.MapleMOTDDialog
 import com.spoiligaming.explorer.ui.dialogs.MapleServerEntryCreationDialog
 import com.spoiligaming.explorer.ui.dialogs.MapleServerEntryValueReplacementDialog
 import com.spoiligaming.explorer.ui.dialogs.MapleServerFilePickerDialog
@@ -39,6 +40,12 @@ sealed class DialogData {
     data class DeletionConfirmation(val serverPosition: Int, val serverName: String) : DialogData()
 
     data class ServerFilePicker(val closeable: Boolean) : DialogData()
+
+    data class ServerMOTD(
+        val serverName: String,
+        val serverAddress: String,
+        val motd: String,
+    ) : DialogData()
 
     data object WipeConfirmation : DialogData()
 
@@ -153,6 +160,15 @@ object DialogController {
                 }
                 is DialogData.ServerFilePicker -> {
                     MapleServerFilePickerDialog(dialogData.closeable) { currentDialogData = null }
+                }
+                is DialogData.ServerMOTD -> {
+                    MapleMOTDDialog(
+                        dialogData.serverName,
+                        dialogData.serverAddress,
+                        dialogData.motd,
+                    ) {
+                        currentDialogData = null
+                    }
                 }
                 DialogData.ExternalModification -> {
                     MapleInformationDialog(
@@ -343,5 +359,13 @@ object DialogController {
 
     fun showMoveServerByIndexDialog() {
         currentDialogData = DialogData.MoveServerByIndex
+    }
+
+    fun showServerMOTDDialog(
+        serverName: String,
+        serverAddress: String,
+        motd: String,
+    ) {
+        currentDialogData = DialogData.ServerMOTD(serverName, serverAddress, motd)
     }
 }

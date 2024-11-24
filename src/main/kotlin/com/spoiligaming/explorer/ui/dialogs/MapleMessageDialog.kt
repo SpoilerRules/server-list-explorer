@@ -4,7 +4,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -34,6 +37,8 @@ import com.spoiligaming.explorer.ui.dialogs.dialog.MapleDialogBase
 import com.spoiligaming.explorer.ui.extensions.onHover
 import com.spoiligaming.explorer.ui.fonts.FontFactory
 import com.spoiligaming.explorer.ui.icons.IconFactory
+import com.spoiligaming.explorer.ui.widgets.MergedText
+import com.spoiligaming.explorer.utils.MinecraftTextUtils
 
 @Composable
 fun MapleConfirmationDialog(
@@ -97,21 +102,85 @@ private fun MapleMessageDialog(
             )
         }
 
-        Box(modifier = Modifier.padding(bottom = 66.dp)) {
-            if (SettingsViewModel.experimentalIconifiedDialogOptions) {
-                ExperimentalButtons(
-                    dismissOnly = isInformationOnly,
-                    onAccept = onAccept,
-                    onDismiss = onDismiss,
+        DialogActionButtons(isInformationOnly, onAccept, onDismiss)
+    }
+}
+
+@Composable
+fun MapleMOTDDialog(
+    serverName: String,
+    serverAddress: String,
+    motd: String,
+    onDismiss: () -> Unit,
+) = MapleDialogBase(
+    0,
+    true,
+    onDismiss,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Column(
+            modifier = Modifier.width(IntrinsicSize.Max),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopStart) {
+                MergedText(
+                    serverName,
+                    MapleColorPalette.fadedText,
+                    FontFactory.comfortaaMedium,
+                    FontWeight.Bold,
+                    " ($serverAddress)",
+                    MapleColorPalette.fadedText,
+                    FontFactory.comfortaaRegular,
+                    FontWeight.Normal,
                 )
-            } else {
-                Buttons(
-                    dismissOnly = isInformationOnly,
-                    onAccept = onAccept,
-                    onDismiss = onDismiss,
+            }
+            Surface(
+                color = MapleColorPalette.control,
+                shape = RoundedCornerShape(8.dp),
+                shadowElevation = 2.dp,
+            ) {
+                Text(
+                    text = MinecraftTextUtils.parseMinecraftMOTD(motd),
+                    style =
+                        TextStyle(
+                            fontFamily = FontFactory.comfortaaMedium,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 24.sp,
+                        ),
+                    maxLines = 2,
+                    lineHeight = 36.sp,
+                    modifier =
+                        Modifier
+                            .padding(16.dp),
                 )
             }
         }
+        DialogActionButtons(true, {}, onDismiss)
+    }
+}
+
+@Composable
+private fun DialogActionButtons(
+    isInformationOnly: Boolean,
+    onAccept: () -> Unit,
+    onDismiss: () -> Unit,
+) = Box(modifier = Modifier.padding(bottom = 66.dp)) {
+    if (SettingsViewModel.experimentalIconifiedDialogOptions) {
+        ExperimentalButtons(
+            dismissOnly = isInformationOnly,
+            onAccept = onAccept,
+            onDismiss = onDismiss,
+        )
+    } else {
+        Buttons(
+            dismissOnly = isInformationOnly,
+            onAccept = onAccept,
+            onDismiss = onDismiss,
+        )
     }
 }
 
