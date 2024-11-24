@@ -1,6 +1,7 @@
 package com.spoiligaming.explorer.utils
 
 import com.spoiligaming.logging.Logger
+import javax.imageio.ImageIO
 import java.awt.Toolkit
 import java.awt.datatransfer.Clipboard
 import java.awt.datatransfer.DataFlavor
@@ -10,14 +11,20 @@ import java.awt.datatransfer.UnsupportedFlavorException
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.util.Base64
-import javax.imageio.ImageIO
 
 object ClipboardUtility {
     private val clipboard: Clipboard = Toolkit.getDefaultToolkit().systemClipboard
 
-    fun copy(content: String?) =
+    fun copy(content: String?, stripMinecraftColorCodes: Boolean = false) =
         content?.let {
-            clipboard.setContents(StringSelection(it), null)
+            clipboard.setContents(
+                StringSelection(
+                    if (stripMinecraftColorCodes) it.replace(
+                        MinecraftTextUtils.minecraftRegex,
+                        ""
+                    ) else it
+                ), null
+            )
             Logger.printSuccess("Copied text content to clipboard: \"$it\"")
         }
 

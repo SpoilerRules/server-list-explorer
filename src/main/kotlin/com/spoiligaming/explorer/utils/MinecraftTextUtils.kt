@@ -38,7 +38,7 @@ object MinecraftTextUtils {
             'k' to SpanStyle(),
         )
 
-    private val minecraftRegex = Regex("§[0-9a-fk-or]")
+    val minecraftRegex = Regex("§[0-9a-fk-or]")
 
     fun parseMinecraftMOTD(message: String): AnnotatedString {
         var currentColor = Color.Unspecified
