@@ -15,18 +15,25 @@ import java.util.Base64
 object ClipboardUtility {
     private val clipboard: Clipboard = Toolkit.getDefaultToolkit().systemClipboard
 
-    fun copy(content: String?, stripMinecraftColorCodes: Boolean = false) =
-        content?.let {
-            clipboard.setContents(
-                StringSelection(
-                    if (stripMinecraftColorCodes) it.replace(
+    fun copy(
+        content: String?,
+        stripMinecraftColorCodes: Boolean = false,
+    ) = content?.let {
+        clipboard.setContents(
+            StringSelection(
+                if (stripMinecraftColorCodes) {
+                    it.replace(
                         MinecraftTextUtils.minecraftRegex,
-                        ""
-                    ) else it
-                ), null
-            )
-            Logger.printSuccess("Copied text content to clipboard: \"$it\"")
-        }
+                        "",
+                    )
+                } else {
+                    it
+                },
+            ),
+            null,
+        )
+        Logger.printSuccess("Copied text content to clipboard: \"$it\"")
+    }
 
     fun copyIconAsImage(base64Icon: String?) =
         base64Icon?.let {
