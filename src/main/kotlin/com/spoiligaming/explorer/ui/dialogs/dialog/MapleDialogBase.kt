@@ -61,16 +61,22 @@ fun MapleDialogBase(
                     {}
                 }
             },
-        properties = PopupProperties(focusable = true),
+        properties = PopupProperties(focusable = isCloseable),
     ) {
         Box(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .background(
-                        Color(0x80000000),
-                        RoundedCornerShape(if (isWindowMaximized) 0.dp else 24.dp),
-                    )
+                Modifier.run {
+                    when (isCloseable) {
+                        true ->
+                            Modifier
+                                .fillMaxSize()
+                                .background(
+                                    Color(0x80000000),
+                                    RoundedCornerShape(if (isWindowMaximized) 0.dp else 24.dp),
+                                )
+                        false -> Modifier.height(IntrinsicSize.Max)
+                    }
+                }
                     .clickable(
                         onClick = { if (!isHovered && isCloseable) onDismiss() },
                         indication = null,
