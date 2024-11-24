@@ -10,11 +10,11 @@
 ## User Interface Preview
 
 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 0fr)); gap: 10px; justify-content: center;">
-  <img src="https://i.imgur.com/hbuQYUy.png" width="250" alt="Screenshot 1">
-  <img src="https://i.imgur.com/lSPgLur.png" width="250" alt="Screenshot 2">
+  <img src="https://i.imgur.com/lSPgLur.png" width="250" alt="Screenshot 1">
+  <img src="https://i.imgur.com/uqIy4nC.png" width="250" alt="Screenshot 2">
   <img src="https://i.imgur.com/3DIxn7c.png" width="250" alt="Screenshot 3">
   <img src="https://i.imgur.com/tcIHRDb.png" width="250" alt="Screenshot 4">
-  <img src="https://i.imgur.com/uqIy4nC.png" width="250" alt="Screenshot 5">
+  <img src="https://i.imgur.com/Zo5NWct.png" width="250" alt="Screenshot 5">
   <img src="https://i.imgur.com/StRBnvS.png" width="250" alt="Screenshot 6">
   <img src="https://i.imgur.com/PrkZPnH.png" width="250" alt="Screenshot 7">
   <img src="https://i.imgur.com/XtVdbEB.png" width="250" alt="Screenshot 8">
@@ -28,8 +28,8 @@
 
 - [User Interface Preview](#user-interface-preview)
 - [Getting Started](#getting-started)
-    - [Available Versions](#available-versions)
-    - [Steps to Run](#steps-to-run)
+    - [For Windows Users](#for-windows-users)
+    - [For macOS and Linux Users](#for-macos-and-linux-users)
 - [Important Note for Users](#important-note-for-users)
 - [Wiki](#wiki)
 - [Contribution](#contribution)
@@ -39,27 +39,33 @@
 
 Getting started with Server List Explorer is straightforward. Follow these steps to get up and running:
 
-1. **Install Java**: Ensure you have Java 11 runtime (or a later version) installed. If not, download and install it from the [official Java website](https://www.oracle.com/java/technologies/downloads/#java21).
+### For Windows Users
 
-2. **Download Server List Explorer**: Head to our [releases page](https://github.com/SpoilerRules/server-list-explorer/releases/latest) and download the version that best fits your needs.
+1. **Download Server List Explorer**: Head to our [releases page](https://github.com/SpoilerRules/server-list-explorer/releases/latest) and download the **`ServerListExplorer_Win64_Portable_Bundled-JRE.zip`** version.
 
-### Available Versions
+2. **Extract the Files**: Extract the contents of the **`ServerListExplorer_Win64_Portable_Bundled-JRE.zip`** file to a folder (unzip).
 
-| Version Name                      | Description                                                                           | Supported Platforms                                   | Recommended |
-|-----------------------------------|---------------------------------------------------------------------------------------|-------------------------------------------------------|-------------|
-| `ServerListExplorer.jar`          | A ready-to-run executable. Not minified or obfuscated.                                | Windows (x64), Linux (x64, arm64), macOS (x64, arm64) | No          |
-| `ServerListExplorer-minified.jar` | A ready-to-run executable. Obfuscated and minified using ProGuard for a smaller size. | Windows (x64), Linux (x64, arm64), macOS (x64, arm64) | Yes         |
+3. **Run the Application**: Navigate to the folder where you unzipped the files and double-click **`server-list-explorer.exe`** to launch the application.
 
-### Steps to Run
+   The bundled Java Runtime Environment (JRE) is included, so no separate Java installation is required.
 
-1. **Locate the Downloaded File**: After downloading the appropriate version, find the `.jar` file in your downloads folder.
+### For macOS and Linux Users
 
-2. **Run the Application**:
-    - **On Windows**: Double-click the `.jar` file to launch it.
-    - **On Linux/Mac**: Open a terminal, navigate to the directory where the `.jar` file is located, and run:
-      ```sh
-      java -jar ServerListExplorer-minified.jar -XX:+UseStringDeduplication
-      ```
+1. **Install Java**: Ensure you have Java 11 or later installed. If not, download and install it from the [official Java website](https://www.oracle.com/java/technologies/downloads/#java21).
+
+2. **Download Server List Explorer**: Head to our [releases page](https://github.com/SpoilerRules/server-list-explorer/releases/latest) and download the version that best fits your needs:
+    - **`ServerListExplorer.jar`** (for the full version)
+    - **`ServerListExplorer-minified.jar`** (for the smaller, minified version)
+
+3. **Run the Application**: Open a terminal, navigate to the directory where the downloaded **`.jar`** file is located, and run the following command:
+   ```sh
+   java -jar ServerListExplorer-minified.jar
+   ```
+   Or for the non-minified version:
+   ```sh
+   java -jar ServerListExplorer.jar
+   ```
+---
 
 And you’re all set! You can now start exploring and managing your Minecraft server list with ease.
 
