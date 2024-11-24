@@ -6,4 +6,4 @@ When the "Compress Server File on Save" setting is enabled, an uncompressed vers
 ^_^
 To edit the server address or name, simply perform a long press (left-click) on the desired text.
 ^_^
-You can open the "Move Server Entry by Index" dialog using the keyboard shortcut Ctrl (or Meta) + J. 
+You can open the "Move Server Entry by Index" dialog using the keyboard shortcut Ctrl (or Cmd) + J.
