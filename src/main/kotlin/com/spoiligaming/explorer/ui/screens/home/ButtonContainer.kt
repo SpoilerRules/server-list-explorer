@@ -217,7 +217,7 @@ private fun refreshIcons() {
         }
 
         val timeTaken = System.currentTimeMillis() - startTime
-        val successRatio = totalAddresses to (addressesProcessed - failedAttempts)
+        val successRatio = (addressesProcessed - failedAttempts) to totalAddresses
 
         withContext(Dispatchers.Default) {
             DialogController.showIconRefreshCompletedDialog(timeTaken, successRatio)
