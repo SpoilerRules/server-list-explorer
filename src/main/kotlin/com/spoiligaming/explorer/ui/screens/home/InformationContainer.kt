@@ -1,8 +1,8 @@
 package com.spoiligaming.explorer.ui.screens.home
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,37 +23,35 @@ import com.spoiligaming.explorer.ui.widgets.MergedText
 
 @Composable
 fun InformationContainer() =
-    Box(
+    Row(
         modifier =
-            Modifier.fillMaxWidth()
+            Modifier
+                .fillMaxWidth()
                 .height(26.dp)
-                .background(MapleColorPalette.quaternary, RoundedCornerShape(16.dp)),
-        contentAlignment = Alignment.Center,
+                .background(MapleColorPalette.quaternary, RoundedCornerShape(16.dp))
+                .padding(horizontal = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Box(
-            Modifier.fillMaxSize().padding(start = 10.dp),
-            contentAlignment = Alignment.CenterStart,
-        ) {
-            MergedText(
-                "Server Count: ",
-                MapleColorPalette.fadedText,
-                FontWeight.Normal,
-                if (isBackupRestoreInProgress) "unknown" else ContemporaryServerEntryListData.serverNameList.size.toString(),
-                MapleColorPalette.fadedText,
-                FontWeight.Normal,
-            )
-        }
-        Box(
-            Modifier.fillMaxSize().padding(end = 10.dp),
-            contentAlignment = Alignment.CenterEnd,
-        ) {
-            MapleHyperlink(
-                text = "Discord",
-                color = MapleColorPalette.accent,
-                fontSize = 16.sp,
-                fontFamily = FontFactory.comfortaaMedium,
-                fontWeight = FontWeight.Bold,
-                url = SoftwareInformation.DISCORD_SERVER_LINK,
-            )
-        }
+        MergedText(
+            "Server Count: ",
+            MapleColorPalette.fadedText,
+            FontWeight.Normal,
+            if (isBackupRestoreInProgress) {
+                "unknown"
+            } else {
+                ContemporaryServerEntryListData.serverNameList.size.toString()
+            },
+            MapleColorPalette.fadedText,
+            FontWeight.Normal,
+        )
+
+        MapleHyperlink(
+            text = "Discord",
+            color = MapleColorPalette.accent,
+            fontSize = 16.sp,
+            fontFamily = FontFactory.comfortaaMedium,
+            fontWeight = FontWeight.Bold,
+            url = SoftwareInformation.DISCORD_SERVER_LINK,
+        )
     }
