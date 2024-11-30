@@ -351,29 +351,3 @@ fun MergedText(
         }
     }
 }
-
-@Composable
-fun MergedText(
-    firstText: String,
-    firstTextColor: Color,
-    firstTextWeight: FontWeight,
-    content: @Composable () -> Unit,
-) = Box(contentAlignment = Alignment.Center) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(5.dp),
-    ) {
-        content()
-
-        Text(
-            text = firstText,
-            color = firstTextColor,
-            style =
-                TextStyle(
-                    fontFamily = FontFactory.comfortaaLight,
-                    fontWeight = firstTextWeight,
-                    fontSize = 15.sp,
-                ),
-            modifier = Modifier.offset(y = 2.65.dp),
-        )
-    }
-}
