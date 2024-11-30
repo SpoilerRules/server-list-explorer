@@ -14,7 +14,7 @@
   <img src="https://i.imgur.com/uqIy4nC.png" width="250" alt="Screenshot 2">
   <img src="https://i.imgur.com/3DIxn7c.png" width="250" alt="Screenshot 3">
   <img src="https://i.imgur.com/tcIHRDb.png" width="250" alt="Screenshot 4">
-  <img src="https://i.imgur.com/saLPpkK.png" width="250" alt="Screenshot 5">
+  <img src="https://i.imgur.com/CRXHTeO.png" width="250" alt="Screenshot 5">
   <img src="https://i.imgur.com/StRBnvS.png" width="250" alt="Screenshot 6">
   <img src="https://i.imgur.com/PrkZPnH.png" width="250" alt="Screenshot 7">
   <img src="https://i.imgur.com/XtVdbEB.png" width="250" alt="Screenshot 8">
