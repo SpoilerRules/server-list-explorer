@@ -14,24 +14,30 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.FormatColorReset
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -44,10 +50,11 @@ import com.spoiligaming.explorer.ui.dialogs.dialog.MapleDialogBase
 import com.spoiligaming.explorer.ui.extensions.onHover
 import com.spoiligaming.explorer.ui.fonts.FontFactory
 import com.spoiligaming.explorer.ui.icons.IconFactory
-import com.spoiligaming.explorer.ui.widgets.MapleTooltip
+import com.spoiligaming.explorer.ui.widgets.MapleToggleSwitch
 import com.spoiligaming.explorer.ui.widgets.MergedText
 import com.spoiligaming.explorer.utils.ClipboardUtility
 import com.spoiligaming.explorer.utils.MinecraftTextUtils
+import kotlinx.coroutines.delay
 
 @Composable
 fun MapleConfirmationDialog(
@@ -132,29 +139,146 @@ fun MapleMOTDDialog(
     ) {
         Column(
             modifier = Modifier.width(IntrinsicSize.Max),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            var isFormattedMOTD by remember { mutableStateOf(true) }
+            val displayedMOTD =
+                if (isFormattedMOTD) {
+                    MinecraftTextUtils.parseMinecraftMOTD(motd)
+                } else {
+                    AnnotatedString(motd.replace(MinecraftTextUtils.minecraftRegex, ""))
+                }
+
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopStart) {
-                MergedText(
-                    serverName,
-                    MapleColorPalette.fadedText,
-                    FontFactory.comfortaaMedium,
-                    FontWeight.Bold,
-                    " ($serverAddress)",
-                    MapleColorPalette.fadedText,
-                    FontFactory.comfortaaRegular,
-                    FontWeight.Normal,
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    MergedText(
+                        serverName,
+                        MapleColorPalette.fadedText,
+                        FontFactory.comfortaaMedium,
+                        FontWeight.Bold,
+                        " ($serverAddress)",
+                        MapleColorPalette.fadedText,
+                        FontFactory.comfortaaRegular,
+                        FontWeight.Normal,
+                    )
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .shadow(elevation = 2.dp, shape = RoundedCornerShape(8.dp))
+                                .background(MapleColorPalette.quaternary, RoundedCornerShape(8.dp))
+                                .padding(8.dp),
+                    ) {
+                        val buttonHeight = 36.dp
+                        var isCopied by remember { mutableStateOf(false) }
+                        var isButtonClicked by remember { mutableStateOf(false) }
+
+                        LaunchedEffect(isButtonClicked) {
+                            if (isButtonClicked) {
+                                delay(3000)
+                                isCopied = false
+                                isButtonClicked = false
+                            }
+                        }
+
+                        TextButton(
+                            onClick = {
+                                ClipboardUtility.copy(
+                                    if (isFormattedMOTD) {
+                                        motd
+                                    } else {
+                                        displayedMOTD.text
+                                    },
+                                )
+                                if (!isCopied) {
+                                    isCopied = true
+                                    isButtonClicked = true
+                                }
+                            },
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MapleColorPalette.menu,
+                                ),
+                            shape = RoundedCornerShape(8.dp),
+                            elevation =
+                                ButtonDefaults.elevatedButtonElevation(
+                                    defaultElevation = 8.dp,
+                                ),
+                            modifier =
+                                Modifier
+                                    .width(133.dp)
+                                    .height(buttonHeight)
+                                    .pointerHoverIcon(PointerIcon.Hand)
+                                    .padding(0.dp),
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                if (isCopied) {
+                                    Icon(
+                                        Icons.Filled.CheckCircle,
+                                        contentDescription = "Copied",
+                                        tint = MapleColorPalette.fadedText,
+                                        modifier = Modifier.size(16.dp),
+                                    )
+                                } else {
+                                    Icon(
+                                        Icons.Filled.ContentCopy,
+                                        contentDescription = "Copy",
+                                        tint = MapleColorPalette.fadedText,
+                                        modifier = Modifier.size(16.dp),
+                                    )
+                                }
+                                Text(
+                                    if (isCopied) {
+                                        "Copied!"
+                                    } else {
+                                        "Copy MOTD"
+                                    },
+                                    color = MapleColorPalette.fadedText,
+                                    style =
+                                        TextStyle(
+                                            fontFamily = FontFactory.comfortaaMedium,
+                                            fontWeight = FontWeight.Normal,
+                                            fontSize = 14.sp,
+                                        ),
+                                )
+                            }
+                        }
+
+                        VerticalDivider(
+                            Modifier.height(buttonHeight),
+                            thickness = 1.dp,
+                            color = MapleColorPalette.control,
+                        )
+
+                        MapleToggleSwitch(
+                            label = "Color formatting",
+                            initialValue = isFormattedMOTD,
+                        ) { isFormattedMOTD = it }
+                    }
+                }
             }
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Surface(
+                    modifier = Modifier.width(IntrinsicSize.Max),
                     color = MapleColorPalette.control,
                     shape = RoundedCornerShape(8.dp),
                     shadowElevation = 2.dp,
                 ) {
                     Text(
-                        text = MinecraftTextUtils.parseMinecraftMOTD(motd),
+                        text = displayedMOTD,
+                        color =
+                            if (isFormattedMOTD) {
+                                Color.Unspecified
+                            } else {
+                                MapleColorPalette.text
+                            },
                         style =
                             TextStyle(
                                 fontFamily = FontFactory.comfortaaMedium,
@@ -163,60 +287,8 @@ fun MapleMOTDDialog(
                             ),
                         maxLines = 2,
                         lineHeight = 36.sp,
-                        modifier =
-                            Modifier
-                                .padding(16.dp),
+                        modifier = Modifier.padding(16.dp),
                     )
-                }
-                Row(
-                    Modifier.shadow(
-                        2.dp,
-                        RoundedCornerShape(8.dp),
-                    ).background(MapleColorPalette.defaultQuaternary, RoundedCornerShape(8.dp)),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    IconButton(
-                        modifier =
-                            Modifier.pointerHoverIcon(
-                                PointerIcon.Hand,
-                            ),
-                        onClick = {
-                            ClipboardUtility.copy(motd)
-                        },
-                    ) {
-                        MapleTooltip(
-                            tooltip = "Copy MOTD",
-                            tooltipDelay = 3000,
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ContentCopy,
-                                tint = MapleColorPalette.fadedText,
-                                contentDescription = "Copy",
-                                modifier = Modifier.size(20.dp),
-                            )
-                        }
-                    }
-                    IconButton(
-                        modifier =
-                            Modifier.pointerHoverIcon(
-                                PointerIcon.Hand,
-                            ),
-                        onClick = {
-                            ClipboardUtility.copy(motd, true)
-                        },
-                    ) {
-                        MapleTooltip(
-                            tooltip = "Copy stripped MOTD (without color codes)",
-                            tooltipDelay = 3000,
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.FormatColorReset,
-                                tint = MapleColorPalette.fadedText,
-                                contentDescription = "Stripped Copy",
-                                modifier = Modifier.size(20.dp),
-                            )
-                        }
-                    }
                 }
             }
         }
