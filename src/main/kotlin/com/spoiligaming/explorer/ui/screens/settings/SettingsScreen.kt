@@ -107,10 +107,7 @@ fun SettingsScreen() {
 
             LazyColumn(
                 state = listState,
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .background(Color.Transparent),
+                modifier = Modifier.weight(1f),
             ) {
                 itemsIndexed(categories) { index, category ->
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -127,7 +124,7 @@ fun SettingsScreen() {
 
                         Column(
                             modifier = Modifier.offset(x = 5.dp),
-                            verticalArrangement = Arrangement.spacedBy((-40).dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
                             category.content()
                         }
@@ -136,7 +133,10 @@ fun SettingsScreen() {
                     if (index != categories.lastIndex) {
                         Spacer(modifier = Modifier.height(16.dp))
                     } else {
-                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier.padding(top = 24.dp),
+                        ) {
                             HorizontalDivider(
                                 color = MapleColorPalette.control,
                                 thickness = 1.dp,

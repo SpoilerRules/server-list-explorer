@@ -71,44 +71,31 @@ import androidx.compose.ui.window.PopupProperties
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.extensions.onHover
 import com.spoiligaming.explorer.ui.fonts.FontFactory
+import kotlin.math.max
+import kotlin.math.min
 import org.jetbrains.compose.resources.painterResource
 import server_list_explorer.generated.resources.Res
 import server_list_explorer.generated.resources.chevron_down
-import kotlin.math.max
-import kotlin.math.min
 
 @Composable
-fun DropdownMenuWithLabel(
+fun MapleDropdownMenu(
     label: String,
     currentValue: String,
     options: List<String>,
     onValueChange: (String) -> Unit,
-) = Row(
-    verticalAlignment = Alignment.CenterVertically,
-    horizontalArrangement = Arrangement.spacedBy(5.dp),
-) {
-    MapleDropdownMenu(
-        false,
-        currentValue,
-        options,
-    ) { newValue ->
-        onValueChange(newValue)
-    }
-    Text(
-        text = label,
-        color = MapleColorPalette.text,
-        style =
-            TextStyle(
-                fontFamily = FontFactory.comfortaaLight,
-                fontWeight = FontWeight.Light,
-                fontSize = 15.sp,
-            ),
-    )
+) = MapleDropdownMenu(
+    label = label,
+    elevation = false,
+    defaultValue = currentValue,
+    options = options,
+) { newValue ->
+    onValueChange(newValue)
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MapleDropdownMenu(
+    label: String? = null,
     elevation: Boolean,
     defaultValue: String,
     options: List<String>,
@@ -130,42 +117,60 @@ fun MapleDropdownMenu(
             }
         }
 
-    Box(
-        modifier =
-            Modifier.width(255.dp)
-                .height(26.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(MapleColorPalette.control, RoundedCornerShape(12.dp))
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = ripple(color = Color.White),
-                ) {
-                    isDropdownExpanded = true
-                },
-        contentAlignment = Alignment.CenterStart,
-    ) {
+    Box(modifier = Modifier.height(26.dp)) {
         Row(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
         ) {
-            Text(
-                text = selectedOption,
-                color = MapleColorPalette.text,
-                style =
-                    TextStyle(
-                        fontFamily = FontFactory.comfortaaLight,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 15.sp,
-                    ),
-            )
+            Box(
+                modifier =
+                    Modifier.width(255.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MapleColorPalette.control, RoundedCornerShape(12.dp))
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = ripple(color = Color.White),
+                        ) {
+                            isDropdownExpanded = true
+                        },
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = selectedOption,
+                        color = MapleColorPalette.text,
+                        style =
+                            TextStyle(
+                                fontFamily = FontFactory.comfortaaLight,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 15.sp,
+                            ),
+                    )
 
-            Box(modifier = Modifier.size(16.dp), contentAlignment = Alignment.Center) {
-                Icon(
-                    painter = painterResource(Res.drawable.chevron_down),
-                    tint = MapleColorPalette.text,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
+                    Box(modifier = Modifier.size(16.dp), contentAlignment = Alignment.Center) {
+                        Icon(
+                            painter = painterResource(Res.drawable.chevron_down),
+                            tint = MapleColorPalette.text,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                        )
+                    }
+                }
+            }
+            label?.let {
+                Text(
+                    text = label,
+                    color = MapleColorPalette.text,
+                    style =
+                        TextStyle(
+                            fontFamily = FontFactory.comfortaaLight,
+                            fontWeight = FontWeight.Light,
+                            fontSize = 15.sp,
+                        ),
                 )
             }
         }

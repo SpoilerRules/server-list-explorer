@@ -12,14 +12,14 @@ import com.spoiligaming.explorer.ConfigurationHandler
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.SettingsViewModel
 import com.spoiligaming.explorer.ui.fonts.FontFactory
-import com.spoiligaming.explorer.ui.widgets.DropdownMenuWithLabel
+import com.spoiligaming.explorer.ui.widgets.MapleDropdownMenu
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
 
 @Composable
 fun SettingsGeneral() =
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        DropdownMenuWithLabel(
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        MapleDropdownMenu(
             label = "Scrollbar Visibility",
             currentValue = ConfigurationHandler.getInstance().generalSettings.scrollBarVisibility,
             options = listOf("Right Side", "Left Side", "Disabled"),
@@ -27,7 +27,7 @@ fun SettingsGeneral() =
             ConfigurationHandler.updateValue { generalSettings.scrollBarVisibility = newValue }
         }
 
-        DropdownMenuWithLabel(
+        MapleDropdownMenu(
             label = "Server List Control Panel Position",
             currentValue = ConfigurationHandler.getInstance().generalSettings.controlPanelPosition,
             options = listOf("Top", "Bottom"),
@@ -47,7 +47,7 @@ fun SettingsGeneral() =
                         fontSize = 15.sp,
                     ),
             )
-            DropdownMenuWithLabel(
+            MapleDropdownMenu(
                 label = "Render API",
                 currentValue = ConfigurationHandler.getInstance().generalSettings.renderApi,
                 options = getRenderApiOptions(),

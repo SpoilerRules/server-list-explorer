@@ -38,8 +38,8 @@ import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.SettingsViewModel
 import com.spoiligaming.explorer.ui.components.MapleColorInformation
 import com.spoiligaming.explorer.ui.components.MapleColorPicker
-import com.spoiligaming.explorer.ui.widgets.DropdownMenuWithLabel
-import com.spoiligaming.explorer.ui.widgets.LabeledMapleToggleSwitch
+import com.spoiligaming.explorer.ui.widgets.MapleDropdownMenu
+import com.spoiligaming.explorer.ui.widgets.MapleToggleSwitch
 import com.spoiligaming.explorer.ui.widgets.MergedText
 import com.spoiligaming.explorer.utils.ColorPaletteUtility
 import com.spoiligaming.explorer.utils.WindowUtility
@@ -106,14 +106,16 @@ fun SettingsTheme() {
         }
     }
 
-    LabeledMapleToggleSwitch(
+    MapleToggleSwitch(
         "Show Scrollbar Background",
         ConfigurationHandler.getInstance().themeSettings.showScrollbarBackground,
     ) { newValue ->
-        ConfigurationHandler.updateValue { themeSettings.showScrollbarBackground = newValue }
+        ConfigurationHandler.updateValue {
+            themeSettings.showScrollbarBackground = newValue
+        }
     }
 
-    LabeledMapleToggleSwitch(
+    MapleToggleSwitch(
         "Show Shortcuts in Context Menu",
         ConfigurationHandler.getInstance().themeSettings.shortcutsInContextMenu,
     ) { newValue ->
@@ -121,7 +123,7 @@ fun SettingsTheme() {
         SettingsViewModel.displayShortcutsInContextMenu = newValue
     }
 
-    LabeledMapleToggleSwitch(
+    MapleToggleSwitch(
         "Experimental Iconified Dialog Options",
         ConfigurationHandler.getInstance().themeSettings.iconifiedDialogOptions,
     ) { newValue ->
@@ -129,161 +131,177 @@ fun SettingsTheme() {
         SettingsViewModel.experimentalIconifiedDialogOptions = newValue
     }
 
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Box(contentAlignment = Alignment.Center) {
-            DropdownMenuWithLabel(
-                label = "Window scale",
-                currentValue =
-                    run {
-                        when (
-                            val currentScale =
-                                ConfigurationHandler.getInstance().themeSettings.windowScale
-                        ) {
-                            "Resizable" -> "Resizable (unstable)"
-                            "Maximized" -> "Maximized (unstable)"
-                            else -> currentScale
+    Column(verticalArrangement = Arrangement.spacedBy((-40).dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Box(contentAlignment = Alignment.Center) {
+                MapleDropdownMenu(
+                    label = "Window scale",
+                    currentValue =
+                        run {
+                            when (
+                                val currentScale =
+                                    ConfigurationHandler.getInstance().themeSettings.windowScale
+                            ) {
+                                "Resizable" -> "Resizable (unstable)"
+                                "Maximized" -> "Maximized (unstable)"
+                                else -> currentScale
+                            }
+                        },
+                    options =
+                        listOf(
+                            "150%",
+                            "125%",
+                            "100%",
+                            "Resizable (unstable)",
+                            "Maximized (unstable)",
+                        ),
+                ) { newValue ->
+                    val processedValue =
+                        when {
+                            newValue.contains("Resizable (unstable)") -> "Resizable"
+                            newValue.contains("Maximized (unstable)") -> "Maximized"
+                            else -> newValue
                         }
-                    },
-                options =
-                    listOf(
-                        "150%",
-                        "125%",
-                        "100%",
-                        "Resizable (unstable)",
-                        "Maximized (unstable)",
-                    ),
-            ) { newValue ->
-                val processedValue =
-                    when {
-                        newValue.contains("Resizable (unstable)") -> "Resizable"
-                        newValue.contains("Maximized (unstable)") -> "Maximized"
-                        else -> newValue
+
+                    val currentScale =
+                        ConfigurationHandler.getInstance().themeSettings.windowScale
+
+                    if (processedValue in listOf("Resizable", "Maximized") &&
+                        currentScale in WindowUtility.windowScaleMapping.keys
+                    ) {
+                        ConfigurationHandler.updateValue {
+                            windowProperties.previousScale = currentScale
+                        }
                     }
 
-                val currentScale = ConfigurationHandler.getInstance().themeSettings.windowScale
-
-                if (processedValue in listOf("Resizable", "Maximized") &&
-                    currentScale in WindowUtility.windowScaleMapping.keys
-                ) {
+                    windowFrame.isResizable = processedValue == "Resizable"
+                    isWindowMaximized = processedValue == "Maximized"
                     ConfigurationHandler.updateValue {
-                        windowProperties.previousScale = currentScale
+                        windowProperties.wasPreviousScaleResizable =
+                            processedValue == "Resizable"
                     }
-                }
 
-                windowFrame.isResizable = processedValue == "Resizable"
-                isWindowMaximized = processedValue == "Maximized"
-                ConfigurationHandler.updateValue {
-                    windowProperties.wasPreviousScaleResizable = processedValue == "Resizable"
-                }
+                    ConfigurationHandler.updateValue {
+                        themeSettings.windowScale = processedValue
 
-                ConfigurationHandler.updateValue {
-                    themeSettings.windowScale = processedValue
+                        when (processedValue) {
+                            "Maximized" -> {
+                                if (currentScale != "Resizable") {
+                                    windowProperties.previousScale = currentScale
+                                    if (currentScale != "Maximized") {
+                                        windowProperties.wasPreviousScaleResizable = false
+                                    }
+                                } else {
+                                    windowProperties.wasPreviousScaleResizable = true
+                                }
+                                WindowUtility.maximizeWindow()
+                            }
 
-                    when (processedValue) {
-                        "Maximized" -> {
-                            if (currentScale != "Resizable") {
-                                windowProperties.previousScale = currentScale
-                                if (currentScale != "Maximized") {
+                            "Resizable" ->
+                                windowFrame.apply {
+                                    size =
+                                        ConfigurationHandler.getInstance().let { config ->
+                                            config.themeSettings.windowScale.let { scale ->
+                                                WindowUtility.windowScaleMapping[scale]
+                                                    ?: WindowUtility.windowScaleMapping[
+                                                        config.windowProperties.previousScale,
+                                                    ]
+                                                    ?: scale.toFloatOrNull()
+                                                    ?: 1f
+                                            }.let { windowScale ->
+                                                config.windowProperties.currentWindowSize?.let { (width, height) ->
+                                                    width to height
+                                                } ?: (800 * windowScale).toInt().let { width ->
+                                                    (600 * windowScale).toInt().let { height ->
+                                                        width to height
+                                                    }
+                                                }
+                                            }.let { Dimension(it.first, it.second) }
+                                        }
+                                    centerOnScreen()
+                                }
+
+                            in WindowUtility.windowScaleMapping.keys -> {
+                                val newScale =
+                                    WindowUtility.windowScaleMapping[processedValue]!!
+
+                                ConfigurationHandler.updateValue {
                                     windowProperties.wasPreviousScaleResizable = false
                                 }
-                            } else {
-                                windowProperties.wasPreviousScaleResizable = true
-                            }
-                            WindowUtility.maximizeWindow()
-                        }
-                        "Resizable" ->
-                            windowFrame.apply {
-                                size =
-                                    ConfigurationHandler.getInstance().let { config ->
-                                        config.themeSettings.windowScale.let { scale ->
-                                            WindowUtility.windowScaleMapping[scale]
-                                                ?: WindowUtility.windowScaleMapping[
-                                                    config.windowProperties.previousScale,
-                                                ]
-                                                ?: scale.toFloatOrNull()
-                                                ?: 1f
-                                        }.let { windowScale ->
-                                            config.windowProperties.currentWindowSize?.let {
-                                                    (width, height) ->
-                                                width to height
-                                            } ?: (800 * windowScale).toInt().let { width ->
-                                                (600 * windowScale).toInt().let { height ->
-                                                    width to height
-                                                }
-                                            }
-                                        }.let { Dimension(it.first, it.second) }
-                                    }
-                                centerOnScreen()
-                            }
-                        in WindowUtility.windowScaleMapping.keys -> {
-                            val newScale = WindowUtility.windowScaleMapping[processedValue]!!
 
-                            ConfigurationHandler.updateValue {
-                                windowProperties.wasPreviousScaleResizable = false
+                                windowFrame.apply {
+                                    size =
+                                        Dimension(
+                                            (800 * newScale).toInt(),
+                                            (600 * newScale).toInt(),
+                                        )
+                                    centerOnScreen()
+                                }
                             }
 
-                            windowFrame.apply {
-                                size = Dimension((800 * newScale).toInt(), (600 * newScale).toInt())
-                                centerOnScreen()
-                            }
+                            else -> throw IllegalArgumentException(
+                                "Invalid window scale value: $processedValue",
+                            )
                         }
-                        else -> throw IllegalArgumentException(
-                            "Invalid window scale value: $processedValue",
-                        )
                     }
                 }
             }
-        }
 
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            colorKeys.forEach { key ->
-                MergedText("$key color", MapleColorPalette.text, FontWeight.Light, 2.49988774.dp) {
-                    Box(
-                        modifier =
-                            Modifier.width(25.dp)
-                                .height(25.dp)
-                                .background(
-                                    color =
-                                        mutableStateOf(colorPaletteMap[key]).value
-                                            ?: Color.Transparent,
-                                    shape = RoundedCornerShape(4.dp),
-                                )
-                                .onClick {
-                                    tooltipStates[key]?.dismiss()
-                                    colorPickerStates[key] = true
-                                }
-                                .onPointerEvent(PointerEventType.Enter) {
-                                    if (colorPickerStates[key] == false) {
-                                        coroutineScope.launch { tooltipStates[key]?.show() }
-                                    }
-                                }
-                                .onPointerEvent(PointerEventType.Exit) {
-                                    tooltipStates[key]?.dismiss()
-                                },
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                colorKeys.forEach { key ->
+                    MergedText(
+                        "$key color",
+                        MapleColorPalette.text,
+                        FontWeight.Light,
+                        2.49988774.dp,
                     ) {
-                        BasicTooltipBox(
-                            tooltip = {
-                                colorPickerStates[key]?.takeIf { !it }?.let {
-                                    colorPaletteMap[key]?.let { color ->
-                                        MapleColorInformation(color)
+                        Box(
+                            modifier =
+                                Modifier.width(25.dp)
+                                    .height(25.dp)
+                                    .background(
+                                        color =
+                                            mutableStateOf(colorPaletteMap[key]).value
+                                                ?: Color.Transparent,
+                                        shape = RoundedCornerShape(4.dp),
+                                    )
+                                    .onClick {
+                                        tooltipStates[key]?.dismiss()
+                                        colorPickerStates[key] = true
                                     }
-                                }
-                            },
-                            positionProvider =
-                                object : PopupPositionProvider {
-                                    override fun calculatePosition(
-                                        anchorBounds: IntRect,
-                                        windowSize: IntSize,
-                                        layoutDirection: LayoutDirection,
-                                        popupContentSize: IntSize,
-                                    ): IntOffset =
-                                        IntOffset(
-                                            x = anchorBounds.left + 30,
-                                            y = anchorBounds.bottom + 20,
-                                        )
+                                    .onPointerEvent(PointerEventType.Enter) {
+                                        if (colorPickerStates[key] == false) {
+                                            coroutineScope.launch { tooltipStates[key]?.show() }
+                                        }
+                                    }
+                                    .onPointerEvent(PointerEventType.Exit) {
+                                        tooltipStates[key]?.dismiss()
+                                    },
+                        ) {
+                            BasicTooltipBox(
+                                tooltip = {
+                                    colorPickerStates[key]?.takeIf { !it }?.let {
+                                        colorPaletteMap[key]?.let { color ->
+                                            MapleColorInformation(color)
+                                        }
+                                    }
                                 },
-                            state = tooltipStates[key] ?: BasicTooltipState(),
-                        ) {}
+                                positionProvider =
+                                    object : PopupPositionProvider {
+                                        override fun calculatePosition(
+                                            anchorBounds: IntRect,
+                                            windowSize: IntSize,
+                                            layoutDirection: LayoutDirection,
+                                            popupContentSize: IntSize,
+                                        ): IntOffset =
+                                            IntOffset(
+                                                x = anchorBounds.left + 30,
+                                                y = anchorBounds.bottom + 20,
+                                            )
+                                    },
+                                state = tooltipStates[key] ?: BasicTooltipState(),
+                            ) {}
+                        }
                     }
                 }
             }

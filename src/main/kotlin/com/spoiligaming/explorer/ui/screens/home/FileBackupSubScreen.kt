@@ -218,8 +218,8 @@ fun FileBackupSubScreen() {
                                     ),
                             )
                             MapleDropdownMenu(
-                                true,
-                                currentSortOrder,
+                                elevation = true,
+                                defaultValue = currentSortOrder,
                                 options =
                                     listOf(
                                         "Newest",
