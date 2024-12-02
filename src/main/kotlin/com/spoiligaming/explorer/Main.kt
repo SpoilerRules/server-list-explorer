@@ -1,19 +1,15 @@
 package com.spoiligaming.explorer
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.window.WindowDraggableArea
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -30,6 +26,7 @@ import javax.swing.JFrame
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.hostOs
+import java.awt.Dimension
 import java.awt.GraphicsEnvironment
 import java.awt.Toolkit
 import java.awt.event.ComponentAdapter
@@ -113,6 +110,7 @@ fun main(args: Array<String>) {
                 "Resizable" ->
                     windowProperties.currentWindowSize?.let { it.first to it.second }
                         ?: (defaultWidth to defaultHeight)
+
                 else -> defaultWidth to defaultHeight
             }
 
@@ -141,6 +139,7 @@ fun main(args: Array<String>) {
             transparent = true,
             state = windowState,
         ) {
+            window.minimumSize = Dimension(800, 600)
             window.isResizable = themeSettings.windowScale == "Resizable"
             windowFrame = window
             windowSize =
@@ -180,24 +179,15 @@ fun main(args: Array<String>) {
                 )
             }
 
-            val roundedCornerShape =
-                remember(isWindowMaximized) {
-                    RoundedCornerShape(if (isWindowMaximized) 0.dp else 24.dp)
-                }
-
-            Surface(
+            WindowDraggableArea(
                 modifier =
                     Modifier
                         .fillMaxSize()
-                        .clip(roundedCornerShape)
-                        .background(Color.Transparent, roundedCornerShape),
-                color = MapleColorPalette.menu,
+                        .background(
+                            color = MapleColorPalette.menu,
+                            shape = RoundedCornerShape(if (isWindowMaximized) 0.dp else 24.dp),
+                        ),
             ) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    WindowDraggableArea(
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
                 StartupCoordinator.Coordinate()
                 DialogController.RenderDialog()
             }
