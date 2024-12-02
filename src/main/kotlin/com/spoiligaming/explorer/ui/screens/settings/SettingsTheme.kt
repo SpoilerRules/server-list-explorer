@@ -209,7 +209,8 @@ fun SettingsTheme() {
                                                     ?: scale.toFloatOrNull()
                                                     ?: 1f
                                             }.let { windowScale ->
-                                                config.windowProperties.currentWindowSize?.let { (width, height) ->
+                                                config.windowProperties.currentWindowSize?.let {
+                                                        (width, height) ->
                                                     width to height
                                                 } ?: (800 * windowScale).toInt().let { width ->
                                                     (600 * windowScale).toInt().let { height ->
