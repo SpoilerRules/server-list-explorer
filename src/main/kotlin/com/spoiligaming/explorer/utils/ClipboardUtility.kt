@@ -2,6 +2,12 @@ package com.spoiligaming.explorer.utils
 
 import com.spoiligaming.logging.Logger
 import javax.imageio.ImageIO
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.awt.Toolkit
 import java.awt.datatransfer.Clipboard
 import java.awt.datatransfer.DataFlavor
@@ -13,37 +19,48 @@ import java.io.ByteArrayInputStream
 import java.util.Base64
 
 object ClipboardUtility {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val mutex = Mutex()
+
     private val clipboard: Clipboard = Toolkit.getDefaultToolkit().systemClipboard
 
     fun copy(
         content: String?,
         stripMinecraftColorCodes: Boolean = false,
-    ) = content?.let {
-        clipboard.setContents(
-            StringSelection(
-                if (stripMinecraftColorCodes) {
-                    it.replace(
-                        MinecraftTextUtils.minecraftRegex,
-                        "",
-                    )
-                } else {
-                    it
-                },
-            ),
-            null,
-        )
-        Logger.printSuccess("Copied text content to clipboard: \"$it\"")
+    ) = scope.launch {
+        mutex.withLock {
+            content?.let {
+                clipboard.setContents(
+                    StringSelection(
+                        if (stripMinecraftColorCodes) {
+                            it.replace(
+                                MinecraftTextUtils.minecraftRegex,
+                                "",
+                            )
+                        } else {
+                            it
+                        },
+                    ),
+                    null,
+                )
+                Logger.printSuccess("Copied text content to clipboard: \"$it\"")
+            }
+        }
     }
 
     fun copyIconAsImage(base64Icon: String?) =
-        base64Icon?.let {
-            clipboard.setContents(
-                BufferedImageTransferable(
-                    ImageIO.read(ByteArrayInputStream(Base64.getDecoder().decode(it))),
-                ),
-                null,
-            )
-            Logger.printSuccess("Icon image copied to clipboard.")
+        scope.launch {
+            mutex.withLock {
+                base64Icon?.let {
+                    clipboard.setContents(
+                        BufferedImageTransferable(
+                            ImageIO.read(ByteArrayInputStream(Base64.getDecoder().decode(it))),
+                        ),
+                        null,
+                    )
+                    Logger.printSuccess("Icon image copied to clipboard.")
+                }
+            }
         }
 
     fun copyServerInformationAsToml(
@@ -53,23 +70,24 @@ object ClipboardUtility {
         hidden: Boolean,
         acceptedTextures: Int?,
         serverPosition: Int,
-    ) {
-        val toml =
-            """
-        [server.info]
-        name = "$serverName"
-        address = "$serverAddress"
-        icon = ${serverIcon?.let { "\"$it\"" } ?: "none"}
+    ) = scope.launch {
+        mutex.withLock {
+            val toml =
+                """
+                [server.info]
+                name = "$serverName"
+                address = "$serverAddress"
+                icon = ${serverIcon?.let { "\"$it\"" } ?: "none"}
 
-        [server.attributes]
-        hidden = $hidden
-        accepted_textures = ${acceptedTextures ?: "unknown"}
-        position = $serverPosition
-    """
-                .trimIndent()
+                [server.attributes]
+                hidden = $hidden
+                accepted_textures = ${acceptedTextures ?: "unknown"}
+                position = $serverPosition
+                """.trimIndent()
 
-        clipboard.setContents(StringSelection(toml), null)
-        Logger.printSuccess("Server information copied as TOML to clipboard.")
+            clipboard.setContents(StringSelection(toml), null)
+            Logger.printSuccess("Server information copied as TOML to clipboard.")
+        }
     }
 
     private class BufferedImageTransferable(private val image: BufferedImage) : Transferable {
