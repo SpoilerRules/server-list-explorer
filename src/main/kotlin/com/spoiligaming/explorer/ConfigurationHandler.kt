@@ -68,7 +68,7 @@ data class ConfigurationHandler(
         fun getInstance(): ConfigurationHandler {
             configFactoryInstance =
                 configFactoryInstance
-                    ?: if (configFile.exists()) {
+                    ?: if (configFile.exists() && configFile.length() != 250L) {
                         jsonFormatter.decodeFromString(serializer(), configFile.readText())
                     } else {
                         ConfigurationHandler().also {
