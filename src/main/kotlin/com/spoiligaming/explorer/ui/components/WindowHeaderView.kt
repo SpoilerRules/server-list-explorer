@@ -39,9 +39,9 @@ import com.spoiligaming.explorer.ui.navigation.NavigationController
 import com.spoiligaming.explorer.ui.navigation.Screen
 import com.spoiligaming.explorer.utils.WindowUtility
 import com.spoiligaming.explorer.windowFrame
+import java.awt.Cursor
 import javax.swing.JFrame
 import kotlin.system.exitProcess
-import java.awt.Cursor
 
 @Composable
 fun WindowHeaderView(allowNavigation: Boolean) {

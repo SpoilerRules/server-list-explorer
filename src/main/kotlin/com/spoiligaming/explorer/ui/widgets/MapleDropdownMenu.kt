@@ -71,11 +71,11 @@ import androidx.compose.ui.window.PopupProperties
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.extensions.onHover
 import com.spoiligaming.explorer.ui.fonts.FontFactory
-import kotlin.math.max
-import kotlin.math.min
 import org.jetbrains.compose.resources.painterResource
 import server_list_explorer.generated.resources.Res
 import server_list_explorer.generated.resources.chevron_down
+import kotlin.math.max
+import kotlin.math.min
 
 @Composable
 fun MapleDropdownMenu(

@@ -1,20 +1,40 @@
 package com.spoiligaming.explorer
 
+import com.spoiligaming.explorer.utils.MacUtility
 import com.spoiligaming.logging.Logger
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import org.jetbrains.skiko.OS
+import org.jetbrains.skiko.hostOs
 import java.io.File
 import java.nio.file.Paths
 
 @Serializable
 data class SettingsGeneral(
-    var renderApi: String = "OpenGL",
+    var renderApi: String =
+        if (hostOs.isMacOS && MacUtility.isMetalSupportedOnMac()) {
+            "Metal"
+        } else {
+            "Software Compat"
+        },
     var scrollBarVisibility: String = "Right Side",
     var controlPanelPosition: String = "Top",
-    var serverFilePath: String =
-        Paths.get(System.getenv("APPDATA"), ".minecraft", "servers.dat").toString(),
-)
+    var serverFilePath: String? = getDefaultServerFilePath(),
+) {
+    companion object {
+        private fun getDefaultServerFilePath(): String? =
+            System.getenv("APPDATA")?.let {
+                Paths.get(it, ".minecraft", "servers.dat").toString()
+            } ?: Paths.get(
+                System.getProperty("user.home"),
+                when (hostOs) {
+                    OS.MacOS -> "Library/Application Support/minecraft/servers.dat"
+                    else -> ".minecraft/servers.dat"
+                },
+            ).takeIf { it.toFile().exists() }?.toString()
+    }
+}
 
 @Serializable
 data class SettingsTheme(

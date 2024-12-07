@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.spoiligaming.explorer.ConfigurationHandler
 import com.spoiligaming.explorer.disableIconIndexing
 import com.spoiligaming.explorer.disableServerInfoIndexing
-import com.spoiligaming.explorer.server.ContemporaryServerEntryListData
+import com.spoiligaming.explorer.server.LiveServerEntryList
 import com.spoiligaming.explorer.server.ServerFileHandler
 import com.spoiligaming.explorer.ui.SettingsViewModel
 import com.spoiligaming.explorer.ui.components.ServerElement
@@ -48,17 +48,17 @@ fun ServerListView() {
         ) {
             configuration.generalSettings.scrollBarVisibility != "Disabled" &&
                 when (configuration.themeSettings.windowScale) {
-                    "100%", "1f", "1.0f" -> ContemporaryServerEntryListData.serverNameList.size > 4
-                    "125%", "1.25f" -> ContemporaryServerEntryListData.serverNameList.size > 6
-                    "150%", "1.5f" -> ContemporaryServerEntryListData.serverNameList.size > 8
-                    else -> ContemporaryServerEntryListData.serverNameList.size > 8
+                    "100%", "1f", "1.0f" -> LiveServerEntryList.serverNameList.size > 4
+                    "125%", "1.25f" -> LiveServerEntryList.serverNameList.size > 6
+                    "150%", "1.5f" -> LiveServerEntryList.serverNameList.size > 8
+                    else -> LiveServerEntryList.serverNameList.size > 8
                 }
         }
 
     val serverItems by remember {
         derivedStateOf {
-            ContemporaryServerEntryListData.serverNameList.zip(
-                ContemporaryServerEntryListData.serverAddressList,
+            LiveServerEntryList.serverNameList.zip(
+                LiveServerEntryList.serverAddressList,
             ).mapIndexed { index, pair ->
                 ServerItem(index, pair.first, pair.second)
             }
@@ -128,9 +128,9 @@ fun ServerListView() {
                                     serverPositionInList = item.originalIndex,
                                     isSelected =
                                         item.originalIndex ==
-                                            ContemporaryServerEntryListData.selectedServer,
+                                            LiveServerEntryList.selectedServer,
                                     onClick = {
-                                        ContemporaryServerEntryListData.selectedServer =
+                                        LiveServerEntryList.selectedServer =
                                             item.originalIndex
                                     },
                                     onMoveUp = { moveServerUp(item.originalIndex) },
@@ -154,19 +154,19 @@ private fun moveServerUp(position: Int) {
         val newPosition = position - 1
         swapPositions(position, newPosition)
         ServerFileHandler.moveServerUp(position)
-        if (ContemporaryServerEntryListData.selectedServer == position) {
-            ContemporaryServerEntryListData.selectedServer = newPosition
+        if (LiveServerEntryList.selectedServer == position) {
+            LiveServerEntryList.selectedServer = newPosition
         }
     }
 }
 
 private fun moveServerDown(position: Int) {
-    if (position < ContemporaryServerEntryListData.serverNameList.size - 1) {
+    if (position < LiveServerEntryList.serverNameList.size - 1) {
         val newPosition = position + 1
         swapPositions(position, newPosition)
         ServerFileHandler.moveServerDown(position)
-        if (ContemporaryServerEntryListData.selectedServer == position) {
-            ContemporaryServerEntryListData.selectedServer = newPosition
+        if (LiveServerEntryList.selectedServer == position) {
+            LiveServerEntryList.selectedServer = newPosition
         }
     }
 }
@@ -175,8 +175,8 @@ private fun swapPositions(
     fromIndex: Int,
     toIndex: Int,
 ) {
-    ContemporaryServerEntryListData.serverNameList.swapPositions(fromIndex, toIndex)
-    ContemporaryServerEntryListData.serverAddressList.swapPositions(fromIndex, toIndex)
+    LiveServerEntryList.serverNameList.swapPositions(fromIndex, toIndex)
+    LiveServerEntryList.serverAddressList.swapPositions(fromIndex, toIndex)
 }
 
 private fun <T> MutableList<T>.swapPositions(

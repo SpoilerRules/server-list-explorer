@@ -16,7 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.spoiligaming.explorer.disableIconIndexing
-import com.spoiligaming.explorer.server.ContemporaryServerEntryListData
+import com.spoiligaming.explorer.server.LiveServerEntryList
 import com.spoiligaming.explorer.server.ServerFileHandler
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.components.ServerInformationView
@@ -76,18 +76,18 @@ fun HomeScreen() =
                             ) {
                                 Box(modifier = Modifier.fillMaxSize()) {
                                     val selectedServerIndex =
-                                        ContemporaryServerEntryListData
+                                        LiveServerEntryList
                                             .selectedServer
 
                                     if (selectedServerIndex != null) {
                                         ServerInformationView(
                                             serverName =
-                                                ContemporaryServerEntryListData
+                                                LiveServerEntryList
                                                     .serverNameList[
                                                     selectedServerIndex,
                                                 ],
                                             serverAddress =
-                                                ContemporaryServerEntryListData
+                                                LiveServerEntryList
                                                     .serverAddressList[
                                                     selectedServerIndex,
                                                 ],

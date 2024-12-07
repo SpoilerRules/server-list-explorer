@@ -35,12 +35,30 @@ object ServerFileHandler {
 
     private lateinit var serverData: ListTag<CompoundTag>
 
-    private var serverFilePath =
-        Paths.get(ConfigurationHandler.getInstance().generalSettings.serverFilePath)
+    private var _serverFilePath: Path? =
+        ConfigurationHandler.getInstance()
+            .generalSettings.serverFilePath?.let {
+                Paths.get(it)
+            }
+
+    var serverFilePath: Path
+        get() {
+            return _serverFilePath?.takeIf { it.toFile().exists() }
+                ?: throw IllegalStateException(
+                    "Server file path is invalid or does not exist. " +
+                        "The file should not be missing while the application is in use.",
+                )
+        }
+        private set(value) {
+            _serverFilePath = value
+        }
 
     fun initializeServerFileLocation(): ServerFileValidationResult {
-        val serverDatFile = File(ConfigurationHandler.getInstance().generalSettings.serverFilePath)
-        serverFilePath = serverDatFile.toPath()
+        val serverDatFile = _serverFilePath?.toFile()
+        if (serverDatFile?.exists() != true) {
+            Logger.printError("Server file path is invalid or does not exist.")
+            return ServerFileValidationResult.FILE_NOT_FOUND
+        }
 
         val validationResult = validateFile(serverDatFile)
 
@@ -69,7 +87,9 @@ object ServerFileHandler {
                         when (subclass.objectInstance) {
                             ServerFileValidationResult.INVALID_NBT -> {
                                 Logger.printError(
-                                    "The structure of the 'server.dat' file is invalid. Please try selecting another file from a different location, or ensure Minecraft: Java Edition has saved the file correctly.",
+                                    "The structure of the 'server.dat' file is invalid. " +
+                                        "Please try selecting another file from a different location, " +
+                                        "or ensure Minecraft: Java Edition has saved the file correctly.",
                                 )
                                 false
                             }
@@ -120,12 +140,20 @@ object ServerFileHandler {
 
         fileWatcherJob =
             CoroutineScope(Dispatchers.IO).launch {
-                val watchService = FileSystems.getDefault().newWatchService()
-                serverFilePath.parent.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY)
+                val filePath = serverFilePath
 
-                lastModifiedTime = Files.getLastModifiedTime(serverFilePath)
+                val watchService = FileSystems.getDefault().newWatchService()
+                filePath.parent.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY)
+
+                lastModifiedTime = Files.getLastModifiedTime(filePath)
 
                 while (isActive) {
+                    if (!Files.exists(filePath)) {
+                        Logger.printError("Server file does not exist anymore.")
+                        StartupCoordinator.retryLoad()
+                        return@launch
+                    }
+
                     val key = watchService.take()
                     val events = key.pollEvents()
 
@@ -136,11 +164,11 @@ object ServerFileHandler {
                         .firstOrNull { it.fileName.toString() == "servers.dat" }
                         ?.let {
                             if (!ConfigurationHandler.getInstance().advancedSettings.serverFileMonitoring) {
-                                return@launch fileWatcherJob?.cancel()!!
+                                fileWatcherJob?.cancel() // Stop monitoring if file monitoring is disabled
                             }
 
                             if (!isInternalModification && !isBackupRestoreInProgress) {
-                                val currentModifiedTime = Files.getLastModifiedTime(serverFilePath)
+                                val currentModifiedTime = Files.getLastModifiedTime(filePath)
                                 if (lastModifiedTime != currentModifiedTime) {
                                     lastModifiedTime = currentModifiedTime
                                     DialogController.showExternalModificationDialog()
@@ -163,34 +191,26 @@ object ServerFileHandler {
             runCatching {
                 if (isInternalModification) return@runCatching
 
-                val serverDataFile =
-                    File(ConfigurationHandler.getInstance().generalSettings.serverFilePath)
-
-                if (!serverDataFile.exists()) {
-                    StartupCoordinator.retryLoad()
-                    return@runCatching
-                }
+                val serverDataFile = serverFilePath.toFile()
 
                 BackupController.create(serverDataFile)
 
-                CompoundTag()
-                    .apply { put("servers", serverData) }
-                    .let { compoundTag ->
-                        isInternalModification = true
-                        NBTUtil.write(
-                            compoundTag,
-                            serverDataFile,
-                            ConfigurationHandler.getInstance().advancedSettings.compressServerFile,
-                        )
-                        Logger.printSuccess("Server data successfully saved.")
-                    }
+                CompoundTag().apply { put("servers", serverData) }.let { compoundTag ->
+                    isInternalModification = true
+                    NBTUtil.write(
+                        compoundTag,
+                        serverDataFile,
+                        ConfigurationHandler.getInstance().advancedSettings.compressServerFile,
+                    )
+                    Logger.printSuccess("Server data successfully saved.")
+                }
             }
                 .onFailure { error ->
                     Logger.printError("Error saving server data: ${error.localizedMessage}")
                 }
                 .also {
                     isInternalModification = false
-                    lastModifiedTime = Files.getLastModifiedTime(serverFilePath)
+                    lastModifiedTime = serverFilePath.let { Files.getLastModifiedTime(it) }
                 }
         }
 

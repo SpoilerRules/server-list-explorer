@@ -1,7 +1,6 @@
 package com.spoiligaming.explorer.utils
 
 import com.spoiligaming.logging.Logger
-import javax.imageio.ImageIO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -17,6 +16,7 @@ import java.awt.datatransfer.UnsupportedFlavorException
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.util.Base64
+import javax.imageio.ImageIO
 
 object ClipboardUtility {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)

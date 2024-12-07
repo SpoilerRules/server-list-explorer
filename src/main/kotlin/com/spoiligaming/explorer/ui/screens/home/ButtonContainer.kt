@@ -30,9 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.spoiligaming.explorer.ConfigurationHandler
 import com.spoiligaming.explorer.StartupCoordinator
-import com.spoiligaming.explorer.server.ContemporaryServerEntryListData
+import com.spoiligaming.explorer.server.LiveServerEntryList
 import com.spoiligaming.explorer.server.ServerDataDelegate
 import com.spoiligaming.explorer.server.ServerFileHandler
 import com.spoiligaming.explorer.ui.MapleColorPalette
@@ -49,7 +48,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.awt.Desktop
-import java.io.File
 
 @Composable
 fun ButtonContainer() {
@@ -117,7 +115,7 @@ fun ButtonContainer() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ServerPathText() {
-    val file = remember { File(ConfigurationHandler.getInstance().generalSettings.serverFilePath) }
+    val file = remember { ServerFileHandler.serverFilePath.toFile() }
     var isHovered by remember { mutableStateOf(false) }
 
     val contextMenuState = remember { ContextMenuState() }
@@ -197,14 +195,14 @@ fun ServerPathText() {
 private fun refreshIcons() {
     DialogController.showIconRefreshStartedDialog()
 
-    val totalAddresses = ContemporaryServerEntryListData.serverAddressList.size
+    val totalAddresses = LiveServerEntryList.serverAddressList.size
     val startTime = System.currentTimeMillis()
 
     CoroutineScope(Dispatchers.IO).launch {
         var addressesProcessed = 0
         var failedAttempts = 0
 
-        ContemporaryServerEntryListData.serverAddressList.forEachIndexed { index, serverAddress ->
+        LiveServerEntryList.serverAddressList.forEachIndexed { index, serverAddress ->
             val result = runCatching { ServerDataDelegate.getServerIcon(serverAddress) }.getOrNull()
 
             if (result != null) {

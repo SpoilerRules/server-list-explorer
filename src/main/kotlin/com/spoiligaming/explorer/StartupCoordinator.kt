@@ -16,7 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.spoiligaming.explorer.server.ContemporaryServerEntryListData
+import com.spoiligaming.explorer.server.LiveServerEntryList
 import com.spoiligaming.explorer.server.ServerFileHandler
 import com.spoiligaming.explorer.server.ServerFileValidationResult
 import com.spoiligaming.explorer.ui.MapleColorPalette
@@ -102,7 +102,7 @@ object StartupCoordinator {
             val names = ServerFileHandler.loadNames()
             val addresses = ServerFileHandler.loadAddresses()
 
-            ContemporaryServerEntryListData.initialize(
+            LiveServerEntryList.initialize(
                 mutableStateListOf(*names.toTypedArray()),
                 mutableStateListOf(*addresses.toTypedArray()),
             )

@@ -8,7 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import com.spoiligaming.explorer.isBackupRestoreInProgress
 import com.spoiligaming.explorer.server.BackupController
-import com.spoiligaming.explorer.server.ContemporaryServerEntryListData
+import com.spoiligaming.explorer.server.LiveServerEntryList
 import com.spoiligaming.explorer.server.ServerFileHandler
 import com.spoiligaming.explorer.ui.dialogs.MapleConfirmationDialog
 import com.spoiligaming.explorer.ui.dialogs.MapleIndexMoveDialog
@@ -88,17 +88,17 @@ object DialogController {
                         onConfirm = {
                             when (dialogData.type) {
                                 ValueReplacementType.NAME ->
-                                    ContemporaryServerEntryListData.updateServerName(
+                                    LiveServerEntryList.updateServerName(
                                         dialogData.serverPositionInList,
                                         dialogData.serverName,
                                     )
                                 ValueReplacementType.ADDRESS ->
-                                    ContemporaryServerEntryListData.updateServerAddress(
+                                    LiveServerEntryList.updateServerAddress(
                                         dialogData.serverPositionInList,
                                         dialogData.serverAddress,
                                     )
                                 ValueReplacementType.ICON ->
-                                    ContemporaryServerEntryListData.updateServerIcon(
+                                    LiveServerEntryList.updateServerIcon(
                                         dialogData.serverPositionInList,
                                         dialogData.serverIconRaw,
                                     )
@@ -116,7 +116,7 @@ object DialogController {
                             "Do you want to delete the server entry named ${dialogData.serverName}?" +
                                 "\nThis action is irreversible.",
                         onAccept = {
-                            ContemporaryServerEntryListData.deleteServer(dialogData.serverPosition)
+                            LiveServerEntryList.deleteServer(dialogData.serverPosition)
                             currentDialogData = null
                         },
                         onDismiss = { currentDialogData = null },
@@ -191,7 +191,7 @@ object DialogController {
                         title = "Are you sure about wiping your server.dat file?",
                         description = "This action is irrecoverable and permanent.",
                         onAccept = {
-                            ContemporaryServerEntryListData.wipeServerFile()
+                            LiveServerEntryList.wipeServerFile()
                             currentDialogData = null
                         },
                         onDismiss = { currentDialogData = null },
@@ -212,7 +212,7 @@ object DialogController {
                 DialogData.EntryCreationDialog -> {
                     MapleServerEntryCreationDialog(
                         onAccept = { serverData ->
-                            ContemporaryServerEntryListData.createServer(
+                            LiveServerEntryList.createServer(
                                 null,
                                 serverData.third,
                                 serverData.second,

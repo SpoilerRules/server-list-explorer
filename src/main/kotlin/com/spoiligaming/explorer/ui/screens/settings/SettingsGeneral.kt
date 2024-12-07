@@ -13,6 +13,7 @@ import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.SettingsViewModel
 import com.spoiligaming.explorer.ui.fonts.FontFactory
 import com.spoiligaming.explorer.ui.widgets.MapleDropdownMenu
+import com.spoiligaming.explorer.utils.MacUtility
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
 
@@ -60,7 +61,12 @@ fun SettingsGeneral() =
 private fun getRenderApiOptions(): List<String> =
     mutableListOf("Unknown", "Software Fast", "Software Compat", "OpenGL").apply {
         if (hostOs == OS.MacOS) {
-            add("Metal")
+            if (!MacUtility.isOpenGLSupportedOnMac()) {
+                remove("OpenGL")
+            }
+            if (MacUtility.isMetalSupportedOnMac()) {
+                add("Metal")
+            }
         } else if (hostOs == OS.Windows) {
             add("Direct3D")
         }

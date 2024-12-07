@@ -26,7 +26,7 @@ dependencies {
     implementation(compose.desktop.linux_x64) // UNCONFIRMED
     implementation(compose.desktop.linux_arm64) // UNCONFIRMED
     implementation(compose.desktop.macos_x64) // UNCONFIRMED
-    implementation(compose.desktop.macos_arm64) // UNCONFIRMED
+    implementation(compose.desktop.macos_arm64)
     implementation(compose.components.resources)
     implementation(compose.material3)
     implementation(compose.materialIconsExtended)
@@ -34,7 +34,6 @@ dependencies {
     // Compose libraries
     implementation(libs.color.picker)
     implementation(libs.file.kit)
-    // implementation("io.github.dzirbel:compose-material-context-menu:0.2.0") WILL BE USED LATER
 
     // Other libraries
     implementation(files("libraries/mcserverping-1.0.7.jar"))

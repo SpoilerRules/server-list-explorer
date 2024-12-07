@@ -56,7 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.spoiligaming.explorer.server.ContemporaryServerEntryListData
+import com.spoiligaming.explorer.server.LiveServerEntryList
 import com.spoiligaming.explorer.server.ServerFileHandler
 import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.dialogs.ValueReplacementType
@@ -119,7 +119,7 @@ fun ServerElement(
                             serverPositionInList = serverPositionInList,
                             type = ValueReplacementType.NAME,
                         ) { newName ->
-                            ContemporaryServerEntryListData.updateServerName(
+                            LiveServerEntryList.updateServerName(
                                 serverPositionInList,
                                 newName,
                             )
@@ -134,7 +134,7 @@ fun ServerElement(
                             serverPositionInList = serverPositionInList,
                             type = ValueReplacementType.ADDRESS,
                         ) { newAddress ->
-                            ContemporaryServerEntryListData.updateServerAddress(
+                            LiveServerEntryList.updateServerAddress(
                                 serverPositionInList,
                                 newAddress,
                             )
@@ -149,7 +149,7 @@ fun ServerElement(
                             serverPositionInList = serverPositionInList,
                             type = ValueReplacementType.ICON,
                         ) { newIcon ->
-                            ContemporaryServerEntryListData.updateServerIcon(
+                            LiveServerEntryList.updateServerIcon(
                                 serverPositionInList,
                                 newIcon,
                             )
@@ -209,7 +209,7 @@ fun ServerElement(
                             interactionSource = interactionSource,
                             onClick = {
                                 if (isSelected) {
-                                    ContemporaryServerEntryListData.selectedServer = null
+                                    LiveServerEntryList.selectedServer = null
                                 } else {
                                     onClick()
                                 }
@@ -222,8 +222,8 @@ fun ServerElement(
                             if (!isHovered &&
                                 (
                                     !isSelected ||
-                                        ContemporaryServerEntryListData.selectedServer == null ||
-                                        ContemporaryServerEntryListData.selectedServer !=
+                                        LiveServerEntryList.selectedServer == null ||
+                                        LiveServerEntryList.selectedServer !=
                                         serverPositionInList
                                 )
                             ) {
@@ -243,7 +243,7 @@ fun ServerElement(
                                                 serverPositionInList = serverPositionInList,
                                                 type = ValueReplacementType.NAME,
                                             ) { newName ->
-                                                ContemporaryServerEntryListData
+                                                LiveServerEntryList
                                                     .updateServerName(
                                                         serverPositionInList,
                                                         newName,
@@ -261,7 +261,7 @@ fun ServerElement(
                                                 type = ValueReplacementType.ADDRESS,
                                             ) {
                                                     newAddress ->
-                                                ContemporaryServerEntryListData
+                                                LiveServerEntryList
                                                     .updateServerAddress(
                                                         serverPositionInList,
                                                         newAddress,
@@ -278,7 +278,7 @@ fun ServerElement(
                                                 serverPositionInList = serverPositionInList,
                                                 type = ValueReplacementType.ICON,
                                             ) { newIcon ->
-                                                ContemporaryServerEntryListData
+                                                LiveServerEntryList
                                                     .updateServerIcon(
                                                         serverPositionInList,
                                                         newIcon,
@@ -332,12 +332,12 @@ fun ServerElement(
                     isHovered = false
                 }
 
-                LaunchedEffect(isHovered, ContemporaryServerEntryListData.selectedServer) {
-                    if (isHovered && ContemporaryServerEntryListData.selectedServer == null) {
+                LaunchedEffect(isHovered, LiveServerEntryList.selectedServer) {
+                    if (isHovered && LiveServerEntryList.selectedServer == null) {
                         focusRequester.requestFocus()
                     } else {
                         if (isSelected &&
-                            ContemporaryServerEntryListData.selectedServer ==
+                            LiveServerEntryList.selectedServer ==
                             serverPositionInList
                         ) {
                             focusRequester.requestFocus()
@@ -472,7 +472,7 @@ fun ServerElement(
                                     serverPositionInList = serverPositionInList,
                                     type = ValueReplacementType.NAME,
                                 ) { newName ->
-                                    ContemporaryServerEntryListData.updateServerName(
+                                    LiveServerEntryList.updateServerName(
                                         serverPositionInList,
                                         newName,
                                     )
@@ -494,7 +494,7 @@ fun ServerElement(
                                     serverPositionInList = serverPositionInList,
                                     type = ValueReplacementType.ADDRESS,
                                 ) { newAddress ->
-                                    ContemporaryServerEntryListData.updateServerAddress(
+                                    LiveServerEntryList.updateServerAddress(
                                         serverPositionInList,
                                         newAddress,
                                     )

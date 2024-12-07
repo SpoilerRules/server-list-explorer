@@ -22,7 +22,6 @@ import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.state.DialogController
 import com.spoiligaming.explorer.utils.WindowUtility
 import com.spoiligaming.logging.Logger
-import javax.swing.JFrame
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.hostOs
@@ -31,6 +30,7 @@ import java.awt.GraphicsEnvironment
 import java.awt.Toolkit
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import javax.swing.JFrame
 
 val controlButtonAsString: String =
     when (hostOs) {

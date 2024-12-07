@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.spoiligaming.explorer.server.ContemporaryServerEntryListData
+import com.spoiligaming.explorer.server.LiveServerEntryList
 import com.spoiligaming.explorer.server.ServerDataDelegate
 import com.spoiligaming.explorer.server.ServerFileHandler
 import com.spoiligaming.explorer.ui.MapleColorPalette
@@ -108,7 +108,7 @@ fun ServerInformationView(
                                             serverPositionInList = serverPositionInList,
                                             type = ValueReplacementType.NAME,
                                         ) { newName ->
-                                            ContemporaryServerEntryListData
+                                            LiveServerEntryList
                                                 .updateServerName(
                                                     serverPositionInList,
                                                     newName,
@@ -130,7 +130,7 @@ fun ServerInformationView(
                                             serverPositionInList = serverPositionInList,
                                             type = ValueReplacementType.ADDRESS,
                                         ) { newAddress ->
-                                            ContemporaryServerEntryListData
+                                            LiveServerEntryList
                                                 .updateServerAddress(
                                                     serverPositionInList,
                                                     newAddress,
@@ -255,7 +255,7 @@ fun ServerInformationView(
                                                         serverAddress,
                                                     )
                                                 withContext(Dispatchers.Default) {
-                                                    ContemporaryServerEntryListData
+                                                    LiveServerEntryList
                                                         .updateServerIcon(
                                                             serverPositionInList,
                                                             result,
