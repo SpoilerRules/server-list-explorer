@@ -1,6 +1,5 @@
 package com.spoiligaming.explorer.ui.screens.home.list
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +15,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.spoiligaming.explorer.ConfigurationHandler
 import com.spoiligaming.explorer.disableIconIndexing
@@ -31,7 +29,7 @@ import com.spoiligaming.explorer.ui.widgets.MapleVerticalScrollbar
 var serverListSearchQuery: String? by mutableStateOf(null)
 
 @Composable
-fun ServerListView() {
+fun ServerListContainer() {
     data class ServerItem(
         val originalIndex: Int,
         val name: String,
@@ -75,7 +73,7 @@ fun ServerListView() {
     disableServerInfoIndexing
         .takeIf { !it }
         ?.let {
-            Box(modifier = Modifier.fillMaxSize().background(Color.Transparent)) {
+            Box(modifier = Modifier.fillMaxSize()) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.fillMaxSize(),

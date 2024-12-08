@@ -22,7 +22,7 @@ import com.spoiligaming.explorer.ui.MapleColorPalette
 import com.spoiligaming.explorer.ui.components.ServerInformationView
 import com.spoiligaming.explorer.ui.components.StationaryView
 import com.spoiligaming.explorer.ui.extensions.asImageBitmap
-import com.spoiligaming.explorer.ui.screens.home.list.ServerListView
+import com.spoiligaming.explorer.ui.screens.home.list.ServerListContainer
 
 @Composable
 fun HomeScreen() =
@@ -63,7 +63,7 @@ fun HomeScreen() =
                                     Modifier
                                         .weight(1f),
                             ) {
-                                ServerListView()
+                                ServerListContainer()
                             }
 
                             Surface(
