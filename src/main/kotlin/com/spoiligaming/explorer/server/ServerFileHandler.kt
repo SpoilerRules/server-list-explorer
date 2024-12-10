@@ -42,18 +42,22 @@ object ServerFileHandler {
             }
 
     var serverFilePath: Path
-        get() {
-            return _serverFilePath?.takeIf { it.toFile().exists() }
+        get() =
+            _serverFilePath?.takeIf { it.toFile().exists() }
                 ?: throw IllegalStateException(
                     "Server file path is invalid or does not exist. " +
                         "The file should not be missing while the application is in use.",
                 )
-        }
         private set(value) {
             _serverFilePath = value
         }
 
     fun initializeServerFileLocation(): ServerFileValidationResult {
+        _serverFilePath =
+            ConfigurationHandler.getInstance()
+                .generalSettings.serverFilePath?.let {
+                    Paths.get(it)
+                }
         val serverDatFile = _serverFilePath?.toFile()
         if (serverDatFile?.exists() != true) {
             Logger.printError("Server file path is invalid or does not exist.")
