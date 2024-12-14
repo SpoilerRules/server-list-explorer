@@ -267,7 +267,6 @@ fun MapleMOTDDialog(
             }
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Surface(
-                    modifier = Modifier.width(IntrinsicSize.Max),
                     color = MapleColorPalette.control,
                     shape = RoundedCornerShape(8.dp),
                     shadowElevation = 2.dp,
