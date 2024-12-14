@@ -210,7 +210,7 @@ fun MapleMOTDDialog(
                                 ),
                             modifier =
                                 Modifier
-                                    .width(133.dp)
+                                    .width(148.dp)
                                     .height(buttonHeight)
                                     .pointerHoverIcon(PointerIcon.Hand)
                                     .padding(0.dp),
@@ -219,21 +219,22 @@ fun MapleMOTDDialog(
                                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                if (isCopied) {
-                                    Icon(
-                                        Icons.Filled.CheckCircle,
-                                        contentDescription = "Copied",
-                                        tint = MapleColorPalette.fadedText,
-                                        modifier = Modifier.size(16.dp),
-                                    )
-                                } else {
-                                    Icon(
-                                        Icons.Filled.ContentCopy,
-                                        contentDescription = "Copy",
-                                        tint = MapleColorPalette.fadedText,
-                                        modifier = Modifier.size(16.dp),
-                                    )
-                                }
+                                Icon(
+                                    imageVector =
+                                        if (isCopied) {
+                                            Icons.Filled.CheckCircle
+                                        } else {
+                                            Icons.Filled.ContentCopy
+                                        },
+                                    contentDescription =
+                                        if (isCopied) {
+                                            "Copied"
+                                        } else {
+                                            "Copy"
+                                        },
+                                    tint = MapleColorPalette.fadedText,
+                                    modifier = Modifier.size(18.dp),
+                                )
                                 Text(
                                     if (isCopied) {
                                         "Copied!"
@@ -245,7 +246,7 @@ fun MapleMOTDDialog(
                                         TextStyle(
                                             fontFamily = FontFactory.comfortaaMedium,
                                             fontWeight = FontWeight.Normal,
-                                            fontSize = 14.sp,
+                                            fontSize = 16.sp,
                                         ),
                                 )
                             }
