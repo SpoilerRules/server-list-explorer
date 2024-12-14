@@ -41,67 +41,74 @@ object MinecraftTextUtils {
     val minecraftRegex = Regex("§[0-9a-fk-or]")
 
     fun parseMinecraftMOTD(message: String): AnnotatedString {
+        val builder = AnnotatedString.Builder()
         var currentColor = Color.Unspecified
         var currentStyle = SpanStyle()
         var isObfuscated = false
+        var lastIndex = 0
 
-        return AnnotatedString.Builder().apply {
-            var lastIndex = 0
-            minecraftRegex.findAll(message).forEach { match ->
-                val start = match.range.first
-                if (start > lastIndex) {
-                    val textToAdd =
-                        if (isObfuscated) {
-                            // if we are in the obfuscated section, replace each character with '?', but not spaces, tabs, or newlines
-                            message.substring(lastIndex, start).map { char ->
-                                if (char.isWhitespace() || char == '\n' || char == '\t') char else '?'
-                            }.joinToString("")
-                        } else {
-                            message.substring(lastIndex, start)
-                        }
-
-                    withStyle(style = currentStyle.copy(color = currentColor)) {
-                        append(textToAdd)
-                    }
-                }
-
-                val code = match.value[1] // skip '§' and get the code
-                when {
-                    minecraftColorEnumMap.containsKey(code) -> {
-                        currentColor = minecraftColorEnumMap[code] ?: Color.Unspecified
-                    }
-
-                    minecraftStyleEnumMap.containsKey(code) -> {
-                        currentStyle = minecraftStyleEnumMap[code] ?: SpanStyle()
-                    }
-
-                    code == 'k' -> {
-                        isObfuscated = !isObfuscated
-                    }
-
-                    else -> {
-                        currentColor = Color.Unspecified
-                        currentStyle = SpanStyle()
-                    }
-                }
-
-                lastIndex = match.range.last + 1
+        for (match in minecraftRegex.findAll(message)) {
+            val start = match.range.first
+            if (start > lastIndex) {
+                appendStyledText(
+                    builder,
+                    message.substring(lastIndex, start),
+                    currentColor,
+                    currentStyle,
+                    isObfuscated,
+                )
             }
 
-            if (lastIndex < message.length) {
-                val finalText =
-                    if (isObfuscated) {
-                        message.substring(lastIndex).map { char ->
-                            if (char.isWhitespace() || char == '\n' || char == '\t') char else '?'
-                        }.joinToString("")
-                    } else {
-                        message.substring(lastIndex)
-                    }
+            val code = match.value[1] // skip '§' and get the code
+            when {
+                minecraftColorEnumMap.containsKey(code) -> {
+                    currentColor = minecraftColorEnumMap[code] ?: Color.Unspecified
+                }
 
-                withStyle(style = currentStyle.copy(color = currentColor)) {
-                    append(finalText)
+                minecraftStyleEnumMap.containsKey(code) -> {
+                    currentStyle = minecraftStyleEnumMap[code] ?: SpanStyle()
+                }
+
+                code == 'k' -> {
+                    isObfuscated = !isObfuscated
+                }
+
+                else -> {
+                    currentColor = Color.Unspecified
+                    currentStyle = SpanStyle()
                 }
             }
-        }.toAnnotatedString()
+            lastIndex = match.range.last + 1
+        }
+
+        if (lastIndex < message.length) {
+            appendStyledText(
+                builder,
+                message.substring(lastIndex),
+                currentColor,
+                currentStyle,
+                isObfuscated,
+            )
+        }
+
+        return builder.toAnnotatedString()
+    }
+
+    private fun appendStyledText(
+        builder: AnnotatedString.Builder,
+        text: String,
+        color: Color,
+        style: SpanStyle,
+        isObfuscated: Boolean,
+    ) = builder.withStyle(style.copy(color = color)) {
+        append(
+            if (isObfuscated) {
+                text.map { char ->
+                    if (char.isWhitespace() || char == '\n' || char == '\t') char else '?'
+                }.joinToString("")
+            } else {
+                text
+            },
+        )
     }
 }
