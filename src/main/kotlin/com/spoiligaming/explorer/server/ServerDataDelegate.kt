@@ -2,6 +2,7 @@ package com.spoiligaming.explorer.server
 
 import br.com.azalim.mcserverping.MCPing
 import br.com.azalim.mcserverping.MCPingOptions
+import com.spoiligaming.logging.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
@@ -52,11 +53,16 @@ object ServerDataDelegate {
                 cache?.timestamp?.plusSeconds(CACHE_DURATION_SECONDS)?.isAfter(Instant.now()) ==
                 true
             ) {
+                Logger.printSuccess(
+                    "Cache hit: Skipping data refresh for Minecraft server $serverAddress. Returning cached data.",
+                )
                 return@withContext ServerDelegateResult.Success(cache!!.serverData)
             }
 
             runCatching {
                 withTimeout(TIMEOUT_DURATION_MS) {
+                    Logger.printSuccess("Fetching data for Minecraft server $serverAddress...")
+
                     val serverData =
                         MCPing.getPing(MCPingOptions.builder().hostname(serverAddress).build())
                             .let {
@@ -72,23 +78,45 @@ object ServerDataDelegate {
                                 )
                             }
                     cache = Cache(serverAddress, serverData, Instant.now())
+
+                    Logger.printSuccess(
+                        "Successfully fetched and cached data for Minecraft server $serverAddress.",
+                    )
                     ServerDelegateResult.Success(serverData)
                 }
             }
-                .getOrElse { ServerDelegateResult.Failure }
+                .getOrElse { error ->
+                    Logger.printError(
+                        "Error while fetching data for Minecraft server $serverAddress: $error",
+                    )
+                    ServerDelegateResult.Failure
+                }
         }
 
     suspend fun getServerIcon(serverAddress: String): String? =
         withContext(Dispatchers.IO) {
             runCatching {
-                val favicon =
+                Logger.printSuccess(
+                    "Attempting to fetch the icon for Minecraft server $serverAddress...",
+                )
+
+                val iconData =
                     MCPing.getPing(MCPingOptions.builder().hostname(serverAddress).build())
                         .favicon
+                        .takeIf { it.startsWith("data:image/png;base64,") }
+                        ?.removePrefix("data:image/png;base64,")
 
-                favicon.removePrefix("data:image/png;base64,").takeIf {
-                    favicon.startsWith("data:image/png;base64,")
+                return@withContext iconData?.also {
+                    Logger.printSuccess("Successfully retrieved the icon for Minecraft server $serverAddress.")
+                } ?: run {
+                    Logger.printWarning("No valid icon found for Minecraft server $serverAddress.")
+                    null
                 }
+            }.getOrElse { error ->
+                Logger.printError(
+                    "Error fetching the icon for Minecraft server $serverAddress: $error",
+                )
+                null
             }
-                .getOrNull()
         }
 }
