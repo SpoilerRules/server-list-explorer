@@ -342,7 +342,19 @@ private fun formatPing(milliseconds: String) =
         val minutes = seconds / 60
         val hours = minutes / 60
 
-        "${if (hours > 0) "${hours}h" else ""}${if (minutes > 0) "${minutes % 60}m" else ""}${if (seconds > 0) "${seconds % 60}s" else "$millis milliseconds"}"
+        buildString {
+            if (hours > 0) {
+                append("${hours}h")
+            }
+            if (minutes > 0) {
+                append("${minutes % 60}m")
+            }
+            if (seconds > 0) {
+                append("${seconds % 60}s")
+            } else {
+                append("$millis milliseconds")
+            }
+        }
     } ?: "Unknown"
 
 private fun formatNumberWithCommas(numberString: String) =
