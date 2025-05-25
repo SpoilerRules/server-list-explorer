@@ -1,6 +1,5 @@
 package com.spoiligaming.explorer
 
-import com.spoiligaming.explorer.utils.MacUtility
 import com.spoiligaming.logging.Logger
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -12,12 +11,7 @@ import java.nio.file.Paths
 
 @Serializable
 data class SettingsGeneral(
-    var renderApi: String =
-        if (hostOs.isMacOS && MacUtility.isMetalSupportedOnMac()) {
-            "Metal"
-        } else {
-            "Software Compat"
-        },
+    var renderApi: String = "Default",
     var scrollBarVisibility: String = "Right Side",
     var controlPanelPosition: String = "Top",
     var serverFilePath: String? = getDefaultServerFilePath(),

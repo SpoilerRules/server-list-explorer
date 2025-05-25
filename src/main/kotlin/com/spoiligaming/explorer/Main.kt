@@ -61,10 +61,13 @@ var isBackupRestoreInProgress by mutableStateOf(false)
  */
 @OptIn(ExperimentalComposeUiApi::class)
 fun main(args: Array<String>) {
-    System.setProperty(
-        "skiko.renderApi",
-        ConfigurationHandler.getInstance().generalSettings.renderApi.uppercase().replace(" ", "_"),
-    )
+    ConfigurationHandler.getInstance()
+        .generalSettings
+        .renderApi
+        .takeIf { !it.equals("Default", ignoreCase = true) }
+        ?.uppercase()
+        ?.replace(" ", "_")
+        ?.let { System.setProperty("skiko.renderApi", it) }
     Logger.printSuccess("Skiko Render API: ${SkiaLayer().renderApi}")
 
     val argumentActions =

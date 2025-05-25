@@ -59,7 +59,7 @@ fun SettingsGeneral() =
     }
 
 private fun getRenderApiOptions(): List<String> =
-    mutableListOf("Unknown", "Software Fast", "Software Compat", "OpenGL").apply {
+    mutableListOf("Default", "Software Fast", "Software Compat", "OpenGL").apply {
         if (hostOs == OS.MacOS) {
             if (!MacUtility.isOpenGLSupportedOnMac()) {
                 remove("OpenGL")
