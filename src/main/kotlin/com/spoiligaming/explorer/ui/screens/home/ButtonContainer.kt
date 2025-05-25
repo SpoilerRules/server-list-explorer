@@ -65,7 +65,7 @@ fun ButtonContainer() {
                 listOf(
                     "Create Server Entry" to { DialogController.showServerEntryCreationDialog() },
                     "Wipe Server List" to { DialogController.showWipeConfirmationDialog() },
-                    //"Sort Server List" to {},
+                    // "Sort Server List" to {},
                     "Refresh Icons" to { refreshIcons() },
                 )
 
