@@ -41,22 +41,50 @@
     <methods>;
 }
 
-# Kotlinx Coroutines Rules
-# https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/resources/META-INF/proguard/coroutines.pro
--keep,allowshrinking class kotlinx.coroutines.internal.MainDispatcherFactory
+# ServiceLoader support
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
 
--keep,allowshrinking class kotlinx.coroutines.CoroutineExceptionHandler
-
-# Keep - Applications. Keep all application classes, along with their 'main' methods.
--keepclasseswithmembers public class * {
-    public static void main(java.lang.String[]);
+# Most of volatile fields are updated with AFU and should not be mangled
+-keepclassmembers class kotlinx.coroutines.** {
+    volatile <fields>;
 }
 
-# Also keep - Enumerations. Keep the special static methods that are required in
-# enumeration classes.
--keepclassmembers enum  * {
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
+# Same story for the standard library's SafeContinuation that also uses AtomicReferenceFieldUpdater
+-keepclassmembers class kotlin.coroutines.SafeContinuation {
+    volatile <fields>;
+}
+
+# These classes are only required by kotlinx.coroutines.debug.internal.AgentPremain, which is only loaded when
+# kotlinx-coroutines-core is used as a Java agent, so these are not needed in contexts where ProGuard is used.
+-dontwarn java.lang.instrument.ClassFileTransformer
+-dontwarn sun.misc.SignalHandler
+-dontwarn java.lang.instrument.Instrumentation
+-dontwarn sun.misc.Signal
+
+# Only used in `kotlinx.coroutines.internal.ExceptionsConstructor`.
+# The case when it is not available is hidden in a `try`-`catch`, as well as a check for Android.
+-dontwarn java.lang.ClassValue
+
+# An annotation used for build tooling, won't be directly accessed.
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+
+# Keep all of JNA’s core classes and their native‐peer fields/methods
+-keep class com.sun.jna.** {
+    *;
+}
+-keepclassmembers class com.sun.jna.** {
+    native <methods>;
+}
+
+# Keep all of JNA Platform (win32, etc.) helper classes as well
+-keep class com.sun.jna.platform.** {
+    *;
+}
+
+-keepclassmembers class * extends com.sun.jna.Structure {
+    <fields>;
+    <methods>;
 }
 
 # Also keep - Database drivers. Keep all implementations of java.sql.Driver.
