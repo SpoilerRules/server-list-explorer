@@ -40,7 +40,6 @@ import com.spoiligaming.explorer.ui.fonts.FontFactory
 import com.spoiligaming.explorer.ui.presentation.MapleContextMenuRepresentation
 import com.spoiligaming.explorer.ui.state.DialogController
 import com.spoiligaming.explorer.ui.widgets.MapleButton
-import com.spoiligaming.explorer.ui.widgets.MapleButtonHeight
 import com.spoiligaming.explorer.utils.ClipboardUtility
 import com.spoiligaming.logging.Logger
 import kotlinx.coroutines.CoroutineScope
@@ -62,27 +61,18 @@ fun ButtonContainer() {
             verticalArrangement = Arrangement.spacedBy(6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            val buttonData =
+            val listButtonData =
                 listOf(
-                    "Load Server File" to
-                        {
-                            DialogController.showServerFilePickerDialog(true)
-                        },
+                    "Create Server Entry" to { DialogController.showServerEntryCreationDialog() },
                     "Wipe Server List" to { DialogController.showWipeConfirmationDialog() },
+                    //"Sort Server List" to {},
                     "Refresh Icons" to { refreshIcons() },
-                    "Reload Server File" to { StartupCoordinator.retryLoad() },
-                    "Force Encode" to
-                        {
-                            DialogController.showForceEncodeConfirmationDialog()
-                        },
                 )
 
             Row(
-                modifier = Modifier.fillMaxWidth().height(26.dp),
-                verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                buttonData.forEach { (text, action) ->
+                listButtonData.forEach { (text, action) ->
                     MapleButton(
                         modifier = Modifier.weight(1f),
                         backgroundColor = MapleColorPalette.control,
@@ -95,17 +85,33 @@ fun ButtonContainer() {
                 }
             }
 
-            Row {
-                MapleButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    width = null,
-                    height = MapleButtonHeight.ORIGINAL.height,
-                    backgroundColor = MapleColorPalette.control,
-                    text = "Create Server Entry",
-                    textColor = MapleColorPalette.text,
-                    fontSize = 15.sp,
-                    onClick = { DialogController.showServerEntryCreationDialog() },
+            val fileButtonData =
+                listOf(
+                    "Load Server File" to
+                        {
+                            DialogController.showServerFilePickerDialog(true)
+                        },
+                    "Reload Server File" to { StartupCoordinator.retryLoad() },
+                    "Force Encode" to
+                        {
+                            DialogController.showForceEncodeConfirmationDialog()
+                        },
                 )
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                fileButtonData.forEach { (text, action) ->
+                    MapleButton(
+                        modifier = Modifier.weight(1f),
+                        backgroundColor = MapleColorPalette.control,
+                        text = text,
+                        textColor = MapleColorPalette.text,
+                        fontSize = 15.sp,
+                        padding = null,
+                        onClick = { action() },
+                    )
+                }
             }
             ServerPathText()
         }
