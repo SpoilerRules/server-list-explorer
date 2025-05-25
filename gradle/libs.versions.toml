@@ -1,13 +1,13 @@
 [versions]
-kotlin = "2.1.0"
-compose = "1.7.1"
-serialization = "1.7.3"
+kotlin = "2.1.21"
+compose = "1.8.1"
+serialization = "1.8.1"
 shadow = "8.3.5"
 ktlint = "12.1.2"
 colorPicker = "0.7.0"
-fileKit = "0.8.7"
+fileKit = "0.8.8"
 nbt = "6.1"
-s4lfj-nop = "2.0.16"
+s4lfj-nop = "2.0.17"
 
 [libraries]
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
