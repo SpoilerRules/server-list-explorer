@@ -11,14 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -102,7 +102,7 @@ fun WindowHeaderView(allowNavigation: Boolean) {
 
 @Composable
 private fun ControlButton(type: ActionType) =
-    Button(
+    TextButton(
         onClick = {
             when (type) {
                 ActionType.EXIT -> exitProcess(0)
@@ -134,9 +134,10 @@ private fun ControlButton(type: ActionType) =
         },
         modifier = Modifier.size(60.dp, 40.dp).pointerHoverIcon(PointerIcon.Hand),
         shape = RoundedCornerShape(12.dp),
+        elevation = ButtonDefaults.elevatedButtonElevation(defaultElevation = 2.dp),
         colors =
             ButtonDefaults.buttonColors(
-                backgroundColor = MapleColorPalette.menu,
+                containerColor = MapleColorPalette.menu,
                 contentColor = MapleColorPalette.fadedText,
             ),
     ) {
@@ -179,7 +180,7 @@ private fun SettingsButton(
             IconFactory.goBackIcon to "Home"
         }
 
-    Button(
+    TextButton(
         onClick = onClick,
         modifier =
             Modifier
@@ -187,20 +188,23 @@ private fun SettingsButton(
                 .height(40.dp)
                 .pointerHoverIcon(PointerIcon(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR))),
         shape = RoundedCornerShape(12.dp),
+        elevation = ButtonDefaults.elevatedButtonElevation(defaultElevation = 4.dp),
         colors =
             ButtonDefaults.buttonColors(
-                backgroundColor = MapleColorPalette.menu,
+                containerColor = MapleColorPalette.menu,
                 contentColor = MapleColorPalette.fadedText,
             ),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             Icon(
                 bitmap = icon,
                 contentDescription = null,
                 tint = MapleColorPalette.fadedText,
                 modifier = Modifier.size(16.dp),
             )
-            Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = buttonText,
                 color = MapleColorPalette.fadedText,
