@@ -40,7 +40,10 @@ fun StationaryView() {
                 shape = RoundedCornerShape(12.dp),
                 shadowElevation = 4.dp,
             ) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Box(
+                    Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 16.dp),
+                    contentAlignment = Alignment.TopCenter,
+                ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -51,7 +54,6 @@ fun StationaryView() {
                             fontSize = 24.sp,
                             fontFamily = FontFactory.comfortaaMedium,
                             fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center,
                         )
                         Text(
                             text = tip,
