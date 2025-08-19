@@ -1,0 +1,132 @@
+name: release
+
+permissions:
+    contents: write
+
+on:
+    push:
+        tags:
+            - 'v[0-9]+\.[0-9]+\.[0-9]+.*'
+    workflow_dispatch:
+        inputs:
+            version:
+                description: 'Version (e.g. 2.0.0, 2.1.0-beta1, 2.1.0-rc1)'
+                required: true
+
+jobs:
+    release:
+        runs-on: windows-latest
+
+        steps:
+            -   name: Check out code
+                uses: actions/checkout@v4
+                with:
+                    fetch-depth: 0
+
+            -   name: Determine version & tag
+                shell: powershell
+                run: |
+                    # use dispatched input, env var, or secret
+                    $V = '${{ github.event.inputs.version }}'
+                    if ([string]::IsNullOrEmpty($V)) { $V = $env:VERSION }
+                    if ([string]::IsNullOrEmpty($V)) { $V = '${{ secrets.VERSION }}' }
+                    "VERSION=$V" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
+                    "TAG=v$V" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
+
+            -   name: Update project version
+                shell: powershell
+                run: |
+                    # ensure gradle.properties contains the correct version
+                    $file = 'gradle.properties'
+                    $content = Get-Content $file -ErrorAction SilentlyContinue
+                    if (-not ($content -match '^version=')) {
+                       Add-Content $file "version=$($env:VERSION)"
+                    } else {
+                       $content -replace '^version=.*', "version=$($env:VERSION)" | Set-Content $file
+                    }
+
+            -   name: Set up JDK 21
+                uses: actions/setup-java@v4
+                with:
+                    # Note: GraalVM locks files
+                    distribution: temurin
+                    java-version: 21
+
+            -   name: Generate ktlint baseline
+                if: env.ACT != 'true'
+                shell: powershell
+                run: .\gradlew.bat --no-configuration-cache ktlintGenerateBaseline
+
+            -   name: Build all artifacts
+                shell: powershell
+                run: .\gradlew.bat app:shadowJar app:build app:packageReleaseUberJarForCurrentOS app:packageReleaseMsi app:packageMsi app:createReleaseDistributable app:createDistributable
+
+            -   name: Build release changelog
+                if: env.ACT != 'true'
+                id: changelog
+                uses: mikepenz/release-changelog-builder-action@v4
+                with:
+                    configuration: |
+                        {
+                          "template": "## Changelogs\n\n{{CHANGELOG}}\n\nFull Changelog: {{PREVIOUS_TAG}}...{{CURRENT_TAG}}",
+                          "sort": "ASC",
+                          "entryTemplate": "- {{commitSubject}} by @{{author}} in #{{pullRequestNumber}}\n"
+                        }
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            -   name: List Compose JARs
+                shell: powershell
+                run: |
+                    Write-Host "=== app/build/compose/jars ==="
+                    Get-ChildItem app/build/compose/jars
+
+            -   name: Prepare extra artifacts
+                shell: powershell
+                run: |
+                    Rename-Item -Path (Get-ChildItem -Path "app/build/compose/jars/ServerListExplorer-windows-x64-*-release.jar").FullName `
+                       -NewName "ServerListExplorer-all-minified.jar"
+
+                    Rename-Item -Path (Get-ChildItem -Path "app/build/compose/binaries/main-release/msi/ServerListExplorer-*.msi").FullName `
+                        -NewName "ServerListExplorer-minified-$($env:VERSION).msi"
+
+                    Get-ChildItem -Path "app/build/compose/jars/ServerListExplorer-windows-x64-*-release.jar" `
+                        | Copy-Item -Destination app/build/compose/binaries/ServerListExplorer-all-minified.jar -Force
+
+                    Compress-Archive -Path app/build/compose/binaries/main-release/app/ServerListExplorer `
+                       -DestinationPath app/build/ServerListExplorer-minified_portable-$($env:VERSION).zip -Force
+
+                    Compress-Archive -Path app/build/compose/binaries/main/app/ServerListExplorer `
+                       -DestinationPath app/build/ServerListExplorer_portable-$($env:VERSION).zip -Force
+
+            -   name: Create GitHub Release
+                if: env.ACT != 'true'
+                uses: softprops/action-gh-release@v2.3.2
+                with:
+                    tag_name: ${{ env.TAG }}
+                    name: "Server List Explorer ${{ env.TAG }}"
+                    body: ${{ steps.changelog.outputs.changelog }}
+                    draft: false
+                    prerelease: ${{ contains(env.TAG, '-beta') || contains(env.TAG, '-rc') }}
+                    files: |
+                        app/build/libs/ServerListExplorer.jar
+                        app/build/libs/ServerListExplorer-all.jar
+                        app/build/compose/jars/ServerListExplorer-all-minified.jar
+                        app/build/compose/binaries/main-release/msi/ServerListExplorer-${{ env.VERSION }}.msi
+                        app/build/compose/binaries/main/msi/ServerListExplorer-${{ env.VERSION }}.msi
+                        app/build/ServerListExplorer-minified_portable-${{ env.VERSION }}.zip
+                        app/build/ServerListExplorer_portable-${{ env.VERSION }}.zip
+
+            -   name: Upload artifacts to workflow run
+                if: env.ACT != 'true'
+                uses: actions/upload-artifact@v4
+                with:
+                    name: sle-${{ env.TAG }}
+                    path: |
+                        app/build/libs/ServerListExplorer.jar
+                        app/build/libs/ServerListExplorer-all.jar
+                        app/build/compose/jars/ServerListExplorer-all-minified.jar
+                        app/build/compose/binaries/main-release/msi/ServerListExplorer-${{ env.VERSION }}.msi
+                        app/build/compose/binaries/main-release/msi/ServerListExplorer-${{ env.VERSION }}.msi
+                        app/build/ServerListExplorer-minified_portable-${{ env.VERSION }}.zip
+                        app/build/ServerListExplorer_portable-${{ env.VERSION }}.zip
