@@ -1,116 +1,84 @@
+/*
+ * This file is part of Server List Explorer.
+ * Copyright (C) 2025 SpoilerRules
+ *
+ * Server List Explorer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Server List Explorer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Server List Explorer.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.compose)
-    alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.shadow)
-    alias(libs.plugins.ktlint)
+    alias(libs.plugins.kotlin.jvm) apply true
+    alias(libs.plugins.compose) apply false
+    alias(libs.plugins.kotlin.compose) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.shadow) apply false
+    alias(libs.plugins.ktlint) apply true
 }
 
-val mainFunction = "com.spoiligaming.explorer.MainKt"
-
-repositories {
-    mavenCentral()
-    google()
-    maven("https://jitpack.io/")
+allprojects {
+    repositories {
+        mavenCentral()
+        google()
+        maven("https://repo.azisaba.net/repository/maven-public/")
+        maven("https://jitpack.io/")
+    }
 }
 
-dependencies {
-    implementation(libs.kotlin.stdlib)
-    implementation(libs.kotlin.reflect)
-    implementation(libs.kotlinx.serialization.json) {
-        exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
+subprojects {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
+
+    dependencies {
+        val libs = gradle.rootProject.libs
+
+        implementation(libs.kotlin.logging)
+
+        testImplementation(project(":app")) // we get log4j2-test.xml from the app module
+        testImplementation(libs.kotlin.test)
+        testRuntimeOnly(libs.log4j.slf4j2.impl)
     }
 
-    implementation(compose.desktop.windows_x64)
-    implementation(compose.desktop.linux_x64) // UNCONFIRMED
-    implementation(compose.desktop.linux_arm64) // UNCONFIRMED
-    implementation(compose.desktop.macos_x64) // UNCONFIRMED
-    implementation(compose.desktop.macos_arm64)
-    implementation(compose.components.resources)
-    implementation(compose.material3)
-    implementation(compose.materialIconsExtended)
-
-    // Compose libraries
-    implementation(libs.color.picker)
-    implementation(libs.file.kit)
-
-    // Other libraries
-    implementation(files("libraries/mcserverping-1.0.7.jar"))
-    implementation(libs.nbt)
-    implementation(libs.s4lfj.noop)
-
-    testImplementation(compose.desktop.uiTestJUnit4)
-    testImplementation(libs.kotlin.test)
-}
-
-tasks {
-    shadowJar {
-        mergeServiceFiles()
-        duplicatesStrategy = DuplicatesStrategy.FAIL
-        archiveFileName.set("ServerListExplorer.jar")
-        manifest {
-            attributes["Main-Class"] = mainFunction
-        }
-        from("LICENSE") {
-            into("")
+    plugins.withType<JavaBasePlugin> {
+        extensions.configure<JavaPluginExtension> {
+            sourceCompatibility = JavaVersion.VERSION_17
+            targetCompatibility = JavaVersion.VERSION_17
         }
     }
 
-    jar {
-        from("LICENSE") {
-            into("")
-        }
-    }
-}
-
-compose {
-    desktop.application {
-        mainClass = mainFunction
-
-        javaHome = System.getenv("JDK_17")
-
-        buildTypes.release.proguard {
-            joinOutputJars.set(true)
-            obfuscate.set(true)
-            optimize.set(true)
-            configurationFiles.from(project.file("proguard-rules.pro"))
-        }
-
-        nativeDistributions {
-            licenseFile.set(project.file("LICENSE"))
+    tasks.withType<KotlinCompile>().configureEach {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 
-    resources {
-        publicResClass = false
-        generateResClass = always
+    tasks.withType<Test> {
+        useJUnitPlatform()
 
-        customDirectory(
-            sourceSetName = "kotlin",
-            directoryProvider = provider { layout.projectDirectory.dir("composeResources") },
-        )
-    }
-}
-
-ktlint {
-    debug.set(false)
-    verbose.set(false)
-    android.set(false)
-    ignoreFailures.set(false)
-    enableExperimentalRules.set(true)
-    baseline.set(file("ktlint-baseline.xml"))
-
-    reporters {
-        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)
+        // inject app/src/test/resources/log4j2-test.xml into test runtime classpath
+        if (project.name != "app") {
+            classpath += project(":app").sourceSets["test"].output
+        }
     }
 
-    filter {
-        exclude("**/generated/**")
-        include("**/kotlin/**")
+    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        debug.set(false)
+        verbose.set(false)
+        android.set(false)
+        ignoreFailures.set(false)
+        enableExperimentalRules.set(true)
+        baseline.set(rootProject.file("ktlint-baseline.xml"))
     }
-}
-
-kotlin {
-    jvmToolchain(11)
 }

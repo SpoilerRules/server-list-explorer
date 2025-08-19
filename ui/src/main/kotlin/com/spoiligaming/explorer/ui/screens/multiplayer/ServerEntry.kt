@@ -1,0 +1,1385 @@
+/*
+ * This file is part of Server List Explorer.
+ * Copyright (C) 2025 SpoilerRules
+ *
+ * Server List Explorer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Server List Explorer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Server List Explorer.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+@file:OptIn(
+    ExperimentalUuidApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class,
+)
+
+package com.spoiligaming.explorer.ui.screens.multiplayer
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ContextMenuArea
+import androidx.compose.foundation.ContextMenuDataProvider
+import androidx.compose.foundation.ContextMenuItem
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.TooltipArea
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Label
+import androidx.compose.material.icons.automirrored.filled.Subject
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Dns
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.NetworkPing
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.SettingsEthernet
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RichTooltip
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.IServerData
+import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.McServerPingOnlineServerData
+import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.McSrvStatOnlineServerData
+import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.OnlineServerData
+import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.OnlineServerDataResourceResult
+import com.spoiligaming.explorer.multiplayer.AcceptTexturesState
+import com.spoiligaming.explorer.multiplayer.HiddenState
+import com.spoiligaming.explorer.multiplayer.MultiplayerServer
+import com.spoiligaming.explorer.multiplayer.history.ServerListHistoryService
+import com.spoiligaming.explorer.multiplayer.repository.ServerListRepository
+import com.spoiligaming.explorer.settings.model.ServerQueryMethod
+import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalAmoledActive
+import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalMultiplayerSettings
+import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
+import com.spoiligaming.explorer.ui.dialog.FloatingDialogBuilder
+import com.spoiligaming.explorer.ui.extensions.safeAsImageBitmapOrNull
+import com.spoiligaming.explorer.ui.extensions.toGroupedString
+import com.spoiligaming.explorer.ui.extensions.toPngBase64
+import com.spoiligaming.explorer.ui.extensions.toPngInputStream
+import com.spoiligaming.explorer.ui.layout.TwinSpillRows
+import com.spoiligaming.explorer.ui.screens.multiplayer.MinecraftFormattingCodeTextFormatter.toMinecraftAnnotatedString
+import com.spoiligaming.explorer.ui.snackbar.SnackbarController
+import com.spoiligaming.explorer.ui.snackbar.SnackbarEvent
+import com.spoiligaming.explorer.ui.theme.isDarkTheme
+import com.spoiligaming.explorer.ui.widgets.ActionItem
+import com.spoiligaming.explorer.ui.widgets.DropdownOption
+import com.spoiligaming.explorer.ui.widgets.HierarchicalDropdownMenu
+import com.spoiligaming.explorer.ui.widgets.SelectableGroupItem
+import com.spoiligaming.explorer.ui.widgets.SlickTextButton
+import com.spoiligaming.explorer.util.ClipboardUtils
+import com.spoiligaming.explorer.util.stripMinecraftColorCodes
+import com.spoiligaming.explorer.util.toHumanReadableDuration
+import com.valentinilk.shimmer.Shimmer
+import com.valentinilk.shimmer.ShimmerBounds
+import com.valentinilk.shimmer.rememberShimmer
+import com.valentinilk.shimmer.shimmer
+import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.imageResource
+import server_list_explorer.ui.generated.resources.Res
+import server_list_explorer.ui.generated.resources.texture_unknown_server
+import kotlin.random.Random
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
+
+/**
+ * TODO: Refactor this file thoroughly
+ *
+ * Goals:
+ * 1. Replace magic numbers with named constants
+ * 2. Break this code into smaller, well-defined functions without over-fragmenting
+ * 3. Add localization support
+ * 4. Improve documentation and inline comments to help future contributors understand the code
+ */
+
+@Composable
+internal fun ServerEntry(
+    selected: Boolean,
+    repo: ServerListRepository,
+    data: MultiplayerServer,
+    historyService: ServerListHistoryService,
+    searchQuery: String,
+    scope: CoroutineScope,
+    modifier: Modifier = Modifier,
+    highlight: Boolean = false,
+    onHighlightFinished: () -> Unit = {},
+    onRefresh: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    val amoledOn = LocalAmoledActive.current
+    val mpSettings = LocalMultiplayerSettings.current
+    val useMcSrvStat = mpSettings.serverQueryMethod == ServerQueryMethod.McSrvStat
+    val serverFlow =
+        remember(
+            data.ip,
+            useMcSrvStat,
+            mpSettings.connectTimeoutMillis,
+            mpSettings.socketTimeoutMillis,
+        ) {
+            ServerEntryController.getServerDataFlow(
+                address = data.ip,
+                useMCSrvStat = useMcSrvStat,
+                connectTimeoutMillis = mpSettings.connectTimeoutMillis,
+                socketTimeoutMillis = mpSettings.socketTimeoutMillis,
+            )
+        }
+    val result by serverFlow.collectAsState(initial = serverFlow.value)
+    LaunchedEffect((result as? OnlineServerDataResourceResult.Success)?.data) {
+        if (result is OnlineServerDataResourceResult.Success) {
+            ServerEntryController.syncServerIcon(data, result, repo, historyService)
+        }
+    }
+
+    val baseColor =
+        if (amoledOn) {
+            Color.Black
+        } else {
+            CardDefaults.elevatedCardColors().containerColor
+        }
+
+    val flashColor = MaterialTheme.colorScheme.secondaryContainer
+
+    val bg by animateColorAsState(
+        targetValue = if (highlight) flashColor else baseColor,
+        animationSpec = tween(durationMillis = 800),
+    )
+
+    LaunchedEffect(highlight) {
+        if (highlight) {
+            delay(800)
+            onHighlightFinished()
+        }
+    }
+
+    // FOR CONTRIBUTORS: make sure to edit ShimmerServerEntry.kt when you edit this
+    ElevatedCard(
+        modifier =
+            modifier
+                .border(
+                    border =
+                        if (selected || amoledOn) {
+                            CardDefaults.outlinedCardBorder()
+                        } else {
+                            BorderStroke(
+                                0.dp,
+                                Color.Transparent,
+                            )
+                        },
+                    shape = CardDefaults.shape,
+                )
+                .onKeyEvent {
+                    if (it.isShiftPressed && selected) {
+                        when (it.key) {
+                            Key.DirectionUp -> {
+                            }
+                        }
+                        true
+                    }
+                    false
+                },
+        colors =
+            CardDefaults.elevatedCardColors().copy(
+                containerColor = bg,
+                contentColor = CardDefaults.elevatedCardColors().contentColor,
+            ),
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                val shimmerInstance = rememberShimmer(shimmerBounds = ShimmerBounds.View)
+                val bmp by rememberServerBitmap(data.iconBytes)
+                val textureDefaultServer = imageResource(Res.drawable.texture_unknown_server)
+
+                val iconSyncVersion by ServerEntryController.iconSyncVersionFlow(data.id)
+                    .collectAsState(initial = 0L)
+                var previousSyncVersion by remember(data.id) { mutableStateOf(0L) }
+                val shouldAnimateIcon =
+                    remember(iconSyncVersion, previousSyncVersion) {
+                        val changed =
+                            previousSyncVersion != 0L && iconSyncVersion != previousSyncVersion
+                        previousSyncVersion = iconSyncVersion
+                        changed
+                    }
+
+                val rememberOnNameSave: (String) -> Unit =
+                    remember(data.id) {
+                        { newName ->
+                            ServerEntryController.changeName(data.id, newName, repo, historyService)
+                        }
+                    }
+                val rememberOnAddressSave: (String) -> Unit =
+                    remember(data.id) {
+                        { newIp ->
+                            ServerEntryController.changeAddress(
+                                data.id,
+                                newIp,
+                                repo,
+                                historyService,
+                            )
+                        }
+                    }
+
+                Row(
+                    Modifier.height(64.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    IconColumn(
+                        serverIcon = bmp,
+                        defaultServerIcon = textureDefaultServer,
+                        serverAddress = data.ip,
+                        scope = scope,
+                        animateIcon = shouldAnimateIcon,
+                    ) {
+                        ServerEntryController.deleteIcon(data, repo, historyService)
+                    }
+                    MotdCard(result, shimmerInstance, modifier.fillMaxHeight())
+                }
+
+                ServerNameAddress(
+                    serverName = buildHighlightedString(data.name, searchQuery),
+                    serverAddress = buildHighlightedString(data.ip, searchQuery),
+                    onNameSave = rememberOnNameSave,
+                    onAddressSave = rememberOnAddressSave,
+                    modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max),
+                )
+
+                AnimatedContent(
+                    targetState = result,
+                    transitionSpec = {
+                        fadeIn() togetherWith fadeOut()
+                    },
+                ) { animatedResult ->
+                    when (animatedResult) {
+                        is OnlineServerDataResourceResult.Error,
+                        is OnlineServerDataResourceResult.RateLimited,
+                        -> OnlineServerDataChipRowsSkeleton()
+                        OnlineServerDataResourceResult.Loading ->
+                            ShimmerOnlineServerDataRow(
+                                shimmerInstance,
+                                uniqueKey = data.id,
+                            )
+
+                        is OnlineServerDataResourceResult.Success<*> ->
+                            OnlineServerDataRow(
+                                result = animatedResult,
+                            )
+                    }
+                }
+            }
+
+            val textureOptions by remember {
+                mutableStateOf(
+                    AcceptTexturesState.entries.map { DropdownOption(it.displayName) },
+                )
+            }
+            var selectedState by remember(data.acceptTextures) {
+                mutableStateOf(data.acceptTextures)
+            }
+            val hiddenOptions by remember {
+                mutableStateOf(
+                    HiddenState.entries.map { DropdownOption(it.displayName) },
+                )
+            }
+            var selectedHiddenState by remember(data.hidden) {
+                mutableStateOf(data.hidden)
+            }
+
+            HierarchicalDropdownMenu(
+                entries =
+                    listOf(
+                        ActionItem(
+                            text = "Refresh",
+                            icon = Icons.Filled.Refresh,
+                            onClick = onRefresh,
+                        ),
+                        ActionItem(
+                            text = "Delete",
+                            icon = Icons.Filled.Delete,
+                            onClick = onDelete,
+                        ),
+                        SelectableGroupItem(
+                            text = "Hidden",
+                            options = hiddenOptions,
+                            selected = DropdownOption(selectedHiddenState.displayName),
+                            onOptionSelected = { option ->
+                                val state = HiddenState.valueOf(option.text)
+                                selectedHiddenState = state
+                                ServerEntryController.changeHiddenState(
+                                    server = data,
+                                    newState = state,
+                                    repo = repo,
+                                    historyService = historyService,
+                                )
+                            },
+                        ),
+                        SelectableGroupItem(
+                            text = "Server Resource Packs",
+                            options = textureOptions,
+                            selected = DropdownOption(selectedState.displayName),
+                            onOptionSelected = { option ->
+                                val state = AcceptTexturesState.valueOf(option.text)
+                                selectedState = state
+                                ServerEntryController.changeTexturesMode(
+                                    server = data,
+                                    newState = state,
+                                    repo = repo,
+                                    historyService = historyService,
+                                )
+                            },
+                        ),
+                    ),
+                modifier =
+                    Modifier
+                        .padding(end = 4.dp, bottom = 4.dp)
+                        .zIndex(1f)
+                        .align(Alignment.BottomEnd)
+                        .pointerHoverIcon(PointerIcon.Hand),
+            ) { _, toggle ->
+                IconButton(onClick = toggle) {
+                    Icon(
+                        imageVector = Icons.Filled.MoreVert,
+                        contentDescription = "Server information",
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun IconColumn(
+    serverIcon: ImageBitmap?,
+    defaultServerIcon: ImageBitmap,
+    serverAddress: String,
+    scope: CoroutineScope,
+    animateIcon: Boolean,
+    onClearCustomIcon: suspend () -> Unit,
+) = ContextMenuArea(
+    items = {
+        val items =
+            mutableListOf(
+                ContextMenuItem("Copy icon image as PNG file") {
+                    runCatching {
+                        ClipboardUtils.copyImageFromStream(
+                            (serverIcon ?: defaultServerIcon).toPngInputStream(),
+                        )
+                    }.onFailure {
+                        scope.launch {
+                            SnackbarController.sendEvent(
+                                SnackbarEvent(
+                                    "Failed to copy icon as PNG for $serverAddress}",
+                                    SnackbarDuration.Short,
+                                ),
+                            )
+                        }
+                    }
+                },
+                ContextMenuItem("Copy icon image as Base64-encoded PNG data") {
+                    runCatching {
+                        ClipboardUtils.copy(
+                            (serverIcon ?: defaultServerIcon).toPngBase64(),
+                        )
+                    }.onFailure {
+                        scope.launch {
+                            SnackbarController.sendEvent(
+                                SnackbarEvent(
+                                    "Failed to copy icon as Base64 for $serverAddress",
+                                    SnackbarDuration.Short,
+                                ),
+                            )
+                        }
+                    }
+                },
+            )
+        if (serverIcon != null) {
+            items +=
+                ContextMenuItem("Revert to default icon") {
+                    scope.launch {
+                        runCatching {
+                            onClearCustomIcon()
+                        }.onFailure {
+                            SnackbarController.sendEvent(
+                                SnackbarEvent(
+                                    "Failed to revert icon for $serverAddress",
+                                    SnackbarDuration.Short,
+                                ),
+                            )
+                        }
+                    }
+                }
+        }
+        items
+    },
+) {
+    if (animateIcon) {
+        AnimatedContent(
+            targetState = serverIcon,
+            transitionSpec = { fadeIn() togetherWith fadeOut() },
+        ) { icon ->
+            Image(
+                bitmap = icon ?: defaultServerIcon,
+                contentDescription =
+                    serverIcon?.let {
+                        "Custom server icon for $serverAddress"
+                    } ?: "Default server icon for $serverAddress",
+                modifier = Modifier.size(64.dp),
+                contentScale = ContentScale.Fit,
+            )
+        }
+    } else {
+        Image(
+            bitmap = serverIcon ?: defaultServerIcon,
+            contentDescription =
+                serverIcon?.let {
+                    "Custom server icon for $serverAddress"
+                } ?: "Default server icon for $serverAddress",
+            modifier = Modifier.size(64.dp),
+            contentScale = ContentScale.Fit,
+        )
+    }
+}
+
+@Composable
+private fun MotdCard(
+    result: OnlineServerDataResourceResult<IServerData>,
+    shimmerInstance: Shimmer,
+    modifier: Modifier = Modifier,
+) {
+    var obfuscationSeed by remember { mutableStateOf(0) }
+    LaunchedEffect(result) {
+        if (result is OnlineServerDataResourceResult.Success) {
+            while (true) {
+                obfuscationSeed = (MotdObfuscationMinimumSeed..Int.MAX_VALUE).random()
+                delay(MotdObfuscationUpdateInterval)
+            }
+        }
+    }
+
+    Card {
+        Box(
+            modifier =
+                modifier
+                    .fillMaxWidth()
+                    .padding(MotdInnerPadding),
+        ) {
+            AnimatedContent(
+                targetState = result,
+                transitionSpec = {
+                    fadeIn() togetherWith fadeOut()
+                },
+            ) { result ->
+                when (result) {
+                    is OnlineServerDataResourceResult.Loading ->
+                        Column(
+                            modifier =
+                                Modifier
+                                    .shimmer(shimmerInstance)
+                                    .fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            Box(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth(0.8f)
+                                        .weight(1f)
+                                        .background(
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            shape = MaterialTheme.shapes.small,
+                                        ),
+                            )
+                            Box(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth(0.6f)
+                                        .weight(1f)
+                                        .background(
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            shape = MaterialTheme.shapes.small,
+                                        ),
+                            )
+                        }
+
+                    is OnlineServerDataResourceResult.Success ->
+                        ContextMenuDataProvider(
+                            items = {
+                                val motdRaw = (result.data as OnlineServerData).motd
+
+                                listOf(
+                                    ContextMenuItem("Copy trimmed") {
+                                        val plain =
+                                            motdRaw
+                                                .stripMinecraftColorCodes()
+                                                .trim()
+                                        ClipboardUtils.copy(plain)
+                                    },
+                                    ContextMenuItem("Copy trimmed with color codes") {
+                                        ClipboardUtils.copy(motdRaw.trim())
+                                    },
+                                )
+                            },
+                        ) {
+                            SelectionContainer(
+                                modifier =
+                                    Modifier.pointerInput(Unit) {
+                                        awaitPointerEventScope {
+                                            while (true) {
+                                                val event = awaitPointerEvent()
+                                                if (event.type == PointerEventType.Press) {
+                                                    event.changes.forEach { it.consume() }
+                                                }
+                                            }
+                                        }
+                                    },
+                            ) {
+                                Text(
+                                    text =
+                                        (result.data as OnlineServerData).motd.toMinecraftAnnotatedString(
+                                            obfuscationSeed,
+                                        ),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    maxLines = MotdMaxLines,
+                                    lineHeight = MotdLineHeight,
+                                )
+                            }
+                        }
+
+                    is OnlineServerDataResourceResult.Error ->
+                        SelectionContainer(
+                            modifier =
+                                Modifier.pointerInput(Unit) {
+                                    awaitPointerEventScope {
+                                        while (true) {
+                                            val event = awaitPointerEvent()
+                                            if (event.type == PointerEventType.Press) {
+                                                event.changes.forEach { it.consume() }
+                                            }
+                                        }
+                                    }
+                                },
+                        ) {
+                            Text(
+                                text = "Server is unreachable.",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
+
+                    is OnlineServerDataResourceResult.RateLimited ->
+                        SelectionContainer(
+                            modifier =
+                                Modifier.pointerInput(Unit) {
+                                    awaitPointerEventScope {
+                                        while (true) {
+                                            val event = awaitPointerEvent()
+                                            if (event.type == PointerEventType.Press) {
+                                                event.changes.forEach { it.consume() }
+                                            }
+                                        }
+                                    }
+                                },
+                        ) {
+                            Text(
+                                text =
+                                    "You have been rate limited by MCSrvStatus for this server.\n" +
+                                        "Please try again in a few minutes.",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.error,
+                                maxLines = MotdMaxLines,
+                                lineHeight = MotdLineHeight,
+                            )
+                        }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun OnlineServerDataRow(
+    modifier: Modifier = Modifier,
+    result: OnlineServerDataResourceResult<IServerData>,
+) {
+    val locale = LocalPrefs.current.locale
+
+    val onlineData = (result as OnlineServerDataResourceResult.Success).data as OnlineServerData
+
+    val protocolVersionText = onlineData.protocolVersion.let { "Protocol $it" }
+    val playerCountText =
+        "${onlineData.onlinePlayers.toGroupedString(locale)} / ${
+            onlineData.maxPlayers.toGroupedString(
+                locale,
+            )
+        }"
+
+    var obfuscationSeed by remember { mutableStateOf(0) }
+    LaunchedEffect(result) {
+        while (true) {
+            obfuscationSeed = (MotdObfuscationMinimumSeed..Int.MAX_VALUE).random()
+            delay(MotdObfuscationUpdateInterval)
+        }
+    }
+
+    var showDescription by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        TwinSpillRows(
+            firstRowItems =
+                buildList {
+                    if (onlineData is McSrvStatOnlineServerData && onlineData.eulaBlocked) {
+                        add {
+                            InfoChip(
+                                Icons.Filled.Error,
+                                "Blocked by Mojang",
+                                tint = MaterialTheme.colorScheme.error,
+                            )
+                        }
+                    }
+                    if (onlineData is McSrvStatOnlineServerData) {
+                        onlineData.info?.let {
+                            var descriptionObfuscationSeed by remember { mutableStateOf(0) }
+                            LaunchedEffect(it) {
+                                while (true) {
+                                    descriptionObfuscationSeed =
+                                        (MotdObfuscationMinimumSeed..Int.MAX_VALUE).random()
+                                    delay(MotdObfuscationUpdateInterval)
+                                }
+                            }
+                            add {
+                                AssistChip(
+                                    onClick = { showDescription = true },
+                                    label = { Text("Description") },
+                                    modifier =
+                                        Modifier.height(32.dp)
+                                            .pointerHoverIcon(PointerIcon.Hand),
+                                    enabled = true,
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Default.Subject,
+                                            contentDescription = "Custom server description",
+                                            modifier = Modifier.size(18.dp),
+                                        )
+                                        FloatingDialogBuilder(
+                                            visible = showDescription,
+                                            onDismissRequest = { showDescription = false },
+                                        ) {
+                                            RichTooltip(
+                                                title = { Text("Server description") },
+                                                text = {
+                                                    Card(modifier = Modifier.padding(top = 12.dp)) {
+                                                        Box(
+                                                            Modifier
+                                                                .fillMaxWidth()
+                                                                .padding(MotdInnerPadding),
+                                                        ) {
+                                                            Text(
+                                                                text =
+                                                                    it.toMinecraftAnnotatedString(
+                                                                        descriptionObfuscationSeed,
+                                                                    ),
+                                                                style = MaterialTheme.typography.bodyMedium,
+                                                                lineHeight = MotdLineHeight,
+                                                            )
+                                                        }
+                                                    }
+                                                },
+                                                action = {
+                                                    TextButton(
+                                                        modifier =
+                                                            Modifier.pointerHoverIcon(
+                                                                PointerIcon.Hand,
+                                                            ),
+                                                        onClick = {
+                                                            showDescription = false
+                                                        },
+                                                    ) {
+                                                        Text("OK")
+                                                    }
+                                                },
+                                            )
+                                        }
+                                    },
+                                )
+                            }
+                        }
+                    }
+                    add {
+                        InfoChip(
+                            Icons.Filled.Info,
+                            onlineData.versionInfo.toMinecraftAnnotatedString(obfuscationSeed),
+                            sizeToggleEnabled = true,
+                        )
+                    }
+                    if (onlineData is McSrvStatOnlineServerData) {
+                        onlineData.versionName?.let {
+                            add {
+                                InfoChip(Icons.AutoMirrored.Filled.Label, it)
+                            }
+                        }
+                    }
+                    add {
+                        InfoChip(Icons.Filled.SettingsEthernet, protocolVersionText)
+                    }
+                },
+            secondRowItems =
+                buildList {
+                    add {
+                        InfoChip(Icons.Filled.People, playerCountText)
+                    }
+                    add {
+                        InfoChip(Icons.Filled.Dns, onlineData.ip)
+                    }
+                    if (onlineData is McServerPingOnlineServerData) {
+                        add {
+                            InfoChip(
+                                icon = Icons.Filled.NetworkPing,
+                                label = onlineData.ping.toHumanReadableDuration(),
+                                tint = getPingColor(onlineData.ping),
+                            )
+                        }
+                    }
+                },
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+@Composable
+private fun InfoChip(
+    icon: ImageVector,
+    label: Any,
+    tint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    sizeToggleEnabled: Boolean = false,
+) {
+    require(label is String || label is AnnotatedString) {
+        "label must be either String or AnnotatedString"
+    }
+
+    val labelText =
+        when (label) {
+            is String -> label
+            is AnnotatedString -> label.text
+            else -> "" // unreachable
+        }
+
+    var isCompact by remember { mutableStateOf(false) }
+    if (!sizeToggleEnabled && isCompact) {
+        isCompact = false
+    }
+
+    val surfaceModifier =
+        if (isCompact) {
+            Modifier
+                .height(32.dp)
+                .width(100.dp)
+                .animateContentSize()
+        } else {
+            Modifier
+                .height(32.dp)
+                .animateContentSize()
+        }
+
+    val menuItems =
+        if (sizeToggleEnabled) {
+            buildList {
+                if (isCompact) {
+                    add(
+                        ContextMenuItem("Expand") {
+                            isCompact = false
+                        },
+                    )
+                } else {
+                    add(
+                        ContextMenuItem("Compact") {
+                            isCompact = true
+                        },
+                    )
+                }
+            }
+        } else {
+            emptyList()
+        }
+
+    val chipContent: @Composable () -> Unit = {
+        Row(
+            modifier = Modifier.padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = "Icon representing $labelText",
+                tint = tint,
+                modifier = Modifier.size(18.dp),
+            )
+            SelectionContainer(
+                modifier =
+                    Modifier.pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                if (event.type == PointerEventType.Press) {
+                                    event.changes.forEach { it.consume() }
+                                }
+                            }
+                        }
+                    },
+            ) {
+                when (label) {
+                    is String ->
+                        Text(
+                            text = label,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = tint,
+                        )
+
+                    is AnnotatedString ->
+                        Text(
+                            text = label,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = tint,
+                        )
+                }
+            }
+        }
+    }
+
+    if (menuItems.isNotEmpty()) {
+        ContextMenuArea(items = { menuItems }) {
+            ContextMenuDataProvider(items = { menuItems }) {
+                Surface(
+                    shape = MaterialTheme.shapes.small,
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    modifier = surfaceModifier,
+                ) {
+                    chipContent()
+                }
+            }
+        }
+    } else {
+        Surface(
+            shape = MaterialTheme.shapes.small,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            modifier = surfaceModifier,
+        ) {
+            chipContent()
+        }
+    }
+}
+
+@Composable
+private fun ShimmerOnlineServerDataRow(
+    shimmer: Shimmer,
+    uniqueKey: Uuid,
+    modifier: Modifier = Modifier,
+) {
+    val baseRandom = remember(uniqueKey) { Random(uniqueKey.hashCode().toLong()) }
+    val requirementWidth =
+        remember(uniqueKey) { generateRequirementWidth(Random(baseRandom.nextInt().toLong())) }
+    val versionWidth =
+        remember(uniqueKey) { generateVersionWidth(Random(baseRandom.nextInt().toLong())) }
+    val protocolWidth =
+        remember(uniqueKey) { generateProtocolWidth(Random(baseRandom.nextInt().toLong())) }
+
+    val playersChipWidth = 100.dp // corresponds roughly to "500 / 1,000"
+    val pingChipWidth = 60.dp // corresponds to "50 ms"
+
+    Column(
+        modifier = modifier.fillMaxWidth().shimmer(shimmer),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            ShimmerInfoChip(width = requirementWidth, shimmer = shimmer)
+            ShimmerInfoChip(width = versionWidth, shimmer = shimmer)
+            ShimmerInfoChip(width = protocolWidth, shimmer = shimmer)
+        }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            ShimmerInfoChip(width = playersChipWidth, shimmer = shimmer)
+            ShimmerInfoChip(width = pingChipWidth, shimmer = shimmer)
+        }
+    }
+}
+
+private fun generateRequirementWidth(random: Random): Dp {
+    val r = random.nextFloat()
+    return when {
+        r < 0.6f -> lerp(50.dp, 100.dp, r / 0.6f)
+        r < 0.9f -> lerp(100.dp, 140.dp, (r - 0.6f) / 0.3f)
+        else -> lerp(140.dp, 180.dp, (r - 0.9f) / 0.1f)
+    }
+}
+
+private fun generateVersionWidth(random: Random): Dp {
+    val r = random.nextFloat()
+    return when {
+        r < 0.7f -> lerp(50.dp, 80.dp, r / 0.7f)
+        else -> lerp(80.dp, 110.dp, (r - 0.7f) / 0.3f)
+    }
+}
+
+private fun generateProtocolWidth(random: Random): Dp {
+    val r = random.nextFloat()
+    return when {
+        r < 0.01f -> 32.dp // 1% chance for a one-digit protocol
+        r < 0.9999f ->
+            lerp(
+                50.dp,
+                70.dp,
+                (r - 0.01f) / 0.9899f,
+            ) // 98.99% chance for two/three digits
+        else -> 140.dp // 0.01% chance for an extremely wide protocol (e.g., 0x40000092)
+    }
+}
+
+@Composable
+private fun ShimmerInfoChip(
+    modifier: Modifier = Modifier,
+    width: Dp,
+    shimmer: Shimmer,
+) {
+    val textHeightDp =
+        with(LocalDensity.current) { MaterialTheme.typography.labelMedium.fontSize.toDp() }
+
+    Surface(
+        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        modifier = modifier.height(32.dp).shimmer(shimmer),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Box(
+                modifier =
+                    Modifier
+                        .size(18.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.onSurfaceVariant),
+            )
+            Box(
+                modifier =
+                    Modifier
+                        .height(textHeightDp)
+                        .width(width)
+                        .background(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            shape = MaterialTheme.shapes.small,
+                        ),
+            )
+        }
+    }
+}
+
+@Composable
+private fun OnlineServerDataChipRowsSkeleton(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Box(Modifier.height(32.dp).background(Color.White))
+        Box(Modifier.height(32.dp).background(Color.White))
+    }
+}
+
+private fun getPingColor(ping: Long) =
+    if (isDarkTheme) {
+        when {
+            ping <= 1L -> Color(0xFF2E7D32)
+            ping <= 200L -> {
+                val t = (ping - 1) / 199f
+                lerp(Color(0xFF2E7D32), Color(0xFFFFEB3B), t)
+            }
+
+            ping <= 500L -> {
+                val t = (ping - 200) / 300f
+                lerp(Color(0xFFFFEB3B), Color(0xFFF44336), t)
+            }
+
+            ping <= 1000L -> {
+                val t = (ping - 500) / 500f
+                lerp(Color(0xFFF44336), Color(0xFF9C27B0), t)
+            }
+
+            else -> Color(0xFF9C27B0)
+        }
+    } else {
+        when {
+            ping <= 1L -> Color(0xFF2E7D32)
+            ping <= 200L -> {
+                val t = (ping - 1) / 199f
+                lerp(
+                    Color(0xFF2E7D32),
+                    Color(0xFFFFA000),
+                    t,
+                )
+            }
+
+            ping <= 500L -> {
+                val t = (ping - 200) / 300f
+                lerp(Color(0xFFFFA000), Color(0xFFD32F2F), t)
+            }
+
+            ping <= 1000L -> {
+                val t = (ping - 500) / 500f
+                lerp(Color(0xFFD32F2F), Color(0xFF6A1B9A), t)
+            }
+
+            else -> Color(0xFF6A1B9A)
+        }
+    }
+
+@Composable
+private fun ServerNameAddress(
+    serverName: AnnotatedString,
+    serverAddress: AnnotatedString,
+    onNameSave: (String) -> Unit,
+    onAddressSave: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier,
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(MotdInnerPadding),
+        ) {
+            EditableText(
+                text = serverName,
+                textStyle = MaterialTheme.typography.titleMedium,
+                x = "Edit server name",
+                onSave = { onNameSave(it) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            EditableText(
+                text = serverAddress,
+                textStyle = MaterialTheme.typography.bodyMedium,
+                x = "Edit server address",
+                onSave = { onAddressSave(it) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+@Composable
+private fun EditableText(
+    text: AnnotatedString,
+    textStyle: TextStyle,
+    x: String,
+    onSave: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var showEditor by remember { mutableStateOf(false) }
+    var editedText by remember { mutableStateOf(text.text) }
+
+    LaunchedEffect(showEditor) {
+        if (!showEditor) {
+            editedText = text.text
+        }
+    }
+
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(modifier = Modifier.weight(1f)) {
+            OverflowAwareTooltipText(text = text, textStyle = textStyle)
+        }
+        SlickTextButton(
+            onClick = { showEditor = true },
+            modifier = Modifier.height(32.dp),
+        ) {
+            Text(
+                text = "Edit",
+                style = MaterialTheme.typography.labelMedium,
+                maxLines = 1,
+            )
+            FloatingDialogBuilder(
+                visible = showEditor,
+                onDismissRequest = { showEditor = false },
+            ) {
+                RichTooltip(
+                    title = { Text(x) },
+                    text = {
+                        OutlinedTextField(
+                            value = editedText,
+                            onValueChange = { editedText = it },
+                            singleLine = true,
+                            label = { Text("New value") },
+                            placeholder = { Text("Type here...") },
+                            modifier =
+                                Modifier.fillMaxWidth().padding(top = 4.dp).onKeyEvent { e ->
+                                    if (e.key == Key.Enter || e.key == Key.NumPadEnter) {
+                                        onSave(editedText)
+                                        showEditor = false
+                                        true
+                                    } else {
+                                        false
+                                    }
+                                },
+                        )
+                    },
+                    action = {
+                        TextButton(
+                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                            onClick = {
+                                onSave(editedText)
+                                showEditor = false
+                            },
+                        ) {
+                            Text("Save")
+                        }
+                    },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun OverflowAwareTooltipText(
+    text: AnnotatedString,
+    textStyle: TextStyle,
+) {
+    var isOverflowing by remember { mutableStateOf(false) }
+    var canShowTooltip by remember { mutableStateOf(false) }
+    var isPressed by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isOverflowing) {
+        canShowTooltip = false
+        if (isOverflowing) {
+            delay(2000)
+            if (isOverflowing && !isPressed) {
+                canShowTooltip = true
+            }
+        }
+    }
+
+    val datext: @Composable () -> Unit = {
+        SelectionContainer {
+            Text(
+                text = text,
+                style = textStyle,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                onTextLayout = { layout ->
+                    isOverflowing = layout.hasVisualOverflow
+                },
+                modifier =
+                    Modifier
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onPress = {
+                                    isPressed = true
+                                    tryAwaitRelease()
+                                    isPressed = false
+                                },
+                            )
+                        },
+            )
+        }
+    }
+
+    if (isOverflowing && canShowTooltip) {
+        TooltipArea(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onPress = {
+                                isPressed = true
+                                tryAwaitRelease()
+                                isPressed = false
+                                if (isOverflowing) {
+                                    canShowTooltip = false
+                                    delay(2_000)
+                                    if (isOverflowing && !isPressed) canShowTooltip = true
+                                }
+                            },
+                        )
+                    },
+            tooltip = {
+                Surface(
+                    modifier = Modifier.heightIn(min = 24.dp),
+                    shape = MaterialTheme.shapes.extraSmall,
+                    color = MaterialTheme.colorScheme.inverseSurface,
+                ) {
+                    Box(
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = text,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.inverseOnSurface,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
+            },
+        ) {
+            datext()
+        }
+    } else {
+        datext()
+    }
+}
+
+@Composable
+private fun buildHighlightedString(
+    source: String,
+    query: String,
+    style: SpanStyle =
+        SpanStyle(
+            background = MaterialTheme.colorScheme.primary.copy(alpha = 0.28f),
+        ),
+) = if (query.isBlank()) {
+    AnnotatedString(source)
+} else {
+    val regex = Regex(Regex.escape(query), RegexOption.IGNORE_CASE)
+    buildAnnotatedString {
+        var lastIndex = 0
+        regex.findAll(source).forEach { matchResult ->
+            val range = matchResult.range
+            // append text before match
+            append(source.substring(lastIndex, range.first))
+            // append matched text with style
+            withStyle(style) {
+                append(source.substring(range))
+            }
+            lastIndex = range.last + 1
+        }
+        // append remaining text
+        if (lastIndex < source.length) {
+            append(source.substring(lastIndex))
+        }
+    }
+}
+
+@Composable
+private fun rememberServerBitmap(iconBytes: ByteArray?) =
+    produceState<ImageBitmap?>(initialValue = null, key1 = iconBytes) {
+        value =
+            iconBytes
+                ?.inputStream()
+                ?.safeAsImageBitmapOrNull()
+    }
+
+private val logger = KotlinLogging.logger {}
+
+private val MotdLineHeight = 20.sp
+
+/*
+ Official Minecraft obfuscation update interval
+ Source: ChatGPT-4.1, July 20, 2025
+ */
+private const val MotdObfuscationUpdateInterval = 80L
+private const val MotdObfuscationMinimumSeed = 0
+private const val MotdMaxLines = 2
+private val MotdInnerPadding = 12.dp

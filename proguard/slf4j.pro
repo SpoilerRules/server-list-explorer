@@ -1,0 +1,2 @@
+-keep class org.slf4j.** { *; }
+-keep class org.apache.logging.slf4j.SLF4JServiceProvider { *; }

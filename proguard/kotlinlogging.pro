@@ -1,0 +1,3 @@
+-assumenosideeffects class io.github.oshai.kotlinlogging.logback.** { *; }
+-dontnote io.github.oshai.kotlinlogging.logback.**
+-dontwarn io.github.oshai.kotlinlogging.logback.**

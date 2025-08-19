@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns="https://logging.apache.org/xml/ns"
+               xsi:schemaLocation="
+                   https://logging.apache.org/xml/ns
+                   https://logging.apache.org/xml/ns/log4j-config-2.xsd"
+               status="WARN"
+               monitorInterval="30">
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%blue{%d{HH:mm:ss}} %highlight{[%t/%p]} %yellow{%c{15.}} %msg%n"
+                           disableAnsi="false"
+                           noConsoleNoAnsi="false"
+                           charset="UTF-8"/>
+        </Console>
+
+        <Async name="AsyncConsole">
+            <AppenderRef ref="Console"/>
+        </Async>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="org.xbill" level="OFF" additivity="false"/>
+
+        <Root level="DEBUG">
+            <AppenderRef ref="AsyncConsole"/>
+        </Root>
+    </Loggers>
+</Configuration>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns="https://logging.apache.org/xml/ns"
+               xsi:schemaLocation="
+                   https://logging.apache.org/xml/ns
+                   https://logging.apache.org/xml/ns/log4j-config-2.xsd"
+               status="WARN"
+               monitorInterval="30">
+
+    <Appenders>
+        <RollingFile name="File" fileName="logs/sle-latest.log"
+                     filePattern="logs/sle-%d{yyyy-MM-dd}-%i.zip"
+                     append="true">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t/%threadId/%p] %c %l PID=%pid - %msg%ex%n"
+                           charset="UTF-8"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+
+        <Async name="AsyncFile">
+            <AppenderRef ref="File"/>
+        </Async>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="org.xbill" level="OFF" additivity="false"/>
+
+        <Root level="INFO">
+            <AppenderRef ref="AsyncFile"/>
+        </Root>
+    </Loggers>
+</Configuration>

@@ -1,0 +1,102 @@
+<resources>
+    <string name="preferred_language_label">Choose your preferred language</string>
+
+    <string name="setup_step_title_localization">Localisation</string>
+    <string name="setup_step_title_paths">Minecraft Path Configuration</string>
+
+    <string name="button_back">Back</string>
+    <string name="button_next">Next</string>
+    <string name="button_finish">Finish</string>
+
+    <string name="setup_path_step_ready">Review the selected paths and continue</string>
+    <string name="setup_path_step_missing">Select the required paths to proceed</string>
+    <string name="setup_wizard_step_counter">Set-up Wizard • Step %1$d of %2$d</string>
+
+    <string name="label_world_saves">World Saves Folder</string>
+    <string name="placeholder_world_saves">Select your 'saves' folder…</string>
+    <string name="error_world_saves_missing">Unable to auto-determine world saves folder; please pick it manually.
+    </string>
+
+    <string name="label_server_list">Server List File</string>
+    <string name="placeholder_server_list">Select your 'servers.dat' file…</string>
+    <string name="error_server_list_missing">Unable to auto-determine server list file; please pick it manually.
+    </string>
+
+    <string name="placeholder_generic">Select %1$s…</string>
+    <string name="detecting_world_saves">Detecting world saves folder…</string>
+    <string name="detecting_server_list">Detecting server list file…</string>
+    <string name="detection_wait">This may take a few moments.</string>
+
+    <string name="settings_section_theme">Theme</string>
+    <string name="settings_section_preferences">Preferences</string>
+    <string name="settings_section_multiplayer">Multiplayer Server List</string>
+    <string name="settings_section_window_appearance">Window Appearance &amp; Effects</string>
+    <string name="settings_navigator_title">Sections</string>
+
+    <string name="error_unable_load_servers">Unable to load servers</string>
+    <string name="error_unable_load_servers_message">An unexpected error occurred while reading your server
+        list.\nPlease check that the file exists and you have permission to read it.
+    </string>
+    <string name="server_list_file_not_set">null (not set)</string>
+
+    <string name="button_browse">Browse…</string>
+    <string name="cd_server_list_file">Server list file</string>
+    <string name="cd_browse">Browse</string>
+    <string name="generic_file_placeholder">file</string>
+    <string name="generic_folder_placeholder">folder</string>
+
+    <string name="add_server_title">Add new server</string>
+    <string name="add_server_label_name">Name</string>
+    <string name="add_server_placeholder_name">myminecraftserver</string>
+    <string name="add_server_label_address">Address</string>
+    <string name="add_server_placeholder_address">myserver</string>
+    <string name="add_server_resource_packs">Server Resource Packs</string>
+    <string name="add_server_hide_label">Hide this server in the Minecraft multiplayer menu</string>
+    <string name="add_server_hide_tooltip">Makes this server entry invisible in the multiplayer server list in supported
+        Minecraft clients.\nThis sets the server entry's "hidden" attribute to false (0b) in NBT format.\nNot all
+        clients recognise this attribute.
+    </string>
+    <string name="add_server_hide_note">You can change this option anytime in Server List Explorer.</string>
+    <string name="add_server_button_add">Add</string>
+
+    <string name="dialog_cancel_button">Cancel</string>
+    <string name="dialog_save_button">Save</string>
+
+    <string name="cd_dialog_icon">Icon for %1$s dialog</string>
+
+    <string name="nav_label_multiplayer">Multiplayer</string>
+    <string name="nav_label_singleplayer">Singleplayer</string>
+    <string name="nav_label_settings">Settings</string>
+
+    <string name="cd_expand_rail">Expand navigation rail</string>
+    <string name="cd_collapse_rail">Collapse navigation rail</string>
+    <string name="cd_switch_to_light_mode">Switch to Light Mode</string>
+    <string name="cd_switch_to_dark_mode">Switch to Dark Mode</string>
+
+    <string name="loading_init_repo">Initialising repository</string>
+    <string name="loading_setup_monitor">Setting up monitor</string>
+    <string name="loading_user_settings">Loading user settings and preferences</string>
+
+    <string name="snackbar_system_accent_unavailable">System accent colour unavailable. Defaulting to your chosen theme
+        colour.
+    </string>
+
+    <string name="color_picker_dialog_title">Pick a colour</string>
+    <string name="color_picker_button_restore">Restore default</string>
+
+    <string name="quick_action_add">Add</string>
+    <string name="quick_action_refresh_selected">Refresh Selected</string>
+    <string name="quick_action_delete_selected">Delete Selected</string>
+    <string name="quick_action_refresh_all">Refresh All</string>
+    <string name="quick_action_delete_all">Delete All</string>
+    <string name="quick_action_deselect_all">Deselect All</string>
+    <string name="quick_action_select_all">Select All</string>
+    <string name="quick_action_query_method">Query Method</string>
+
+    <string name="search_bar_placeholder">Search…</string>
+    <string name="cd_search_icon">Search icon</string>
+    <string name="cd_advanced_options">Advanced</string>
+    <string name="search_filter_name_and_address">Name &amp; Address</string>
+    <string name="search_filter_name_only">Name only</string>
+    <string name="search_filter_address_only">Address only</string>
+</resources>
