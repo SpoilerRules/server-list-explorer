@@ -12,7 +12,7 @@ check out the [User Interface Preview](#user-interface-preview) to see the proje
 
 ## User Interface Preview
 
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 0fr)); gap: 10px; justify-content: center;">
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 0fr)); gap: 10px; justify-content: center;">
   <img src="https://i.imgur.com/sQzIVyL.png" width="500" alt="Screenshot 1">
   <img src="https://i.imgur.com/s3yGMjq.png" width="500" alt="Screenshot 2">
   <img src="https://i.imgur.com/nXdLGW1.png" width="500" alt="Screenshot 3">
@@ -28,7 +28,44 @@ check out the [User Interface Preview](#user-interface-preview) to see the proje
 ## Table of Contents
 
 - [User Interface Preview](#user-interface-preview)
+- [How to Run the Project](#how-to-run-the-project)
 - [Wiki](#wiki)
+
+## How to Run the Project
+
+This project is built using Gradle and requires **Java 17 or higher** to run. Follow the steps below to build and execute the application:
+
+### 1. Build the Project
+
+From the root of the project, run the following Gradle task to generate the **shadow JAR**:
+
+```
+./gradlew :app:shadowJar
+```
+
+This task will produce a **fat JAR** (a JAR containing all dependencies) that can be run independently.
+
+### 2. Locate the JAR
+
+Once the build completes, the generated JAR files can be found in the `app/build/libs/` directory:
+
+- **Shadow JAR** (includes all dependencies):
+  `ServerListExplorer-all.jar`
+  This is the recommended JAR to run for ease of use.
+
+- **Normal JAR** (without bundled dependencies):
+  `ServerListExplorer.jar`
+  Use this only if you plan to manage dependencies manually.
+
+### 3. Run the Application
+
+Run the shadow JAR using Java 17 or higher:
+
+```
+java -jar app/build/libs/ServerListExplorer-all.jar
+```
+
+If you prefer the normal JAR, make sure to provide all required dependencies on the classpath.
 
 ## Wiki
 
