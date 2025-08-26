@@ -12,17 +12,17 @@ check out the [User Interface Preview](#user-interface-preview) to see the proje
 
 ## User Interface Preview
 
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 0fr)); gap: 10px; justify-content: center;">
-  <img src="https://i.imgur.com/sQzIVyL.png" width="500" alt="Screenshot 1">
-  <img src="https://i.imgur.com/s3yGMjq.png" width="500" alt="Screenshot 2">
-  <img src="https://i.imgur.com/nXdLGW1.png" width="500" alt="Screenshot 3">
-  <img src="https://i.imgur.com/eMH8Hq6.png" width="500" alt="Screenshot 4">
-  <img src="https://i.imgur.com/SGZOFtL.png" width="500" alt="Screenshot 5">
-  <img src="https://i.imgur.com/zHec8SU.png" width="500" alt="Screenshot 6">
-  <img src="https://i.imgur.com/bsewslp.png" width="500" alt="Screenshot 7">
-  <img src="https://i.imgur.com/lPcWLLU.png" width="500" alt="Screenshot 8">
-  <img src="https://i.imgur.com/encWz5c.png" width="500" alt="Screenshot 9">
-  <img src="https://i.imgur.com/g9WLE7A.gif" width="500" alt="GIF 1">
+<div>
+  <img src="https://i.imgur.com/sQzIVyL.png" alt="Screenshot 1">
+  <img src="https://i.imgur.com/s3yGMjq.png" alt="Screenshot 2">
+  <img src="https://i.imgur.com/nXdLGW1.png" alt="Screenshot 3">
+  <img src="https://i.imgur.com/eMH8Hq6.png" alt="Screenshot 4">
+  <img src="https://i.imgur.com/SGZOFtL.png" alt="Screenshot 5">
+  <img src="https://i.imgur.com/zHec8SU.png" alt="Screenshot 6">
+  <img src="https://i.imgur.com/bsewslp.png" alt="Screenshot 7">
+  <img src="https://i.imgur.com/lPcWLLU.png" alt="Screenshot 8">
+  <img src="https://i.imgur.com/encWz5c.png" alt="Screenshot 9">
+  <img src="https://i.imgur.com/g9WLE7A.gif" alt="GIF 1">
 </div>
 
 ## Table of Contents
