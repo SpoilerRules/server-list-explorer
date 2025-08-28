@@ -22,32 +22,17 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.spoiligaming.explorer.minecraft.common.IModuleKind
-import com.spoiligaming.explorer.minecraft.common.UnifiedModeInitializer
-import com.spoiligaming.explorer.multiplayer.ServerListMonitor
-import com.spoiligaming.explorer.multiplayer.repository.ServerListRepository
 import com.spoiligaming.explorer.settings.manager.UniversalSettingsManager
 import com.spoiligaming.explorer.ui.AppLocaleProvider
-import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalMultiplayerSettings
 import com.spoiligaming.explorer.ui.components.LoadingScreen
-import com.spoiligaming.explorer.ui.screens.multiplayer.MultiplayerErrorScreen
-import com.spoiligaming.explorer.ui.screens.multiplayer.MultiplayerScreen
+import com.spoiligaming.explorer.ui.screens.multiplayer.MultiplayerScreenContainer
 import com.spoiligaming.explorer.ui.screens.settings.SettingsScreen
 import com.spoiligaming.explorer.ui.t
-import io.github.oshai.kotlinlogging.KotlinLogging
 import server_list_explorer.ui.generated.resources.Res
-import server_list_explorer.ui.generated.resources.loading_init_repo
-import server_list_explorer.ui.generated.resources.loading_setup_monitor
 import server_list_explorer.ui.generated.resources.loading_user_settings
 
 @Composable
@@ -61,60 +46,7 @@ internal fun NavGraph(navController: NavHostController) {
         popExitTransition = { ExitTransition.None },
     ) {
         composable<MultiplayerServerListScreen> {
-            val serverListFile = LocalMultiplayerSettings.current.serverListFile
-            val scope = rememberCoroutineScope()
-
-            var repo by remember { mutableStateOf<ServerListRepository?>(null) }
-            var monitor by remember { mutableStateOf<ServerListMonitor?>(null) }
-
-            LoadingScreen(
-                displayAfterThreshold = true,
-                steps =
-                    buildList {
-                        add(
-                            t(Res.string.loading_init_repo) to {
-                                UnifiedModeInitializer
-                                    .initialize<ServerListRepository>(
-                                        IModuleKind.Multiplayer,
-                                        serverListFile,
-                                    )
-                                    .onSuccess { repo = it }
-                                    .onFailure {
-                                        logger.error(it) { "Error initializing server list repository" }
-                                    }
-                            },
-                        )
-                        if (repo != null) {
-                            add(
-                                t(Res.string.loading_setup_monitor) to {
-                                    monitor =
-                                        ServerListMonitor(
-                                            repo = repo!!,
-                                            scope = scope,
-                                            intervalMillis = 1000,
-                                        ).also { repo!!.monitor = it }
-                                },
-                            )
-                        }
-                    },
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                repo?.let {
-                    MultiplayerScreen(
-                        repo = it,
-                        onReloadRequest = {
-                            navController.navigate(MultiplayerServerListScreen) {
-                                popUpTo(MultiplayerServerListScreen) { inclusive = true }
-                            }
-                        },
-                    )
-                } ?: MultiplayerErrorScreen(navController)
-            }
-
-            DisposableEffect(monitor) {
-                monitor?.start()
-                onDispose { monitor?.stop() }
-            }
+            MultiplayerScreenContainer(navController)
         }
 
         composable<SingleplayerWorldListScreen> { }
@@ -135,5 +67,3 @@ internal fun NavGraph(navController: NavHostController) {
         }
     }
 }
-
-private val logger = KotlinLogging.logger {}

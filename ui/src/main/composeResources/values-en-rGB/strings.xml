@@ -14,13 +14,11 @@
 
     <string name="label_world_saves">World Saves Folder</string>
     <string name="placeholder_world_saves">Select your 'saves' folder…</string>
-    <string name="error_world_saves_missing">Unable to auto-determine world saves folder; please pick it manually.
-    </string>
+    <string name="error_world_saves_missing">Unable to auto-determine world saves folder; please pick it manually.</string>
 
     <string name="label_server_list">Server List File</string>
     <string name="placeholder_server_list">Select your 'servers.dat' file…</string>
-    <string name="error_server_list_missing">Unable to auto-determine server list file; please pick it manually.
-    </string>
+    <string name="error_server_list_missing">Unable to auto-determine server list file; please pick it manually.</string>
 
     <string name="placeholder_generic">Select %1$s…</string>
     <string name="detecting_world_saves">Detecting world saves folder…</string>
@@ -34,9 +32,7 @@
     <string name="settings_navigator_title">Sections</string>
 
     <string name="error_unable_load_servers">Unable to load servers</string>
-    <string name="error_unable_load_servers_message">An unexpected error occurred while reading your server
-        list.\nPlease check that the file exists and you have permission to read it.
-    </string>
+    <string name="error_unable_load_servers_message">An unexpected error occurred while reading your server list.\nPlease check that the file exists and you have permission to read it.</string>
     <string name="server_list_file_not_set">null (not set)</string>
 
     <string name="button_browse">Browse…</string>
@@ -52,10 +48,7 @@
     <string name="add_server_placeholder_address">myserver</string>
     <string name="add_server_resource_packs">Server Resource Packs</string>
     <string name="add_server_hide_label">Hide this server in the Minecraft multiplayer menu</string>
-    <string name="add_server_hide_tooltip">Makes this server entry invisible in the multiplayer server list in supported
-        Minecraft clients.\nThis sets the server entry's "hidden" attribute to false (0b) in NBT format.\nNot all
-        clients recognise this attribute.
-    </string>
+    <string name="add_server_hide_tooltip">Makes this server entry invisible in the multiplayer server list in supported Minecraft clients.\nThis sets the server entry's "hidden" attribute to false (0b) in NBT format.\nNot all clients recognise this attribute.</string>
     <string name="add_server_hide_note">You can change this option anytime in Server List Explorer.</string>
     <string name="add_server_button_add">Add</string>
 
@@ -77,14 +70,13 @@
     <string name="loading_setup_monitor">Setting up monitor</string>
     <string name="loading_user_settings">Loading user settings and preferences</string>
 
-    <string name="snackbar_system_accent_unavailable">System accent colour unavailable. Defaulting to your chosen theme
-        colour.
-    </string>
+    <string name="snackbar_system_accent_unavailable">System accent colour unavailable. Defaulting to your chosen theme colour.</string>
 
     <string name="color_picker_dialog_title">Pick a colour</string>
     <string name="color_picker_button_restore">Restore default</string>
 
     <string name="quick_action_add">Add</string>
+    <string name="quick_action_sort">Sort</string>
     <string name="quick_action_refresh_selected">Refresh Selected</string>
     <string name="quick_action_delete_selected">Delete Selected</string>
     <string name="quick_action_refresh_all">Refresh All</string>
@@ -99,4 +91,27 @@
     <string name="search_filter_name_and_address">Name &amp; Address</string>
     <string name="search_filter_name_only">Name only</string>
     <string name="search_filter_address_only">Address only</string>
+
+    <string name="sort_mode_ping">Lowest ping</string>
+    <string name="sort_mode_player_count">Most players online</string>
+    <string name="sort_title">Sorting your servers</string>
+    <string name="sort_status_preparing">Preparing…</string>
+    <string name="sort_status_sorting_entries">Sorting entries…</string>
+    <string name="sort_status_applying">Applying new order to disk…</string>
+    <string name="sort_status_done">Done</string>
+    <string name="sort_button_skip_pinging">Skip pinging</string>
+    <string name="sort_live_activity">Live activity</string>
+    <string name="sort_timeline_title">Timeline</string>
+    <string name="sort_step_pinging">Pinging</string>
+    <string name="sort_step_sorting">Sorting</string>
+    <string name="sort_whats_happening_title">What's happening</string>
+    <string name="sort_whats_happening_desc">First, we ping each server to collect up-to-date details like latency and player counts. After that, the servers are reordered in memory and the new order is applied to your list.</string>
+    <string name="sort_info_servers">Servers</string>
+    <string name="sort_info_timeout">Timeout</string>
+    <string name="sort_info_mode">Mode</string>
+    <string name="sort_pinging_servers">Pinging servers…</string>
+    <string name="sort_max_time_remaining">Max time remaining: %1$ds</string>
+    <string name="sort_skip_message">You can skip this step — we'll sort using what we've already learned.</string>
+    <string name="sort_status_in_progress">In progress</string>
+    <string name="sort_status_next">Next</string>
 </resources>

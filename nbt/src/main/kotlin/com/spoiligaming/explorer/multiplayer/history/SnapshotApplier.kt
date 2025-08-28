@@ -191,6 +191,13 @@ private suspend fun ServerListChange.applyTo(
                     }
                 }
 
+            is SortChange -> {
+                val listToApply = if (direction == Direction.UNDO) oldServers else newServers
+                repo.deleteAll()
+                listToApply.forEach { repo.add(it) }
+                true
+            }
+
             is SetHiddenChange ->
                 when (direction) {
                     Direction.UNDO ->
