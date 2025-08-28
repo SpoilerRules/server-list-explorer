@@ -50,6 +50,10 @@ class ServerListMonitor(
     val changeFlow = _changeFlow
     private var lastStats: FileStats? = null
 
+    @Volatile
+    internal var internalSavePending = false
+        private set
+
     init {
         require(intervalMillis > 0) { "intervalMillis must be positive" }
     }
@@ -66,18 +70,23 @@ class ServerListMonitor(
                     delay(intervalMillis)
                     val current = filePath.readStats()
                     val previous = lastStats!!
-                    if (current.lastModified != previous.lastModified ||
-                        current.size != previous.size
-                    ) {
-                        logger.debug {
-                            "Detected change in $filePath: " +
-                                "modified=${current.lastModified}, " +
-                                "size=${current.size}, " +
-                                "crc32=${current.crc32}"
+                    val changed = current.lastModified != previous.lastModified || current.size != previous.size
+                    if (changed) {
+                        if (internalSavePending) {
+                            internalSavePending = false
+                            lastStats = current
+                            logger.debug { "Suppressed change from internal save for $filePath" }
+                        } else {
+                            logger.debug {
+                                "Detected change in $filePath: " +
+                                    "modified=${current.lastModified}, " +
+                                    "size=${current.size}, " +
+                                    "crc32=${current.crc32}"
+                            }
+                            _changeFlow.value = filePath
+                            logger.info { "External file change reported for $filePath" }
+                            lastStats = current
                         }
-                        _changeFlow.value = filePath
-                        logger.info { "External file change reported for $filePath" }
-                        lastStats = current
                     }
                 }
             }
@@ -87,6 +96,7 @@ class ServerListMonitor(
         val filePath = repo.serverDatPath
         val baseline = filePath.readStats()
         lastStats = baseline
+        internalSavePending = false
         logger.debug { "Internal save baseline recorded for $filePath: $baseline" }
     }
 
@@ -94,6 +104,10 @@ class ServerListMonitor(
         monitorJob?.cancel()
         monitorJob = null
         logger.info { "Stopped monitoring external file" }
+    }
+
+    internal fun willSaveInternally() {
+        internalSavePending = true
     }
 }
 
