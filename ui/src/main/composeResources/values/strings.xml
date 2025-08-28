@@ -14,13 +14,11 @@
 
     <string name="label_world_saves">World Saves Folder</string>
     <string name="placeholder_world_saves">Select your 'saves' folder...</string>
-    <string name="error_world_saves_missing">Unable to auto-determine world saves folder; please pick it manually.
-    </string>
+    <string name="error_world_saves_missing">Unable to auto-determine world saves folder; please pick it manually.</string>
 
     <string name="label_server_list">Server List File</string>
     <string name="placeholder_server_list">Select your 'servers.dat' file...</string>
-    <string name="error_server_list_missing">Unable to auto-determine server list file; please pick it manually.
-    </string>
+    <string name="error_server_list_missing">Unable to auto-determine server list file; please pick it manually.</string>
 
     <string name="placeholder_generic">Select %1$s...</string>
     <string name="detecting_world_saves">Detecting world saves folder...</string>
@@ -34,9 +32,7 @@
     <string name="settings_navigator_title">Sections</string>
 
     <string name="error_unable_load_servers">Unable to load servers</string>
-    <string name="error_unable_load_servers_message">An unexpected error occurred while reading your server
-        list.\nPlease check that the file exists and you have permission to read it.
-    </string>
+    <string name="error_unable_load_servers_message">An unexpected error occurred while reading your server list.\nPlease check that the file exists and you have permission to read it.</string>
     <string name="server_list_file_not_set">null (not set)</string>
 
     <string name="button_browse">Browse...</string>
@@ -52,10 +48,7 @@
     <string name="add_server_placeholder_address">myserver</string>
     <string name="add_server_resource_packs">Server Resource Packs</string>
     <string name="add_server_hide_label">Hide this server in the Minecraft multiplayer menu</string>
-    <string name="add_server_hide_tooltip">Makes this server entry invisible in the multiplayer server list in supported
-        Minecraft clients.\nThis sets the server entry's "hidden" attribute to false (0b) in NBT format.\nNot all
-        clients recognize this attribute.
-    </string>
+    <string name="add_server_hide_tooltip">Makes this server entry invisible in the multiplayer server list in supported Minecraft clients.\nThis sets the server entry's "hidden" attribute to false (0b) in NBT format.\nNot all clients recognize this attribute.</string>
     <string name="add_server_hide_note">You can change this option anytime in Server List Explorer.</string>
     <string name="add_server_button_add">Add</string>
 
@@ -77,14 +70,13 @@
     <string name="loading_setup_monitor">Setting up monitor</string>
     <string name="loading_user_settings">Loading all user settings and preferences</string>
 
-    <string name="snackbar_system_accent_unavailable">System accent color unavailable. Defaulting to your chosen theme
-        color.
-    </string>
+    <string name="snackbar_system_accent_unavailable">System accent color unavailable. Defaulting to your chosen theme color.</string>
 
     <string name="color_picker_dialog_title">Pick a color</string>
     <string name="color_picker_button_restore">Restore default</string>
 
     <string name="quick_action_add">Add</string>
+    <string name="quick_action_sort">Sort</string>
     <string name="quick_action_refresh_selected">Refresh Selected</string>
     <string name="quick_action_delete_selected">Delete Selected</string>
     <string name="quick_action_refresh_all">Refresh All</string>
@@ -101,9 +93,7 @@
     <string name="search_filter_address_only">Address only</string>
 
     <string name="dialog_title_manage_server_list">Manage server list file</string>
-    <string name="dialog_support_text_manage_server_list">Choose or open the folder for your multiplayer server list
-        file.
-    </string>
+    <string name="dialog_support_text_manage_server_list">Choose or open the folder for your multiplayer server list file.</string>
     <string name="text_no_file_selected">No file selected</string>
     <string name="text_server_count">Servers in file: %1$d</string>
     <string name="button_open_folder">Open folder</string>
