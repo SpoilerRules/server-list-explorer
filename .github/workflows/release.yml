@@ -61,20 +61,6 @@ jobs:
                 shell: powershell
                 run: .\gradlew.bat app:shadowJar app:build app:packageReleaseUberJarForCurrentOS app:packageReleaseMsi app:packageMsi app:createReleaseDistributable app:createDistributable
 
-            -   name: Build release changelog
-                if: env.ACT != 'true'
-                id: changelog
-                uses: mikepenz/release-changelog-builder-action@v4
-                with:
-                    configuration: |
-                        {
-                          "template": "## Changelogs\n\n{{CHANGELOG}}\n\nFull Changelog: {{PREVIOUS_TAG}}...{{CURRENT_TAG}}",
-                          "sort": "ASC",
-                          "entryTemplate": "- {{commitSubject}} by @{{author}} in #{{pullRequestNumber}}\n"
-                        }
-                env:
-                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
             -   name: List Compose JARs
                 shell: powershell
                 run: |
@@ -106,6 +92,7 @@ jobs:
                     tag_name: ${{ env.TAG }}
                     name: "Server List Explorer ${{ env.TAG }}"
                     body: ${{ steps.changelog.outputs.changelog }}
+                    generate_release_notes: true
                     draft: false
                     prerelease: ${{ contains(env.TAG, '-beta') || contains(env.TAG, '-rc') || contains(env.TAG, '-alpha') }}
                     files: |
