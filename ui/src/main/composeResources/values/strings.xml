@@ -99,4 +99,27 @@
     <string name="button_open_folder">Open folder</string>
     <string name="cd_open_folder">Open folder</string>
     <string name="file_picker_title_server_list">Select server list (.dat)</string>
+
+    <string name="sort_mode_ping">Lowest ping</string>
+    <string name="sort_mode_player_count">Most players online</string>
+    <string name="sort_title">Sorting your servers</string>
+    <string name="sort_status_preparing">Preparing...</string>
+    <string name="sort_status_sorting_entries">Sorting entries...</string>
+    <string name="sort_status_applying">Applying new order to disk...</string>
+    <string name="sort_status_done">Done</string>
+    <string name="sort_button_skip_pinging">Skip pinging</string>
+    <string name="sort_live_activity">Live activity</string>
+    <string name="sort_timeline_title">Timeline</string>
+    <string name="sort_step_pinging">Pinging</string>
+    <string name="sort_step_sorting">Sorting</string>
+    <string name="sort_whats_happening_title">What's happening</string>
+    <string name="sort_whats_happening_desc">First, we ping each server to collect up-to-date details like latency and player counts. After that, the servers are reordered in memory and the new order is applied to your list.</string>
+    <string name="sort_info_servers">Servers</string>
+    <string name="sort_info_timeout">Timeout</string>
+    <string name="sort_info_mode">Mode</string>
+    <string name="sort_pinging_servers">Pinging servers...</string>
+    <string name="sort_max_time_remaining">Max time remaining: %1$ds</string>
+    <string name="sort_skip_message">You can skip this step — we'll sort using what we've already learned.</string>
+    <string name="sort_status_in_progress">In progress</string>
+    <string name="sort_status_next">Next</string>
 </resources>

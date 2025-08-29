@@ -88,6 +88,14 @@ data class MoveServerChange(
     override fun description() = "Moved '${server.name}' (${server.ip}) from position $fromIndex to $toIndex"
 }
 
+data class SortChange(
+    val oldServers: List<MultiplayerServer>,
+    val newServers: List<MultiplayerServer>,
+    override val timestamp: Instant = Instant.now(),
+) : ServerListChange() {
+    override fun description() = "Sorted server list"
+}
+
 data class SetHiddenChange(
     val serverId: Uuid,
     val oldHidden: Boolean,

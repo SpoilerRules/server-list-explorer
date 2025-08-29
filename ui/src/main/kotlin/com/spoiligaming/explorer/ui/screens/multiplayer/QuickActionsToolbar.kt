@@ -36,6 +36,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.DatasetLinked
@@ -76,6 +77,7 @@ import server_list_explorer.ui.generated.resources.quick_action_query_method
 import server_list_explorer.ui.generated.resources.quick_action_refresh_all
 import server_list_explorer.ui.generated.resources.quick_action_refresh_selected
 import server_list_explorer.ui.generated.resources.quick_action_select_all
+import server_list_explorer.ui.generated.resources.quick_action_sort
 
 @Composable
 internal fun QuickActionsToolbar(
@@ -83,6 +85,7 @@ internal fun QuickActionsToolbar(
     totalCount: Int,
     selectedCount: Int,
     onAdd: () -> Unit,
+    onSort: () -> Unit,
     onSelectAll: () -> Unit,
     onClearSelection: () -> Unit,
     onRefresh: (onlySelected: Boolean) -> Unit,
@@ -166,6 +169,12 @@ internal fun QuickActionsToolbar(
                 label = t(Res.string.quick_action_add),
                 shimmer = null,
                 onClick = onAdd,
+            )
+            QuickActionButton(
+                icon = Icons.AutoMirrored.Default.Sort,
+                label = t(Res.string.quick_action_sort),
+                shimmer = shimmer,
+                onClick = onSort,
             )
             divider()
             QuickActionButton(

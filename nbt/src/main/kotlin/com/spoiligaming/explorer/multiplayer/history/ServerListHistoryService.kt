@@ -77,6 +77,14 @@ class ServerListHistoryService(
             redoChange
         }
 
+    suspend fun clear() =
+        mutex.withLock {
+            undoStack.clear()
+            redoStack.clear()
+            refreshFlags()
+            logger.debug { "Cleared all history" }
+        }
+
     private fun <T> ArrayDeque<T>.pushWithLimit(
         element: T,
         limit: Int,

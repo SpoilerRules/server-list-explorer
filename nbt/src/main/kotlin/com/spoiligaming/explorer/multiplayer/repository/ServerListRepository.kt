@@ -60,15 +60,21 @@ class ServerListRepository(internal val serverDatPath: Path) {
 
     suspend fun commit() =
         mutex.withLock {
-            ds.saveServers(_servers.value)
             if (::monitor.isInitialized) {
-                monitor.recordInternalSave()
+                monitor.willSaveInternally()
             } else {
                 logger.warn {
                     "ServerListMonitor is not initialized. " +
                         "Attach monitor to avoid false file conflicts on internal saves."
                 }
             }
+
+            ds.saveServers(_servers.value)
+
+            if (::monitor.isInitialized) {
+                monitor.recordInternalSave()
+            }
+
             logger.debug { "Changes committed to disk" }
         }
 

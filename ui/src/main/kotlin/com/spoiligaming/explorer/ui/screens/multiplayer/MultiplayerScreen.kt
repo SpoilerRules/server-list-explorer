@@ -67,7 +67,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -112,7 +111,6 @@ import com.spoiligaming.explorer.ui.dialog.ExpressiveDialog
 import com.spoiligaming.explorer.ui.dialog.onClick
 import com.spoiligaming.explorer.ui.dialog.prominent
 import com.spoiligaming.explorer.ui.extensions.clickWithModifiers
-import com.spoiligaming.explorer.ui.navigation.MultiplayerServerListScreen
 import com.spoiligaming.explorer.ui.window.WindowManager
 import com.spoiligaming.explorer.util.OSUtils
 import com.valentinilk.shimmer.ShimmerBounds
@@ -123,6 +121,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
 import sh.calvin.reorderable.DragGestureDetector
@@ -147,23 +146,12 @@ import kotlin.uuid.Uuid
 @Composable
 internal fun MultiplayerScreen(
     repo: ServerListRepository,
+    historyService: ServerListHistoryService,
     onReloadRequest: () -> Unit,
+    onSortRequest: (SortType, List<MultiplayerServer>) -> Unit,
 ) {
-    DisposableEffect(Unit) {
-        onDispose {
-            ServerEntryController.clearCache()
-            logger.info {
-                "Cleared ${ServerEntryController::class.simpleName} cache because " +
-                    "${MultiplayerServerListScreen::class.simpleName} left the composition"
-            }
-        }
-    }
-
     val mpSettings = LocalMultiplayerSettings.current
     val prefs = LocalPrefs.current
-
-    val historyService =
-        remember { ServerListHistoryService(maxUndoEntries = prefs.maxUndoHistorySize) }
 
     val scope = rememberCoroutineScope()
     var showConflictDialog by remember { mutableStateOf(false) }
@@ -293,6 +281,7 @@ internal fun MultiplayerScreen(
     val isEntriesEmpty = entries.isEmpty()
 
     var showAddDialog by remember { mutableStateOf(false) }
+    var showSortDialog by remember { mutableStateOf(false) }
     var showDeleteAllDialog by remember { mutableStateOf(false) }
     var showQueryMethodDialog by remember { mutableStateOf(false) }
     var showServerFileDialog by remember { mutableStateOf(false) }
@@ -319,6 +308,7 @@ internal fun MultiplayerScreen(
             totalCount = entries.size,
             selectedCount = selectedIds.size,
             onAdd = { showAddDialog = true },
+            onSort = { showSortDialog = true },
             onSelectAll = { controller.selectAll() },
             onClearSelection = { controller.selection.clear() },
             onRefresh = refreshAction,
@@ -381,6 +371,38 @@ internal fun MultiplayerScreen(
                 showServerFileDialog = false
             },
         )
+    }
+
+    if (showSortDialog) {
+        var selectedSortType by remember { mutableStateOf(SortType.Ping) }
+        ExpressiveDialog(onDismissRequest = { showSortDialog = false }) {
+            title("Sort server list")
+            supportText("Uses MCServerPing as the server query method")
+            body {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    SortType.entries.forEach { mode ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            RadioButton(
+                                selected = selectedSortType == mode,
+                                onClick = { selectedSortType = mode },
+                                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                            )
+                            Text(stringResource(mode.label))
+                        }
+                    }
+                }
+            }
+            accept(
+                "Sort".prominent onClick {
+                    showSortDialog = false
+                    onSortRequest(selectedSortType, pendingOrder)
+                },
+            )
+            cancel("Cancel" onClick { showSortDialog = false })
+        }
     }
 
     if (showQueryMethodDialog) {
