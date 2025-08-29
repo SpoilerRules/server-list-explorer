@@ -177,7 +177,7 @@ internal fun MultiplayerScreen(
         ) {
             icon(Icons.Filled.DatasetLinked)
             title("External File Change Detected")
-            supportText("The server list file at $conflictPath has been modified externally.")
+            supportText("The server list file at $conflictPath has been modified externally")
             accept(
                 "OK".prominent onClick {
                     scope.launch {
@@ -340,7 +340,7 @@ internal fun MultiplayerScreen(
             title("Delete All?")
             icon(Icons.Filled.DeleteForever)
             supportText(
-                "Are you sure you want to delete all entries? This action cannot be undone.",
+                "Are you sure you want to delete all entries? This action cannot be undone",
             )
             accept(
                 "Delete All".prominent onClick {
