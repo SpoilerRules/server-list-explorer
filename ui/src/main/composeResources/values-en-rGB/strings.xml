@@ -92,6 +92,14 @@
     <string name="search_filter_name_only">Name only</string>
     <string name="search_filter_address_only">Address only</string>
 
+    <string name="dialog_title_manage_server_list">Manage server list file</string>
+    <string name="dialog_support_text_manage_server_list">Choose or open the folder for your multiplayer server list file</string>
+    <string name="text_no_file_selected">No file selected</string>
+    <string name="text_server_count">Servers in file: %1$d</string>
+    <string name="button_open_folder">Open folder</string>
+    <string name="cd_open_folder">Open folder</string>
+    <string name="file_picker_title_server_list">Select server list (.dat)</string>
+
     <string name="sort_mode_ping">Lowest ping</string>
     <string name="sort_mode_player_count">Most players online</string>
     <string name="sort_title">Sorting your servers</string>
