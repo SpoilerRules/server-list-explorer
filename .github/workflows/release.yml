@@ -107,7 +107,7 @@ jobs:
                     name: "Server List Explorer ${{ env.TAG }}"
                     body: ${{ steps.changelog.outputs.changelog }}
                     draft: false
-                    prerelease: ${{ contains(env.TAG, '-beta') || contains(env.TAG, '-rc') }}
+                    prerelease: ${{ contains(env.TAG, '-beta') || contains(env.TAG, '-rc') || contains(env.TAG, '-alpha') }}
                     files: |
                         app/build/libs/ServerListExplorer.jar
                         app/build/libs/ServerListExplorer-all.jar
