@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
+import com.spoiligaming.explorer.ui.screens.multiplayer.MinecraftFormattingCodeTextFormatter.appendMinecraftText
 import com.spoiligaming.explorer.util.MinecraftColorCodeRegex
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlin.random.Random
@@ -139,11 +140,6 @@ internal object MinecraftFormattingCodeTextFormatter {
         }
     }
 
-    fun String.toMinecraftAnnotatedString(obfuscationSeed: Int) =
-        buildAnnotatedString {
-            appendMinecraftText(this@toMinecraftAnnotatedString, obfuscationSeed)
-        }
-
     @Suppress("NOTHING_TO_INLINE")
     private inline fun obfuscateIfNeeded(
         text: String,
@@ -185,5 +181,10 @@ internal object MinecraftFormattingCodeTextFormatter {
             }
         }
 }
+
+internal fun String.toMinecraftAnnotatedString(obfuscationSeed: Int) =
+    buildAnnotatedString {
+        appendMinecraftText(this@toMinecraftAnnotatedString, obfuscationSeed)
+    }
 
 private val logger = KotlinLogging.logger {}
