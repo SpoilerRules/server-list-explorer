@@ -103,8 +103,7 @@ internal object MinecraftFormattingCodeTextFormatter {
                 currentStyle = SpanStyle()
                 obfuscate = false
             } else {
-                val code = match.value[1].lowercaseChar()
-                when (code) {
+                when (val code = match.value[1].lowercaseChar()) {
                     in colorMap -> {
                         currentColor = colorMap.getValue(code)
                         // color resets all styles
