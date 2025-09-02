@@ -40,6 +40,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -94,6 +95,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.lerp
@@ -756,22 +759,28 @@ private fun OnlineServerDataRow(
                         }
                     }
                     if (onlineData is McSrvStatOnlineServerData) {
-                        onlineData.info?.let {
-                            var descriptionObfuscationSeed by remember { mutableStateOf(0) }
-                            LaunchedEffect(it) {
+                        onlineData.info?.let { serverData ->
+                            var descriptionObfuscationSeed by remember { mutableStateOf(MotdObfuscationMinimumSeed) }
+
+                            var descIsSelecting by remember { mutableStateOf(false) }
+                            var descAllSelected by remember { mutableStateOf(false) }
+                            val descSelectingState = rememberUpdatedState(descIsSelecting)
+
+                            LaunchedEffect(serverData) {
                                 while (true) {
-                                    descriptionObfuscationSeed =
-                                        (MotdObfuscationMinimumSeed..Int.MAX_VALUE).random()
+                                    if (!descSelectingState.value) {
+                                        descriptionObfuscationSeed =
+                                            (MotdObfuscationMinimumSeed..Int.MAX_VALUE).random()
+                                    }
                                     delay(MotdObfuscationUpdateInterval)
                                 }
                             }
+
                             add {
                                 AssistChip(
                                     onClick = { showDescription = true },
                                     label = { Text("Description") },
-                                    modifier =
-                                        Modifier.height(32.dp)
-                                            .pointerHoverIcon(PointerIcon.Hand),
+                                    modifier = Modifier.height(32.dp).pointerHoverIcon(PointerIcon.Hand),
                                     enabled = true,
                                     leadingIcon = {
                                         Icon(
@@ -786,36 +795,67 @@ private fun OnlineServerDataRow(
                                             RichTooltip(
                                                 title = { Text("Server description") },
                                                 text = {
-                                                    Card(modifier = Modifier.padding(top = 12.dp)) {
-                                                        Box(
-                                                            Modifier
-                                                                .fillMaxWidth()
-                                                                .padding(MotdInnerPadding),
-                                                        ) {
-                                                            // TODO: when making this text selectable, make sure to account for random characters like in MOTD handling
-                                                            Text(
-                                                                text =
-                                                                    it.toMinecraftAnnotatedString(
-                                                                        descriptionObfuscationSeed,
-                                                                    ),
-                                                                style = MaterialTheme.typography.bodyMedium,
-                                                                lineHeight = MotdLineHeight,
-                                                            )
+                                                    ContextMenuDataProvider(
+                                                        items = {
+                                                            buildList {
+                                                                if (descAllSelected && serverData.isNotEmpty()) {
+                                                                    add(
+                                                                        ContextMenuItem("Copy with color codes") {
+                                                                            ClipboardUtils.copy(serverData)
+                                                                        },
+                                                                    )
+                                                                }
+                                                            }
+                                                        },
+                                                    ) {
+                                                        Card(modifier = Modifier.padding(top = 12.dp)) {
+                                                            Box(
+                                                                Modifier
+                                                                    .fillMaxWidth()
+                                                                    .padding(MotdInnerPadding),
+                                                            ) {
+                                                                val focusRequester = remember { FocusRequester() }
+
+                                                                LaunchedEffect(Unit) {
+                                                                    focusRequester.requestFocus()
+                                                                }
+
+                                                                HackedSelectionContainer(
+                                                                    modifier =
+                                                                        Modifier
+                                                                            .focusRequester(focusRequester)
+                                                                            .focusable()
+                                                                            .pointerInput(Unit) {
+                                                                                awaitPointerEventScope {
+                                                                                    while (true) {
+                                                                                        val event = awaitPointerEvent()
+                                                                                        if (event.type == PointerEventType.Press) {
+                                                                                            event.changes.forEach { it.consume() }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            },
+                                                                    onSelectedChange = { descIsSelecting = it },
+                                                                    onAllSelectedChange = { descAllSelected = it },
+                                                                ) {
+                                                                    Text(
+                                                                        text =
+                                                                            serverData.toMinecraftAnnotatedString(
+                                                                                descriptionObfuscationSeed,
+                                                                            ),
+                                                                        style = MaterialTheme.typography.bodyMedium,
+                                                                        lineHeight = MotdLineHeight,
+                                                                    )
+                                                                }
+                                                            }
                                                         }
                                                     }
                                                 },
                                                 action = {
                                                     TextButton(
-                                                        modifier =
-                                                            Modifier.pointerHoverIcon(
-                                                                PointerIcon.Hand,
-                                                            ),
-                                                        onClick = {
-                                                            showDescription = false
-                                                        },
-                                                    ) {
-                                                        Text("OK")
-                                                    }
+                                                        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                                                        onClick = { showDescription = false },
+                                                    ) { Text("OK") }
                                                 },
                                             )
                                         }
