@@ -667,12 +667,9 @@ internal fun MultiplayerScreen(
                 ) {
                     val blockCount = LocalBlockParentShortcuts.current
 
-                    LaunchedEffect(Unit) {
-                        while (true) {
-                            if (!gridHasFocus && blockCount.value == 0 && !searchHasFocus) {
-                                gridFocusRequester.requestFocus()
-                            }
-                            delay(100)
+                    LaunchedEffect(gridHasFocus) {
+                        if (!gridHasFocus && blockCount.value == 0 && !searchHasFocus) {
+                            gridFocusRequester.requestFocus()
                         }
                     }
 
