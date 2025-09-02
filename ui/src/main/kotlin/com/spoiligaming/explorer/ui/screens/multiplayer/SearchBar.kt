@@ -44,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -76,6 +77,7 @@ import server_list_explorer.ui.generated.resources.search_filter_name_only
 internal fun DockedSearchScreen(
     expanded: Boolean,
     onSearch: (query: String) -> Unit,
+    onFocusChange: (Boolean) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     var query by remember { mutableStateOf("") }
@@ -124,7 +126,7 @@ internal fun DockedSearchScreen(
                             true
                         }
                         false
-                    },
+                    }.onFocusChanged { onFocusChange(it.isFocused) },
                 placeholder = {
                     Text(
                         t(Res.string.search_bar_placeholder),

@@ -67,8 +67,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -193,13 +195,18 @@ internal fun MultiplayerScreen(
     }
     val gridFocusRequester = remember { FocusRequester() }
     var gridHasFocus by remember { mutableStateOf(false) }
+    var searchHasFocus by remember { mutableStateOf(false) }
     val controller =
         remember(repo, historyService) {
             ServerListController(
                 repo = repo,
                 scope = scope,
                 historyService = historyService,
-                onSelectionChanged = { gridFocusRequester.requestFocus() },
+                onSelectionChanged = {
+                    if (!searchHasFocus) {
+                        gridFocusRequester.requestFocus()
+                    }
+                },
             )
         }
     val selectedIds by controller.selection.selectedIds.collectAsState()
@@ -472,15 +479,6 @@ internal fun MultiplayerScreen(
         mpSettings.dragShakeIntensityDegrees.toFloat()
     val infinite = rememberInfiniteTransition()
 
-    LaunchedEffect(gridHasFocus) {
-        if (!gridHasFocus) {
-            delay(100)
-            if (!gridHasFocus) {
-                gridFocusRequester.requestFocus()
-            }
-        }
-    }
-
     val isAtBottom by remember {
         derivedStateOf {
             val layoutInfo = lazyGridState.layoutInfo
@@ -603,6 +601,7 @@ internal fun MultiplayerScreen(
                                     onSearch = { q ->
                                         searchQuery = q
                                     },
+                                    onFocusChange = { focused -> searchHasFocus = focused },
                                 )
                             }
                         }
@@ -619,6 +618,7 @@ internal fun MultiplayerScreen(
                                 onSearch = { q ->
                                     searchQuery = q
                                 },
+                                onFocusChange = { focused -> searchHasFocus = focused },
                             )
                         }
                     }
@@ -641,7 +641,6 @@ internal fun MultiplayerScreen(
             val percentage = mpSettings.serverEntrySizePercent.coerceIn(1, 100)
             val cellMinWidth =
                 remember(percentage) {
-                    // Wider min/max for extended, default otherwise
                     val (minDp, maxDp) = 260 to 1100
                     val step = 4
                     val totalSteps = (maxDp - minDp) / step
@@ -663,158 +662,191 @@ internal fun MultiplayerScreen(
                             .fillMaxHeight(),
                 )
             } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(cellMinWidth),
-                    state = lazyGridState,
-                    modifier =
-                        Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .focusRequester(gridFocusRequester)
-                            .focusable()
-                            .onFocusChanged { state ->
-                                gridHasFocus = state.isFocused
-                            }
-                            .onPreviewKeyEvent { e ->
-                                val isSelectionMod =
-                                    if (hostOs == OS.MacOS) e.isMetaPressed else e.isCtrlPressed
-                                when {
-                                    // Ctrl+A (select all)
-                                    isSelectionMod && e.key == Key.A -> {
-                                        controller.selectAll()
-                                        true
-                                    }
-                                    // Delete (delete selected)
-                                    e.key == Key.Delete && selectedIds.isNotEmpty() -> {
-                                        controller.deleteSelected()
-                                        true
-                                    }
-
-                                    // Refresh (refresh selected)
-                                    isSelectionMod && e.key == Key.R -> {
-                                        controller.refreshSelected(
-                                            useMCSrvStat = mpSettings.serverQueryMethod == ServerQueryMethod.McSrvStat,
-                                            connectTimeoutMillis = mpSettings.connectTimeoutMillis,
-                                            socketTimeoutMillis = mpSettings.socketTimeoutMillis,
-                                        )
-                                        true
-                                    }
-
-                                    else -> false
-                                }
-                            },
-                    contentPadding =
-                        PaddingValues(
-                            start = if (mpSettings.actionBarOrientation == ActionBarOrientation.Right) 12.dp else 0.dp,
-                            end = if (mpSettings.actionBarOrientation == ActionBarOrientation.Left) 12.dp else 0.dp,
-                            bottom = if (isAtBottom) 12.dp else 0.dp,
-                        ),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                CompositionLocalProvider(
+                    LocalBlockParentShortcuts provides remember { mutableStateOf(0) },
                 ) {
-                    if (isEntriesEmpty) {
-                        items(Random.nextInt(from = 3, until = 8)) {
-                            ShimmerServerEntry(
-                                modifier = Modifier.aspectRatio(6f / 3f),
-                                shimmer = shimmerInstance,
-                            )
-                        }
-                    } else {
-                        items(
-                            items = filteredEntries,
-                            key = { it.id },
-                        ) { serverEntry ->
-                            var hasDragged by remember { mutableStateOf(false) }
-                            var isShaking by remember { mutableStateOf(false) }
-                            val shakeRotation by if (isShaking) {
-                                infinite.animateFloat(
-                                    initialValue = -shakeIntensity,
-                                    targetValue = shakeIntensity,
-                                    animationSpec =
-                                        infiniteRepeatable(
-                                            animation =
-                                                tween(
-                                                    durationMillis = 80,
-                                                    easing = LinearEasing,
-                                                ),
-                                            repeatMode = RepeatMode.Reverse,
-                                        ),
-                                )
-                            } else {
-                                remember { mutableStateOf(0f) }
+                    val blockCount = LocalBlockParentShortcuts.current
+
+                    LaunchedEffect(Unit) {
+                        while (true) {
+                            if (!gridHasFocus && blockCount.value == 0 && !searchHasFocus) {
+                                gridFocusRequester.requestFocus()
                             }
-                            ReorderableItem(reorderState, key = serverEntry.id) { _ ->
-                                Box(
-                                    modifier =
-                                        Modifier
-                                            .animateItem()
-                                            .graphicsLayer { rotationZ = shakeRotation }
-                                            .clip(CardDefaults.elevatedShape)
-                                            .draggableHandle(
-                                                onDragStarted = {
-                                                    isShaking = true
-                                                    hasDragged = true
-                                                },
-                                                onDragStopped = {
-                                                    isShaking = false
-                                                    lastMove?.let { (server, indices) ->
-                                                        val (_, newPendingIdx) = indices
-                                                        val oldRepoIdx = entries.indexOf(server)
-                                                        val toRepoIdx =
-                                                            newPendingIdx.coerceIn(
-                                                                0,
-                                                                entries.lastIndex,
-                                                            )
-                                                        if (oldRepoIdx != -1 && oldRepoIdx != toRepoIdx) {
-                                                            controller.move(
-                                                                server = server,
-                                                                fromIndex = oldRepoIdx,
-                                                                toIndex = toRepoIdx,
-                                                            )
-                                                        }
-                                                    }
-                                                    lastMove = null
-                                                    pendingOrder = entries
-                                                },
-                                                dragGestureDetector = DragGestureDetector.LongPress,
+                            delay(100)
+                        }
+                    }
+
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(cellMinWidth),
+                        state = lazyGridState,
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                                .focusRequester(gridFocusRequester)
+                                .focusable()
+                                .onFocusChanged { state -> gridHasFocus = state.isFocused }
+                                .onPreviewKeyEvent { e ->
+                                    if (blockCount.value != 0) return@onPreviewKeyEvent false
+
+                                    val isSelectionMod =
+                                        if (hostOs == OS.MacOS) e.isMetaPressed else e.isCtrlPressed
+
+                                    when {
+                                        // Ctrl+A (select all)
+                                        isSelectionMod && e.key == Key.A && blockCount.value == 0 -> {
+                                            controller.selectAll()
+                                            true
+                                        }
+                                        // Delete (delete selected)
+                                        e.key == Key.Delete && selectedIds.isNotEmpty() -> {
+                                            controller.deleteSelected()
+                                            true
+                                        }
+
+                                        // Refresh (refresh selected)
+                                        isSelectionMod && e.key == Key.R -> {
+                                            controller.refreshSelected(
+                                                useMCSrvStat =
+                                                    mpSettings.serverQueryMethod == ServerQueryMethod.McSrvStat,
+                                                connectTimeoutMillis = mpSettings.connectTimeoutMillis,
+                                                socketTimeoutMillis = mpSettings.socketTimeoutMillis,
                                             )
-                                            .clickWithModifiers { ctrl, shift, meta ->
-                                                if (!hasDragged) {
-                                                    controller.selection.handlePointerClick(
-                                                        id = serverEntry.id,
-                                                        entries = entries.map { it.id },
-                                                        ctrlMeta = ctrl || meta,
-                                                        shift = shift,
-                                                    )
-                                                }
-                                                hasDragged = false
-                                            },
-                                ) {
-                                    ServerEntry(
-                                        selected = serverEntry.id in selectedIds,
-                                        data = serverEntry,
-                                        repo = repo,
-                                        historyService = historyService,
-                                        searchQuery = searchQuery,
-                                        scope = scope,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        highlight = (serverEntry.id == flashId.value),
-                                        onHighlightFinished = {
-                                            if (flashId.value == serverEntry.id) {
-                                                flashId.value =
-                                                    null
-                                            }
-                                        },
-                                        onRefresh = {
-                                            controller.refreshSingle(
-                                                serverEntry.ip,
-                                                mpSettings.serverQueryMethod == ServerQueryMethod.McSrvStat,
-                                                mpSettings.connectTimeoutMillis,
-                                                mpSettings.socketTimeoutMillis,
-                                            )
-                                        },
-                                        onDelete = { controller.deleteSingle(serverEntry) },
+                                            true
+                                        }
+
+                                        else -> false
+                                    }
+                                },
+                        contentPadding =
+                            PaddingValues(
+                                start =
+                                    if (mpSettings.actionBarOrientation == ActionBarOrientation.Right) {
+                                        12.dp
+                                    } else {
+                                        0.dp
+                                    },
+                                end =
+                                    if (mpSettings.actionBarOrientation == ActionBarOrientation.Left) {
+                                        12.dp
+                                    } else {
+                                        0.dp
+                                    },
+                                bottom =
+                                    if (isAtBottom) {
+                                        12.dp
+                                    } else {
+                                        0.dp
+                                    },
+                            ),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        if (isEntriesEmpty) {
+                            items(Random.nextInt(from = 3, until = 8)) {
+                                ShimmerServerEntry(
+                                    modifier = Modifier.aspectRatio(6f / 3f),
+                                    shimmer = shimmerInstance,
+                                )
+                            }
+                        } else {
+                            items(
+                                items = filteredEntries,
+                                key = { it.id },
+                            ) { serverEntry ->
+                                var hasDragged by remember { mutableStateOf(false) }
+                                var isShaking by remember { mutableStateOf(false) }
+                                val shakeRotation by if (isShaking) {
+                                    infinite.animateFloat(
+                                        initialValue = -shakeIntensity,
+                                        targetValue = shakeIntensity,
+                                        animationSpec =
+                                            infiniteRepeatable(
+                                                animation =
+                                                    tween(
+                                                        durationMillis = 80,
+                                                        easing = LinearEasing,
+                                                    ),
+                                                repeatMode = RepeatMode.Reverse,
+                                            ),
                                     )
+                                } else {
+                                    remember { mutableStateOf(0f) }
+                                }
+                                ReorderableItem(reorderState, key = serverEntry.id) { _ ->
+                                    Box(
+                                        modifier =
+                                            Modifier
+                                                .animateItem()
+                                                .graphicsLayer { rotationZ = shakeRotation }
+                                                .clip(CardDefaults.elevatedShape)
+                                                .draggableHandle(
+                                                    onDragStarted = {
+                                                        isShaking = true
+                                                        hasDragged = true
+                                                    },
+                                                    onDragStopped = {
+                                                        isShaking = false
+                                                        lastMove?.let { (server, indices) ->
+                                                            val (_, newPendingIdx) = indices
+                                                            val oldRepoIdx = entries.indexOf(server)
+                                                            val toRepoIdx =
+                                                                newPendingIdx.coerceIn(
+                                                                    0,
+                                                                    entries.lastIndex,
+                                                                )
+                                                            if (oldRepoIdx != -1 && oldRepoIdx != toRepoIdx) {
+                                                                controller.move(
+                                                                    server = server,
+                                                                    fromIndex = oldRepoIdx,
+                                                                    toIndex = toRepoIdx,
+                                                                )
+                                                            }
+                                                        }
+                                                        lastMove = null
+                                                        pendingOrder = entries
+                                                    },
+                                                    dragGestureDetector = DragGestureDetector.LongPress,
+                                                )
+                                                .clickWithModifiers { ctrl, shift, meta ->
+                                                    gridFocusRequester.requestFocus()
+                                                    if (!hasDragged) {
+                                                        controller.selection.handlePointerClick(
+                                                            id = serverEntry.id,
+                                                            entries = entries.map { it.id },
+                                                            ctrlMeta = ctrl || meta,
+                                                            shift = shift,
+                                                        )
+                                                    }
+                                                    hasDragged = false
+                                                },
+                                    ) {
+                                        ServerEntry(
+                                            selected = serverEntry.id in selectedIds,
+                                            data = serverEntry,
+                                            repo = repo,
+                                            historyService = historyService,
+                                            searchQuery = searchQuery,
+                                            scope = scope,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            highlight = (serverEntry.id == flashId.value),
+                                            onHighlightFinished = {
+                                                if (flashId.value == serverEntry.id) {
+                                                    flashId.value =
+                                                        null
+                                                }
+                                            },
+                                            onRefresh = {
+                                                controller.refreshSingle(
+                                                    serverEntry.ip,
+                                                    mpSettings.serverQueryMethod == ServerQueryMethod.McSrvStat,
+                                                    mpSettings.connectTimeoutMillis,
+                                                    mpSettings.socketTimeoutMillis,
+                                                )
+                                            },
+                                            onDelete = { controller.deleteSingle(serverEntry) },
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -946,5 +978,7 @@ private fun ServerListHistoryControlCard(
         }
     }
 }
+
+internal val LocalBlockParentShortcuts = compositionLocalOf { mutableStateOf(0) }
 
 private val logger = KotlinLogging.logger {}
