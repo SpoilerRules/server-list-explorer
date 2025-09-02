@@ -117,7 +117,7 @@ requests.
    val offset = (-1).dp
    val negativeIndex = (-list.size)
    ```
-3. If `t` or `stringResource` can’t be used inline because the current scope isn’t composable, create a variable instead
+3. If `t` or `stringResource` can't be used inline because the current scope isn’t composable, create a variable instead
     - Contain the full, descriptive name of the string resource (no vague abbreviations).
     - Be converted to snake_case in the resource name but camelCase in the variable.
     - End with the word 'Text' so nobody mistakes it for anything else.

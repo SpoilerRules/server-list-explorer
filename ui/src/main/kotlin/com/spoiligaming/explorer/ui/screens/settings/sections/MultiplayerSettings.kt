@@ -141,7 +141,7 @@ private fun ActionBarOrientationDropdown(
 
     ItemSelectableDropdownMenu(
         title = "Action bar orientation",
-        description = "Set where the server list’s action bar appears: Right, Top, Left, or Bottom.",
+        description = "Set where the server list's action bar appears: Right, Top, Left, or Bottom.",
         selectedOption = selectedOption,
         options = options,
     ) { selected ->

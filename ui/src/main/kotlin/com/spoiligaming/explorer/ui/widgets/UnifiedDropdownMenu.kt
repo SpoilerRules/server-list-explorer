@@ -362,7 +362,7 @@ internal fun SelectableDropdown(
                 Modifier
                     .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true)
                     .pointerHoverIcon(PointerIcon.Hand),
-            onClick = {}, // handled by ExposedDropdownMenuBox
+            onClick = { /* handled by ExposedDropdownMenuBox */ },
             contentPadding = PaddingValues(all = 12.dp),
         ) {
             Row(

@@ -67,13 +67,28 @@ internal fun ItemTextField(
                     value = textValue,
                     onValueChange = onValueChange,
                     placeholder = { Text(placeholder) },
-                    visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
+                    visualTransformation =
+                        if (isPassword && !passwordVisible) {
+                            PasswordVisualTransformation()
+                        } else {
+                            VisualTransformation.None
+                        },
                     trailingIcon = {
                         if (isPassword) {
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                 Icon(
-                                    imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                    contentDescription = if (passwordVisible) "Toggle off password visibility" else "Toggle on password visibility",
+                                    imageVector =
+                                        if (passwordVisible) {
+                                            Icons.Default.Visibility
+                                        } else {
+                                            Icons.Default.VisibilityOff
+                                        },
+                                    contentDescription =
+                                        if (passwordVisible) {
+                                            "Toggle off password visibility"
+                                        } else {
+                                            "Toggle on password visibility"
+                                        },
                                     tint = Color.Gray,
                                     modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                                 )
@@ -109,13 +124,28 @@ internal fun ItemOutlinedTextField(
                 value = textValue,
                 onValueChange = onValueChange,
                 placeholder = { Text(placeholder) },
-                visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
+                visualTransformation =
+                    if (isPassword && !passwordVisible) {
+                        PasswordVisualTransformation()
+                    } else {
+                        VisualTransformation.None
+                    },
                 trailingIcon = {
                     if (isPassword) {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
-                                imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                contentDescription = if (passwordVisible) "Toggle off password visibility" else "Toggle on password visibility",
+                                imageVector =
+                                    if (passwordVisible) {
+                                        Icons.Default.Visibility
+                                    } else {
+                                        Icons.Default.VisibilityOff
+                                    },
+                                contentDescription =
+                                    if (passwordVisible) {
+                                        "Toggle off password visibility"
+                                    } else {
+                                        "Toggle on password visibility"
+                                    },
                                 tint = Color.Gray,
                                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                             )
