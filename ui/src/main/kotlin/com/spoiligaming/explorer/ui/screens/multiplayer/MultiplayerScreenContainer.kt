@@ -76,7 +76,8 @@ internal fun MultiplayerScreenContainer(navController: NavController) {
                 add(
                     loadingInitRepoText to
                         suspend {
-                            @Suppress("unused", "UnusedVariable") val result =
+                            @Suppress("unused", "UnusedVariable")
+                            val result =
                                 UnifiedModeInitializer.initialize<ServerListRepository>(
                                     IModuleKind.Multiplayer,
                                     mp.serverListFile,

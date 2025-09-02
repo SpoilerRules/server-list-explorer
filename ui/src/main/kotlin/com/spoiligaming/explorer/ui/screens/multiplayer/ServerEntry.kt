@@ -89,6 +89,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -139,30 +140,30 @@ import com.spoiligaming.explorer.ui.extensions.toGroupedString
 import com.spoiligaming.explorer.ui.extensions.toPngBase64
 import com.spoiligaming.explorer.ui.extensions.toPngInputStream
 import com.spoiligaming.explorer.ui.layout.TwinSpillRows
-import com.spoiligaming.explorer.ui.screens.multiplayer.MinecraftFormattingCodeTextFormatter.toMinecraftAnnotatedString
 import com.spoiligaming.explorer.ui.snackbar.SnackbarController
 import com.spoiligaming.explorer.ui.snackbar.SnackbarEvent
 import com.spoiligaming.explorer.ui.theme.isDarkTheme
 import com.spoiligaming.explorer.ui.widgets.ActionItem
 import com.spoiligaming.explorer.ui.widgets.DropdownOption
+import com.spoiligaming.explorer.ui.widgets.HackedSelectionContainer
 import com.spoiligaming.explorer.ui.widgets.HierarchicalDropdownMenu
 import com.spoiligaming.explorer.ui.widgets.SelectableGroupItem
 import com.spoiligaming.explorer.ui.widgets.SlickTextButton
 import com.spoiligaming.explorer.util.ClipboardUtils
-import com.spoiligaming.explorer.util.stripMinecraftColorCodes
 import com.spoiligaming.explorer.util.toHumanReadableDuration
 import com.valentinilk.shimmer.Shimmer
 import com.valentinilk.shimmer.ShimmerBounds
 import com.valentinilk.shimmer.rememberShimmer
 import com.valentinilk.shimmer.shimmer
-import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.imageResource
 import server_list_explorer.ui.generated.resources.Res
 import server_list_explorer.ui.generated.resources.texture_unknown_server
 import kotlin.random.Random
+import kotlin.random.Random.Default.nextInt
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -531,83 +532,114 @@ private fun MotdCard(
     result: OnlineServerDataResourceResult<IServerData>,
     shimmerInstance: Shimmer,
     modifier: Modifier = Modifier,
-) {
-    var obfuscationSeed by remember { mutableStateOf(0) }
-    LaunchedEffect(result) {
-        if (result is OnlineServerDataResourceResult.Success) {
-            while (true) {
-                obfuscationSeed = (MotdObfuscationMinimumSeed..Int.MAX_VALUE).random()
-                delay(MotdObfuscationUpdateInterval)
-            }
-        }
-    }
-
-    Card {
-        Box(
-            modifier =
-                modifier
-                    .fillMaxWidth()
-                    .padding(MotdInnerPadding),
-        ) {
-            AnimatedContent(
-                targetState = result,
-                transitionSpec = {
-                    fadeIn() togetherWith fadeOut()
-                },
-            ) { result ->
-                when (result) {
-                    is OnlineServerDataResourceResult.Loading ->
-                        Column(
+) = Card {
+    Box(modifier = modifier.fillMaxWidth().padding(MotdInnerPadding)) {
+        AnimatedContent(
+            targetState = result,
+            transitionSpec = {
+                fadeIn() togetherWith fadeOut()
+            },
+        ) { result ->
+            when (result) {
+                is OnlineServerDataResourceResult.Loading ->
+                    Column(
+                        modifier =
+                            Modifier
+                                .shimmer(shimmerInstance)
+                                .fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Box(
                             modifier =
                                 Modifier
-                                    .shimmer(shimmerInstance)
-                                    .fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(4.dp),
-                        ) {
-                            Box(
-                                modifier =
-                                    Modifier
-                                        .fillMaxWidth(0.8f)
-                                        .weight(1f)
-                                        .background(
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            shape = MaterialTheme.shapes.small,
-                                        ),
-                            )
-                            Box(
-                                modifier =
-                                    Modifier
-                                        .fillMaxWidth(0.6f)
-                                        .weight(1f)
-                                        .background(
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            shape = MaterialTheme.shapes.small,
-                                        ),
-                            )
+                                    .fillMaxWidth(0.8f)
+                                    .weight(1f)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        shape = MaterialTheme.shapes.small,
+                                    ),
+                        )
+                        Box(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth(0.6f)
+                                    .weight(1f)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        shape = MaterialTheme.shapes.small,
+                                    ),
+                        )
+                    }
+
+                is OnlineServerDataResourceResult.Success -> {
+                    val data = result.data
+                    if (data !is OnlineServerData) {
+                        Text(
+                            text = "Invalid server data.",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.error,
+                            lineHeight = MotdLineHeight,
+                        )
+                        return@AnimatedContent
+                    }
+
+                    val motdRaw = data.motd
+
+                    var isSelecting by remember { mutableStateOf(false) }
+                    var allSelected by remember { mutableStateOf(false) }
+
+                    var obfuscationSeed by remember { mutableStateOf(MotdObfuscationMinimumSeed) }
+                    val selectingState = rememberUpdatedState(isSelecting)
+
+                    LaunchedEffect(motdRaw) {
+                        while (isActive) {
+                            if (!selectingState.value) {
+                                obfuscationSeed =
+                                    nextInt(
+                                        MotdObfuscationMinimumSeed,
+                                        Int.MAX_VALUE,
+                                    )
+                            }
+                            delay(MotdObfuscationUpdateInterval)
+                        }
+                    }
+
+                    val blockCount = LocalBlockParentShortcuts.current
+
+                    val wasSelecting = remember { mutableStateOf(false) }
+
+                    LaunchedEffect(isSelecting) {
+                        if (isSelecting && !wasSelecting.value) {
+                            blockCount.value += 1
+                        }
+                        if (!isSelecting && wasSelecting.value) {
+                            blockCount.value = (blockCount.value - 1).coerceAtLeast(0)
+                        }
+                        wasSelecting.value = isSelecting
+                    }
+
+                    val annotatedMotd =
+                        remember(motdRaw, obfuscationSeed) {
+                            motdRaw.toMinecraftAnnotatedString(obfuscationSeed)
                         }
 
-                    is OnlineServerDataResourceResult.Success ->
-                        ContextMenuDataProvider(
-                            items = {
-                                val motdRaw = (result.data as OnlineServerData).motd
-
-                                listOf(
-                                    ContextMenuItem("Copy trimmed") {
-                                        val plain =
-                                            motdRaw
-                                                .stripMinecraftColorCodes()
-                                                .trim()
-                                        ClipboardUtils.copy(plain)
-                                    },
-                                    ContextMenuItem("Copy trimmed with color codes") {
-                                        ClipboardUtils.copy(motdRaw.trim())
-                                    },
-                                )
-                            },
-                        ) {
-                            SelectionContainer(
-                                modifier =
-                                    Modifier.pointerInput(Unit) {
+                    ContextMenuDataProvider(
+                        items = {
+                            buildList {
+                                if (allSelected && motdRaw.isNotEmpty()) {
+                                    add(
+                                        ContextMenuItem("Copy with color codes") {
+                                            ClipboardUtils.copy(motdRaw)
+                                        },
+                                    )
+                                }
+                            }
+                        },
+                    ) {
+                        HackedSelectionContainer(
+                            modifier =
+                                Modifier
+                                    .pointerInput(Unit) {
                                         awaitPointerEventScope {
                                             while (true) {
                                                 val event = awaitPointerEvent()
@@ -617,65 +649,64 @@ private fun MotdCard(
                                             }
                                         }
                                     },
-                            ) {
-                                Text(
-                                    text =
-                                        (result.data as OnlineServerData).motd.toMinecraftAnnotatedString(
-                                            obfuscationSeed,
-                                        ),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    maxLines = MotdMaxLines,
-                                    lineHeight = MotdLineHeight,
-                                )
-                            }
-                        }
-
-                    is OnlineServerDataResourceResult.Error ->
-                        SelectionContainer(
-                            modifier =
-                                Modifier.pointerInput(Unit) {
-                                    awaitPointerEventScope {
-                                        while (true) {
-                                            val event = awaitPointerEvent()
-                                            if (event.type == PointerEventType.Press) {
-                                                event.changes.forEach { it.consume() }
-                                            }
-                                        }
-                                    }
-                                },
+                            onSelectedChange = { isSelecting = it },
+                            onAllSelectedChange = { allSelected = it },
                         ) {
                             Text(
-                                text = "Server is unreachable.",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.error,
-                            )
-                        }
-
-                    is OnlineServerDataResourceResult.RateLimited ->
-                        SelectionContainer(
-                            modifier =
-                                Modifier.pointerInput(Unit) {
-                                    awaitPointerEventScope {
-                                        while (true) {
-                                            val event = awaitPointerEvent()
-                                            if (event.type == PointerEventType.Press) {
-                                                event.changes.forEach { it.consume() }
-                                            }
-                                        }
-                                    }
-                                },
-                        ) {
-                            Text(
-                                text =
-                                    "You have been rate limited by MCSrvStatus for this server.\n" +
-                                        "Please try again in a few minutes.",
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.error,
+                                text = annotatedMotd,
+                                style = MaterialTheme.typography.bodyMedium,
                                 maxLines = MotdMaxLines,
                                 lineHeight = MotdLineHeight,
                             )
                         }
+                    }
                 }
+
+                is OnlineServerDataResourceResult.Error ->
+                    SelectionContainer(
+                        modifier =
+                            Modifier.pointerInput(Unit) {
+                                awaitPointerEventScope {
+                                    while (true) {
+                                        val event = awaitPointerEvent()
+                                        if (event.type == PointerEventType.Press) {
+                                            event.changes.forEach { it.consume() }
+                                        }
+                                    }
+                                }
+                            },
+                    ) {
+                        Text(
+                            text = "Server is unreachable.",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+
+                is OnlineServerDataResourceResult.RateLimited ->
+                    SelectionContainer(
+                        modifier =
+                            Modifier.pointerInput(Unit) {
+                                awaitPointerEventScope {
+                                    while (true) {
+                                        val event = awaitPointerEvent()
+                                        if (event.type == PointerEventType.Press) {
+                                            event.changes.forEach { it.consume() }
+                                        }
+                                    }
+                                }
+                            },
+                    ) {
+                        Text(
+                            text =
+                                "You have been rate limited by MCSrvStatus for this server.\n" +
+                                    "Please try again in a few minutes.",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.error,
+                            maxLines = MotdMaxLines,
+                            lineHeight = MotdLineHeight,
+                        )
+                    }
             }
         }
     }
@@ -761,6 +792,7 @@ private fun OnlineServerDataRow(
                                                                 .fillMaxWidth()
                                                                 .padding(MotdInnerPadding),
                                                         ) {
+                                                            // TODO: when making this text selectable, make sure to account for random characters like in MOTD handling
                                                             Text(
                                                                 text =
                                                                     it.toMinecraftAnnotatedString(
@@ -1370,8 +1402,6 @@ private fun rememberServerBitmap(iconBytes: ByteArray?) =
                 ?.inputStream()
                 ?.safeAsImageBitmapOrNull()
     }
-
-private val logger = KotlinLogging.logger {}
 
 private val MotdLineHeight = 20.sp
 
