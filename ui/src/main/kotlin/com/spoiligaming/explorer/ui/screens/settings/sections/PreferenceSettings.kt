@@ -108,7 +108,7 @@ internal fun PreferenceSettings() {
                 )
                 ItemSwitch(
                     title = "Highlight after scrolling to new entry",
-                    description = "Highlight a newly added multiplayer server or singleplayer world once it’s scrolled into view.",
+                    description = "Highlight a newly added multiplayer server or singleplayer world once it's scrolled into view.",
                     isChecked = prefs.highlightAfterScroll,
                     onCheckedChange = { newValue ->
                         preferenceSettingsManager.updateSettings {

@@ -115,7 +115,7 @@ private fun ThemeModeDropdown(
 
     ItemSelectableDropdownMenu(
         title = "Theme mode",
-        description = "Choose Light for a bright theme, Dark for a darker look, or System Default to match your device’s current setting.",
+        description = "Choose Light for a bright theme, Dark for a darker look, or System Default to match your device's current setting.",
         selectedOption = selectedOption,
         options = options,
     ) { selectedOption ->

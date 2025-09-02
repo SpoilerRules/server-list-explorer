@@ -128,7 +128,7 @@ private fun TitleBarColorModeDropdown(
 
     ItemSelectableDropdownMenu(
         title = "Title bar color mode",
-        description = "Select how your title bar’s color is determined.",
+        description = "Select how your title bar's color is determined.",
         selectedOption = selectedOption,
         options = options,
     ) { selectedOption ->
