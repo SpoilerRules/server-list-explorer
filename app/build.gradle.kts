@@ -150,6 +150,7 @@ compose.desktop.application {
             rootProject.file("proguard/kotlinlogging.pro"),
             rootProject.file("proguard/kotlinx-serialization.pro"),
             rootProject.file("proguard/log4j.pro"),
+            rootProject.file("proguard/HackedSelectionContainer.kt.pro"),
             rootProject.file("proguard/oshi.pro"),
             rootProject.file("proguard/slf4j.pro"),
         )
