@@ -12,7 +12,7 @@ check out the [User Interface Preview](#user-interface-preview) to see the proje
 
 ## User Interface Preview
 
-<div class="image-grid">
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
   <img src="https://i.imgur.com/sQzIVyL.png" alt="Screenshot 1">
   <img src="https://i.imgur.com/s3yGMjq.png" alt="Screenshot 2">
   <img src="https://i.imgur.com/nXdLGW1.png" alt="Screenshot 3">
@@ -24,20 +24,6 @@ check out the [User Interface Preview](#user-interface-preview) to see the proje
   <img src="https://i.imgur.com/lPcWLLU.png" alt="Screenshot 9">
   <img src="https://i.imgur.com/encWz5c.png" alt="Screenshot 10">
 </div>
-
-<style>
-.image-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
-
-.image-grid img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-</style>
 
 ## Table of Contents
 
