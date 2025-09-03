@@ -31,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -50,7 +51,7 @@ internal inline fun <reified T : Number> ItemValueSlider(
     modifier: Modifier = Modifier,
     value: T,
     valueRange: ClosedFloatingPointRange<Float>,
-    crossinline onValueChange: (T) -> Unit,
+    noinline onValueChange: (T) -> Unit,
 ) {
     val isInt = T::class == Int::class
     val isLong = T::class == Long::class
@@ -65,9 +66,10 @@ internal inline fun <reified T : Number> ItemValueSlider(
 
     var localValue by remember { mutableStateOf(clamped) }
 
-    LaunchedEffect(value) {
-        localValue = value.toFloat().coerceIn(valueRange)
-    }
+    LaunchedEffect(value) { localValue = value.toFloat().coerceIn(valueRange) }
+
+    val currentValue by rememberUpdatedState(value)
+    val currentOnChange by rememberUpdatedState(onValueChange)
 
     LaunchedEffect(Unit) {
         snapshotFlow { localValue }
@@ -81,7 +83,7 @@ internal inline fun <reified T : Number> ItemValueSlider(
                         isLong -> coerced.roundToInt().toLong() as T
                         else -> coerced as T
                     }
-                if (final != value) onValueChange(final)
+                if (final != currentValue) currentOnChange(final)
             }
     }
 
@@ -97,8 +99,7 @@ internal inline fun <reified T : Number> ItemValueSlider(
                 Text(
                     text =
                         when (value) {
-                            is Int -> value.toString()
-                            is Long -> value.toString()
+                            is Int, is Long -> value.toString()
                             is Float -> String.format(FLOAT_FORMAT, value)
                             else -> value.toString()
                         },
@@ -106,17 +107,7 @@ internal inline fun <reified T : Number> ItemValueSlider(
                 )
                 Slider(
                     value = localValue,
-                    onValueChange = {
-                        localValue = it
-                        val coerced = it.coerceIn(valueRange)
-                        val final: T =
-                            when {
-                                isInt -> coerced.roundToInt() as T
-                                isLong -> coerced.roundToInt().toLong() as T
-                                else -> coerced as T
-                            }
-                        if (final != value) onValueChange(final)
-                    },
+                    onValueChange = { localValue = it },
                     valueRange = valueRange,
                     steps = autoSteps,
                     modifier = modifier.fillMaxWidth(SLIDER_WIDTH_RATIO),
