@@ -77,7 +77,7 @@ internal inline fun <reified T : Number> ItemValueSlider(
             .debounce(SLIDER_DEBOUNCE_MS)
             .collectLatest { raw ->
                 val coerced = raw.coerceIn(valueRange)
-                val final: T =
+                val final =
                     when {
                         isInt -> coerced.roundToInt() as T
                         isLong -> coerced.roundToInt().toLong() as T
@@ -98,10 +98,10 @@ internal inline fun <reified T : Number> ItemValueSlider(
             ) {
                 Text(
                     text =
-                        when (value) {
-                            is Int, is Long -> value.toString()
-                            is Float -> String.format(FLOAT_FORMAT, value)
-                            else -> value.toString()
+                        when {
+                            isInt -> localValue.roundToInt().toString()
+                            isLong -> localValue.roundToInt().toLong().toString()
+                            else -> String.format(FLOAT_FORMAT, localValue)
                         },
                     style = MaterialTheme.typography.bodyMedium,
                 )
