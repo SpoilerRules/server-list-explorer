@@ -98,6 +98,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.window.DialogProperties
 import com.spoiligaming.explorer.multiplayer.MultiplayerServer
 import com.spoiligaming.explorer.multiplayer.history.ServerListHistoryService
@@ -131,6 +132,7 @@ import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -638,15 +640,15 @@ internal fun MultiplayerScreen(
         }
 
         Row(modifier = Modifier.weight(1f)) {
-            val percentage = mpSettings.serverEntrySizePercent.coerceIn(1, 100)
+            val percentage = mpSettings.serverEntrySizePercent.coerceIn(1, 100).toFloat()
             val cellMinWidth =
                 remember(percentage) {
-                    val (minDp, maxDp) = 260 to 1100
-                    val step = 4
-                    val totalSteps = (maxDp - minDp) / step
-                    val raw = (percentage - 1) * totalSteps
-                    val stepped = (raw + 99 / 2) / 99
-                    (minDp + stepped * step).dp
+                    val (minWidth, maxWidth) = 260.dp to 1100.dp
+                    val step = 4.dp
+                    val fraction = (percentage - 1f) / 99f
+                    val interpolated = lerp(minWidth, maxWidth, fraction)
+                    val units = (interpolated.value / step.value).roundToInt()
+                    (units * step.value).dp
                 }
 
             if (mpSettings.actionBarOrientation == ActionBarOrientation.Right) {
