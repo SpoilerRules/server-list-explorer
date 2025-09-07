@@ -34,6 +34,8 @@ import androidx.compose.ui.window.rememberWindowState
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalWindowState
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.ProvideAppSettings
+import org.jetbrains.skiko.OS
+import org.jetbrains.skiko.hostOs
 import java.awt.Dimension
 
 internal object WindowManager {
@@ -89,7 +91,9 @@ internal object WindowManager {
                     title = WINDOW_TITLE,
                     state = windowState,
                 ) {
-                    WindowEffects(window).applyEffects()
+                    if (hostOs == OS.Windows) {
+                        WindowEffects(window).applyEffects()
+                    }
 
                     LaunchedEffect(window) {
                         window.minimumSize = MIN_WINDOW_SIZE
