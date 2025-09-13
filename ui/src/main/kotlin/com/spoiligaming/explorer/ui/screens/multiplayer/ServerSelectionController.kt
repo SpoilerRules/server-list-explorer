@@ -25,7 +25,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-internal class ServerSelectionController(private val onSelectionChanged: (() -> Unit)?) {
+internal class ServerSelectionController(
+    private val onSelectionChanged: (() -> Unit)?,
+) {
     private val _selectedIds = MutableStateFlow<Set<Uuid>>(emptySet())
     val selectedIds = _selectedIds.asStateFlow()
 

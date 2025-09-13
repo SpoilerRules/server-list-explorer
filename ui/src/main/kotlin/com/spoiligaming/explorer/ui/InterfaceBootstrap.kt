@@ -160,7 +160,11 @@ private fun MainAppScreen() {
 
         val paddingValue =
             if (
-                navController.currentBackStackEntryAsState().value?.destination?.route
+                navController
+                    .currentBackStackEntryAsState()
+                    .value
+                    ?.destination
+                    ?.route
                 == MultiplayerServerListScreen::class.qualifiedName
             ) {
                 NO_CONTENT_PADDING

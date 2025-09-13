@@ -77,7 +77,8 @@ tasks.shadowJar {
 val rawVersion = project.version.toString()
 val (major, minor, patch, qualifier) =
     Regex("""(\d+)\.(\d+)(?:\.(\d+))?(?:-([\w.\-]+))?""")
-        .matchEntire(rawVersion)?.destructured
+        .matchEntire(rawVersion)
+        ?.destructured
         ?: error("Version \"$rawVersion\" is not valid SemVer")
 
 val build = patch.ifEmpty { "0" }
@@ -103,9 +104,11 @@ compose.desktop.application {
         System.getenv("JAVA_HOME"),
         (findProperty("org.gradle.java.home") as? String),
         runCatching {
-            extensions.getByType(JavaToolchainService::class.java)
+            extensions
+                .getByType(JavaToolchainService::class.java)
                 .launcherFor { languageVersion.set(JavaLanguageVersion.of(17)) }
-                .get().metadata.installationPath.asFile.absolutePath
+                .get()
+                .metadata.installationPath.asFile.absolutePath
         }.getOrNull(),
         System.getProperty("java.home"),
     ).filterNotNull().map { it.trim() }.firstOrNull { it.isNotEmpty() }

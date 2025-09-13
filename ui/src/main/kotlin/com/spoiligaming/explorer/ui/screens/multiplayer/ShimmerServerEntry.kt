@@ -58,7 +58,8 @@ internal fun ShimmerServerEntry(
                     shape = CardDefaults.shape,
                 ),
         colors =
-            CardDefaults.cardColors()
+            CardDefaults
+                .cardColors()
                 .copy(
                     containerColor = if (amoledOn) Color.Black else CardDefaults.cardColors().containerColor,
                 ),

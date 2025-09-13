@@ -22,7 +22,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class ThemeMode(val displayName: String) {
+enum class ThemeMode(
+    val displayName: String,
+) {
     @SerialName("light")
     Light("Light"),
 

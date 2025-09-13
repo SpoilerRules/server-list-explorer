@@ -212,9 +212,10 @@ private fun rememberSettingsScrollbarAdapter(
             itemHeights.values.toList(),
             averageItemHeightPx,
         ) {
-            (0 until sectionCount).sumOf { index ->
-                itemHeights[index]?.toDouble() ?: averageItemHeightPx.toDouble()
-            }.toFloat()
+            (0 until sectionCount)
+                .sumOf { index ->
+                    itemHeights[index]?.toDouble() ?: averageItemHeightPx.toDouble()
+                }.toFloat()
         }
 
     val scrollOffsetPx by remember(
@@ -225,9 +226,10 @@ private fun rememberSettingsScrollbarAdapter(
     ) {
         derivedStateOf {
             val beforeHeight =
-                (0 until listState.firstVisibleItemIndex).sumOf { index ->
-                    itemHeights[index]?.toDouble() ?: averageItemHeightPx.toDouble()
-                }.toFloat()
+                (0 until listState.firstVisibleItemIndex)
+                    .sumOf { index ->
+                        itemHeights[index]?.toDouble() ?: averageItemHeightPx.toDouble()
+                    }.toFloat()
             beforeHeight + listState.firstVisibleItemScrollOffset
         }
     }

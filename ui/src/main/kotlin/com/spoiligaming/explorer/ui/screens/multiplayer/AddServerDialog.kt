@@ -141,7 +141,8 @@ internal fun AddServerDialog(
                                     ),
                                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                                 colors =
-                                    SegmentedButtonDefaults.colors()
+                                    SegmentedButtonDefaults
+                                        .colors()
                                         .copy(inactiveContainerColor = Color.Transparent),
                             ) {
                                 Text(stateOpt.displayName)

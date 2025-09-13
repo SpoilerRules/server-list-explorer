@@ -80,9 +80,11 @@ internal object WindowManager {
 
                 SideEffect {
                     isWindowCompact =
-                        !ws.isWindowMaximized && ws.currentWidth.dp < CompactWidthThresold
+                        !ws.isWindowMaximized &&
+                        ws.currentWidth.dp < CompactWidthThresold
                     isWindowShort =
-                        !ws.isWindowMaximized && ws.currentHeight.dp < ShortHeightThresold
+                        !ws.isWindowMaximized &&
+                        ws.currentHeight.dp < ShortHeightThresold
                 }
 
                 Window(

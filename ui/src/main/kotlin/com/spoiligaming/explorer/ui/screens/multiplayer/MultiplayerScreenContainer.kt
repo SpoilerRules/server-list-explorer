@@ -78,15 +78,16 @@ internal fun MultiplayerScreenContainer(navController: NavController) {
                         suspend {
                             @Suppress("unused", "UnusedVariable")
                             val result =
-                                UnifiedModeInitializer.initialize<ServerListRepository>(
-                                    IModuleKind.Multiplayer,
-                                    mp.serverListFile,
-                                ).onSuccess {
-                                    repo = it
-                                }.onFailure {
-                                    logger.error(it) { "Error initializing server list repository" }
-                                    screenState = MultiplayerScreenState.Error
-                                }
+                                UnifiedModeInitializer
+                                    .initialize<ServerListRepository>(
+                                        IModuleKind.Multiplayer,
+                                        mp.serverListFile,
+                                    ).onSuccess {
+                                        repo = it
+                                    }.onFailure {
+                                        logger.error(it) { "Error initializing server list repository" }
+                                        screenState = MultiplayerScreenState.Error
+                                    }
                         },
                 )
                 if (repo != null) {
@@ -196,7 +197,10 @@ private sealed interface MultiplayerScreenState {
     data object Ready : MultiplayerScreenState
 
     /** The state when the server list is being actively sorted. */
-    data class Sorting(val servers: List<MultiplayerServer>, val sortType: SortType) : MultiplayerScreenState
+    data class Sorting(
+        val servers: List<MultiplayerServer>,
+        val sortType: SortType,
+    ) : MultiplayerScreenState
 }
 
 private const val MONITOR_INTERVAL_MILLIS = 1000L

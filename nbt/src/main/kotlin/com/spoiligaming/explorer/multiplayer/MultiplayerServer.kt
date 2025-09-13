@@ -43,10 +43,8 @@ data class MultiplayerServer(
                     runCatching { Base64.decode(it) }
                         .onFailure { e ->
                             logger.error(e) { "Failed to decode icon for '$name': ${e.message}" }
-                        }
-                        .getOrNull()
-                }
-                ?.takeIf { it.size <= MAX_ICON_SIZE_BYTES }
+                        }.getOrNull()
+                }?.takeIf { it.size <= MAX_ICON_SIZE_BYTES }
                 ?: run {
                     iconBase64?.let {
                         logger.error {
@@ -66,14 +64,18 @@ data class MultiplayerServer(
 }
 
 // TODO: localize
-enum class AcceptTexturesState(val displayName: String) {
+enum class AcceptTexturesState(
+    val displayName: String,
+) {
     Enabled("Enabled"),
     Disabled("Disabled"),
     Prompt("Prompt"),
 }
 
 // TODO: localize
-enum class HiddenState(val displayName: String) {
+enum class HiddenState(
+    val displayName: String,
+) {
     Hidden("Hidden"),
     NotHidden("Not Hidden"),
 }

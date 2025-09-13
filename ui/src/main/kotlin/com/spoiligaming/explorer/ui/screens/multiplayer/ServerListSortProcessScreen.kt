@@ -563,7 +563,9 @@ private fun AssistiveText(
 
 private enum class SortStep { Pinging, Sorting }
 
-internal enum class SortType(val label: StringResource) {
+internal enum class SortType(
+    val label: StringResource,
+) {
     Ping(Res.string.sort_mode_ping),
     MaxPlayerCount(Res.string.sort_mode_player_count),
 }

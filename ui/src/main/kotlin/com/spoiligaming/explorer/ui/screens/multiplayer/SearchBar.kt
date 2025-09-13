@@ -99,34 +99,35 @@ internal fun DockedSearchScreen(
                 expanded = expanded,
                 onExpandedChange = {},
                 modifier =
-                    Modifier.onPreviewKeyEvent { e ->
+                    Modifier
+                        .onPreviewKeyEvent { e ->
                     /*
                      * This logic works around an issue in Compose Multiplatform version 1.8.2
                      * where Escape key events may be reported as Key.Unknown or with incorrect keyCode or event type.
                      * The code below ensures Escape is detected reliably by checking the Key, keyCode, and utf16CodePoint.
                      * This can be revisited if Escape key handling is fixed in future Compose Multiplatform versions.
                      */
-                        val isEscapeByKey = e.key == Key.Escape
-                        val isEscapeByCode = e.key.keyCode == ESCAPE_KEY_CODE
-                        val isEscapeByUtf16 = e.utf16CodePoint == ESCAPE_UTF16_CODE_POINT
+                            val isEscapeByKey = e.key == Key.Escape
+                            val isEscapeByCode = e.key.keyCode == ESCAPE_KEY_CODE
+                            val isEscapeByUtf16 = e.utf16CodePoint == ESCAPE_UTF16_CODE_POINT
 
-                        val detected = isEscapeByKey || isEscapeByCode || isEscapeByUtf16
+                            val detected = isEscapeByKey || isEscapeByCode || isEscapeByUtf16
 
-                        if ((e.type == KeyEventType.KeyDown && detected) ||
-                            (e.type == KeyEventType.Unknown && isEscapeByUtf16)
-                        ) {
-                            when {
-                                isEscapeByKey -> logger.debug { "Escape detected by Key.Escape mapping" }
-                                isEscapeByCode -> logger.debug { "Escape detected by GLFW keyCode == 256L" }
-                                else -> logger.debug { "Escape detected by utf16CodePoint == 27 fallback" }
+                            if ((e.type == KeyEventType.KeyDown && detected) ||
+                                (e.type == KeyEventType.Unknown && isEscapeByUtf16)
+                            ) {
+                                when {
+                                    isEscapeByKey -> logger.debug { "Escape detected by Key.Escape mapping" }
+                                    isEscapeByCode -> logger.debug { "Escape detected by GLFW keyCode == 256L" }
+                                    else -> logger.debug { "Escape detected by utf16CodePoint == 27 fallback" }
+                                }
+
+                                query = ""
+                                focusManager.clearFocus()
+                                true
                             }
-
-                            query = ""
-                            focusManager.clearFocus()
-                            true
-                        }
-                        false
-                    }.onFocusChanged { onFocusChange(it.isFocused) },
+                            false
+                        }.onFocusChanged { onFocusChange(it.isFocused) },
                 placeholder = {
                     Text(
                         t(Res.string.search_bar_placeholder),
@@ -223,7 +224,10 @@ internal fun DockedSearchBarShimmer(shimmer: Shimmer) {
         expanded = false,
         onExpandedChange = {},
         modifier =
-            Modifier.shimmer(shimmer).width(width).height(SearchBarHeight)
+            Modifier
+                .shimmer(shimmer)
+                .width(width)
+                .height(SearchBarHeight)
                 .pointerInput(Unit) {
                     // no need to handle events, just consume them all
                     detectTapGestures(onTap = {})
@@ -231,7 +235,9 @@ internal fun DockedSearchBarShimmer(shimmer: Shimmer) {
     ) {}
 }
 
-internal enum class SearchFilter(val label: StringResource) {
+internal enum class SearchFilter(
+    val label: StringResource,
+) {
     NameAndAddress(Res.string.search_filter_name_and_address),
     NameOnly(Res.string.search_filter_name_only),
     AddressOnly(Res.string.search_filter_address_only),

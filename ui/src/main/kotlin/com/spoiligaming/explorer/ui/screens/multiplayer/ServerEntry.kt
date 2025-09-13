@@ -254,8 +254,7 @@ internal fun ServerEntry(
                             )
                         },
                     shape = CardDefaults.shape,
-                )
-                .onKeyEvent {
+                ).onKeyEvent {
                     if (it.isShiftPressed && selected) {
                         when (it.key) {
                             Key.DirectionUp -> {
@@ -280,7 +279,8 @@ internal fun ServerEntry(
                 val bmp by rememberServerBitmap(data.iconBytes)
                 val textureDefaultServer = imageResource(Res.drawable.texture_unknown_server)
 
-                val iconSyncVersion by ServerEntryController.iconSyncVersionFlow(data.id)
+                val iconSyncVersion by ServerEntryController
+                    .iconSyncVersionFlow(data.id)
                     .collectAsState(initial = 0L)
                 var previousSyncVersion by remember(data.id) { mutableStateOf(0L) }
                 val shouldAnimateIcon =
@@ -829,8 +829,13 @@ private fun OnlineServerDataRow(
                                                                                 awaitPointerEventScope {
                                                                                     while (true) {
                                                                                         val event = awaitPointerEvent()
-                                                                                        if (event.type == PointerEventType.Press) {
-                                                                                            event.changes.forEach { it.consume() }
+                                                                                        if (event.type ==
+                                                                                            PointerEventType.Press
+                                                                                        ) {
+                                                                                            event.changes.forEach {
+                                                                                                it
+                                                                                                    .consume()
+                                                                                            }
                                                                                         }
                                                                                     }
                                                                                 }
@@ -1109,7 +1114,10 @@ private fun ShimmerInfoChip(
     shimmer: Shimmer,
 ) {
     val textHeightDp =
-        with(LocalDensity.current) { MaterialTheme.typography.labelMedium.fontSize.toDp() }
+        with(LocalDensity.current) {
+            MaterialTheme.typography.labelMedium.fontSize
+                .toDp()
+        }
 
     Surface(
         shape = MaterialTheme.shapes.small,

@@ -39,8 +39,7 @@ object ServerListModule : IModeLoader<ServerListRepository> {
             runCatching { ServerListPaths.validate(target) }
                 .onFailure { e ->
                     logger.error(e) { "Validation failed for server list path: $target" }
-                }
-                .map {
+                }.map {
                     ServerListRepository(target!!).also { it.load() }.also { repository = it }
                 }
         }

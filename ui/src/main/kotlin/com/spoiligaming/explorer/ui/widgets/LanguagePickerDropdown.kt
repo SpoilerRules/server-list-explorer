@@ -185,8 +185,7 @@ internal fun LanguagePickerDropdownMenu(
                                 } else {
                                     MaterialTheme.colorScheme.surfaceContainer
                                 },
-                            )
-                            .pointerHoverIcon(PointerIcon.Hand),
+                            ).pointerHoverIcon(PointerIcon.Hand),
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                 )
             }

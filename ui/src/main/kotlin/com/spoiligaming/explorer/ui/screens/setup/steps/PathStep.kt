@@ -271,7 +271,9 @@ private fun FilePathSelector(
                 IconButton(
                     onClick = onBrowse,
                     modifier =
-                        Modifier.size(IconButtonSize).onHover { isHovered = it }
+                        Modifier
+                            .size(IconButtonSize)
+                            .onHover { isHovered = it }
                             .pointerHoverIcon(PointerIcon.Hand),
                     colors =
                         IconButtonDefaults.iconButtonColors(

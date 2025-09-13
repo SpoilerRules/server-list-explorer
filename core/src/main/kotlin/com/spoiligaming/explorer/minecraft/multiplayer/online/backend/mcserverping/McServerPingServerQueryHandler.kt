@@ -63,8 +63,11 @@ internal class McServerPingServerQueryHandler(
                     return@withContext OfflineServerData
                 }
 
-            if (!forceQuery && !skipCache &&
-                cache?.serverIp == resolvedIp && (cache!!.timestamp + cacheDelay) > now
+            if (
+                !forceQuery &&
+                !skipCache &&
+                cache?.serverIp == resolvedIp &&
+                (cache!!.timestamp + cacheDelay) > now
             ) {
                 logger.info { "Cache hit for server IP $resolvedIp - returning cached data." }
                 return@withContext cache!!.serverData
@@ -75,10 +78,12 @@ internal class McServerPingServerQueryHandler(
 
                 val pingResult =
                     MCPing.getPing(
-                        MCPingOptions.builder()
+                        MCPingOptions
+                            .builder()
                             .hostname(serverAddress)
                             .timeout(connectionTimeoutMillis)
-                            .readTimeout(socketTimeoutMillis).build(),
+                            .readTimeout(socketTimeoutMillis)
+                            .build(),
                     )
 
                 val motd = pingResult.description.text

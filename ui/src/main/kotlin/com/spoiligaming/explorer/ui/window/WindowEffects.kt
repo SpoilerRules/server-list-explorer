@@ -37,7 +37,9 @@ import com.spoiligaming.explorer.util.OSUtils
 import kotlinx.coroutines.delay
 import javax.swing.JFrame
 
-internal class WindowEffects(private val window: JFrame) {
+internal class WindowEffects(
+    private val window: JFrame,
+) {
     companion object {
         private const val DEBOUNCE_MILLIS = 25L
     }

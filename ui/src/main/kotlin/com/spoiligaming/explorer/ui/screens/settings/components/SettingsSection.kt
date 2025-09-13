@@ -51,8 +51,7 @@ internal fun SettingsSection(
                 .background(
                     MaterialTheme.colorScheme.surfaceColorAtElevation(BoxElevation),
                     shape = CardDefaults.outlinedShape,
-                )
-                .border(CardDefaults.outlinedCardBorder(), shape = CardDefaults.outlinedShape),
+                ).border(CardDefaults.outlinedCardBorder(), shape = CardDefaults.outlinedShape),
     ) {
         Column(
             modifier =

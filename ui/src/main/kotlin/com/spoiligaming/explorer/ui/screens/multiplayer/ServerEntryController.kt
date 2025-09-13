@@ -86,11 +86,12 @@ internal object ServerEntryController {
         val key = Key(address, useMCSrvStat, connectTimeoutMillis, socketTimeoutMillis)
 
         val flow =
-            cache.getOrPut(key) {
-                MutableStateFlow(
-                    OnlineServerDataResourceResult.Loading,
-                )
-            }.also { it.value = OnlineServerDataResourceResult.Loading }
+            cache
+                .getOrPut(key) {
+                    MutableStateFlow(
+                        OnlineServerDataResourceResult.Loading,
+                    )
+                }.also { it.value = OnlineServerDataResourceResult.Loading }
 
         scope.launch {
             OnlineServerDataFacade(

@@ -146,9 +146,10 @@ internal object MinecraftFormattingCodeTextFormatter {
         seed: Int,
     ) = if (obfuscate) {
         val random = Random(seed)
-        text.map { char ->
-            if (char.isWhitespace()) char else glyphs[random.nextInt(glyphs.size)]
-        }.joinToString("")
+        text
+            .map { char ->
+                if (char.isWhitespace()) char else glyphs[random.nextInt(glyphs.size)]
+            }.joinToString("")
     } else {
         text
     }

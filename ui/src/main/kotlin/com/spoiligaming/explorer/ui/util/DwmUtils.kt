@@ -95,8 +95,7 @@ internal fun rememberSystemAccentColor(
                     emit(DwmUtils.getSystemAccentColorOrNull())
                     delay(pollIntervalMillis)
                 }
-            }
-                .distinctUntilChanged()
+            }.distinctUntilChanged()
                 .collect { newColor -> value = newColor }
         }
 
