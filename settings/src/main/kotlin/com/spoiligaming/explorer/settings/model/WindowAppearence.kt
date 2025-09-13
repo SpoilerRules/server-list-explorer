@@ -41,7 +41,10 @@ import kotlinx.serialization.Serializable
  * </a>
  */
 @Serializable
-enum class WindowCornerPreferenceSetting(val displayName: String, val dwmValue: Int) {
+enum class WindowCornerPreferenceSetting(
+    val displayName: String,
+    val dwmValue: Int,
+) {
     @SerialName("system_default")
     SYSTEM_DEFAULT("System Default", 0), // DWMWCP_DEFAULT
 
@@ -56,7 +59,9 @@ enum class WindowCornerPreferenceSetting(val displayName: String, val dwmValue: 
 }
 
 @Serializable
-enum class TitleBarColorMode(val displayName: String) {
+enum class TitleBarColorMode(
+    val displayName: String,
+) {
     @SerialName("auto")
     AUTO("Automatic"),
 

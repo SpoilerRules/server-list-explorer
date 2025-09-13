@@ -32,10 +32,10 @@ class ServerListHistoryService(
     private val redoStack = ArrayDeque<ServerListChange>()
 
     private val _canUndo = MutableStateFlow(false)
-    val canUndoFlow = _canUndo.asStateFlow()
+    val canUndo = _canUndo.asStateFlow()
 
     private val _canRedo = MutableStateFlow(false)
-    val canRedoFlow = _canRedo.asStateFlow()
+    val canRedo = _canRedo.asStateFlow()
 
     private fun refreshFlags() {
         _canUndo.value = undoStack.isNotEmpty()

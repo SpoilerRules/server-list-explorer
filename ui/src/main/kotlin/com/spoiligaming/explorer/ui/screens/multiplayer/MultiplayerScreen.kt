@@ -519,11 +519,13 @@ internal fun MultiplayerScreen(
                                     if (undoRepeatJob == null) {
                                         undoRepeatJob =
                                             scope.launch {
-                                                historyService.undo()
+                                                historyService
+                                                    .undo()
                                                     ?.let { change -> applyUndo(change, repo) }
                                                 delay(prefs.undoRedoRepeatInitialDelayMillis)
                                                 while (true) {
-                                                    historyService.undo()
+                                                    historyService
+                                                        .undo()
                                                         ?.let { change -> applyUndo(change, repo) }
                                                     delay(prefs.undoRedoRepeatIntervalMillis)
                                                 }
@@ -536,11 +538,13 @@ internal fun MultiplayerScreen(
                                     if (redoRepeatJob == null) {
                                         redoRepeatJob =
                                             scope.launch {
-                                                historyService.redo()
+                                                historyService
+                                                    .redo()
                                                     ?.let { change -> applyRedo(change, repo) }
                                                 delay(prefs.undoRedoRepeatInitialDelayMillis)
                                                 while (true) {
-                                                    historyService.redo()
+                                                    historyService
+                                                        .redo()
                                                         ?.let { change -> applyRedo(change, repo) }
                                                     delay(prefs.undoRedoRepeatIntervalMillis)
                                                 }
@@ -806,8 +810,7 @@ internal fun MultiplayerScreen(
                                                         pendingOrder = entries
                                                     },
                                                     dragGestureDetector = DragGestureDetector.LongPress,
-                                                )
-                                                .clickWithModifiers { ctrl, shift, meta ->
+                                                ).clickWithModifiers { ctrl, shift, meta ->
                                                     gridFocusRequester.requestFocus()
                                                     if (!hasDragged) {
                                                         controller.selection.handlePointerClick(
@@ -904,8 +907,8 @@ private fun ServerListHistoryControlCard(
     repo: ServerListRepository,
     scope: CoroutineScope,
 ) {
-    val canUndo by historyService.canUndoFlow.collectAsState()
-    val canRedo by historyService.canRedoFlow.collectAsState()
+    val canUndo by historyService.canUndo.collectAsState()
+    val canRedo by historyService.canRedo.collectAsState()
 
     ElevatedCard(
         modifier =

@@ -80,12 +80,10 @@ internal fun EditableText(
                 } else {
                     MaterialTheme.colorScheme.surface
                 },
-            )
-            .clickable(enabled = !isEditing) {
+            ).clickable(enabled = !isEditing) {
                 draft = value
                 isEditing = true
-            }
-            .padding(4.dp)
+            }.padding(4.dp)
 
     if (isEditing) {
         BasicTextField(
@@ -115,13 +113,11 @@ internal fun EditableText(
 
                             else -> false
                         }
-                    }
-                    .onFocusChanged { fs ->
+                    }.onFocusChanged { fs ->
                         if (!fs.isFocused && isEditing) {
                             tryConfirm(draft, validate, onConfirm) { isEditing = false }
                         }
-                    }
-                    .padding(4.dp),
+                    }.padding(4.dp),
             textStyle = textStyle,
         )
     } else {

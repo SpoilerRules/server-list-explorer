@@ -63,11 +63,12 @@ internal class FileServerListDataSource(
     }
 
     private fun initEmptyRoot() =
-        CompoundTag().apply {
-            put("servers", ListTag(CompoundTag::class.java))
-        }.also { newRoot ->
-            NBTUtil.write(newRoot, serverDatPath.toFile(), compressed)
-        }
+        CompoundTag()
+            .apply {
+                put("servers", ListTag(CompoundTag::class.java))
+            }.also { newRoot ->
+                NBTUtil.write(newRoot, serverDatPath.toFile(), compressed)
+            }
 
     @Suppress("UNCHECKED_CAST")
     private fun extractServers(root: CompoundTag) =
@@ -83,7 +84,8 @@ internal class FileServerListDataSource(
     ) = withContext(Dispatchers.IO) {
         val root = cachedRoot.get() ?: readRoot().also { cachedRoot.set(it) }
         val serversTag =
-            root.getListTag("servers")
+            root
+                .getListTag("servers")
                 .also { require(it is ListTag<*>) { "No 'servers' list found in NBT" } }
                 as ListTag<CompoundTag>
 

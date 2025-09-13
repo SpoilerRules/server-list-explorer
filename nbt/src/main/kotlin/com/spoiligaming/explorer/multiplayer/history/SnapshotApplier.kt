@@ -117,7 +117,8 @@ private suspend fun ServerListChange.applyTo(
 
                     Direction.REDO -> {
                         val idsToRemove = serversWithIndices.map { it.second.id }.toSet()
-                        repo.all()
+                        repo
+                            .all()
                             .mapIndexed { idx, srv -> idx to srv }
                             .filter { it.second.id in idsToRemove }
                             .map { it.first }

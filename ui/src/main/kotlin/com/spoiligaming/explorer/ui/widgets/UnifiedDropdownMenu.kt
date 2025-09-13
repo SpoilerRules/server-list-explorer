@@ -282,7 +282,8 @@ private fun SelectableGroupContent(
                             closeRoot()
                         },
                         modifier =
-                            Modifier.pointerHoverIcon(PointerIcon.Hand)
+                            Modifier
+                                .pointerHoverIcon(PointerIcon.Hand)
                                 .then(
                                     if (option == item.selected) {
                                         Modifier.background(
@@ -293,7 +294,8 @@ private fun SelectableGroupContent(
                                     },
                                 ),
                         leadingIcon =
-                            option.resolveIcon(isSelected = option == item.selected)
+                            option
+                                .resolveIcon(isSelected = option == item.selected)
                                 ?.let { icon ->
                                     {
                                         Icon(
@@ -416,14 +418,14 @@ internal fun SelectableDropdown(
                         expanded = false
                     },
                     modifier =
-                        Modifier.background(
-                            if (selected == option) {
-                                MaterialTheme.colorScheme.secondaryContainer
-                            } else {
-                                MaterialTheme.colorScheme.surfaceContainer
-                            },
-                        )
-                            .pointerHoverIcon(PointerIcon.Hand),
+                        Modifier
+                            .background(
+                                if (selected == option) {
+                                    MaterialTheme.colorScheme.secondaryContainer
+                                } else {
+                                    MaterialTheme.colorScheme.surfaceContainer
+                                },
+                            ).pointerHoverIcon(PointerIcon.Hand),
                     leadingIcon =
                         option.resolveIcon(isSelected = option == selected)?.let { icon ->
                             {

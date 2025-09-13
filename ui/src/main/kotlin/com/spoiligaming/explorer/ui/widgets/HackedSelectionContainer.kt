@@ -85,7 +85,8 @@ internal fun HackedSelectionContainer(
 
     val selectedTextGetter =
         remember(managerClass) {
-            SelectionReflection.findZeroArgMethodContaining(managerClass, "SelectedText")
+            SelectionReflection
+                .findZeroArgMethodContaining(managerClass, "SelectedText")
                 ?.apply { isAccessible = true }
         }
 
@@ -258,7 +259,8 @@ private object SelectionReflection {
     }
 
     fun findClearSelection(cls: Class<*>) =
-        cls.allMethods()
+        cls
+            .allMethods()
             .firstOrNull { m ->
                 m.parameterCount == ZERO_PARAMETER_COUNT &&
                     arrayOf("clearSelection", "deselect", "onRelease").any { n ->
@@ -267,16 +269,17 @@ private object SelectionReflection {
             }?.apply { isAccessible = true }
 
     fun findSelectAll(cls: Class<*>) =
-        cls.allMethods()
+        cls
+            .allMethods()
             .firstOrNull {
                 it.parameterCount == ZERO_PARAMETER_COUNT &&
                     it.name.contains("selectAll", ignoreCase = true)
-            }
-            ?.apply { isAccessible = true }
+            }?.apply { isAccessible = true }
 
     fun findUpdateSelectionMethod(cls: Class<*>): Method {
         val adjCls = Class.forName("androidx.compose.foundation.text.selection.SelectionAdjustment")
-        return cls.allMethods()
+        return cls
+            .allMethods()
             .first {
                 it.name.startsWith("updateSelection") &&
                     it.parameterTypes.size == UPDATE_SELECTION_PARAM_COUNT &&
@@ -294,12 +297,36 @@ private object SelectionReflection {
 
     fun isCollapsed(sel: Any?): Boolean {
         if (sel == null) return true
-        val start = sel.javaClass.getDeclaredField("start").apply { isAccessible = true }.get(sel)
-        val end = sel.javaClass.getDeclaredField("end").apply { isAccessible = true }.get(sel)
-        val sid = start.javaClass.getDeclaredField("selectableId").apply { isAccessible = true }.getLong(start)
-        val eid = end.javaClass.getDeclaredField("selectableId").apply { isAccessible = true }.getLong(end)
-        val so = start.javaClass.getDeclaredField("offset").apply { isAccessible = true }.getInt(start)
-        val eo = end.javaClass.getDeclaredField("offset").apply { isAccessible = true }.getInt(end)
+        val start =
+            sel.javaClass
+                .getDeclaredField("start")
+                .apply { isAccessible = true }
+                .get(sel)
+        val end =
+            sel.javaClass
+                .getDeclaredField("end")
+                .apply { isAccessible = true }
+                .get(sel)
+        val sid =
+            start.javaClass
+                .getDeclaredField("selectableId")
+                .apply { isAccessible = true }
+                .getLong(start)
+        val eid =
+            end.javaClass
+                .getDeclaredField("selectableId")
+                .apply { isAccessible = true }
+                .getLong(end)
+        val so =
+            start.javaClass
+                .getDeclaredField("offset")
+                .apply { isAccessible = true }
+                .getInt(start)
+        val eo =
+            end.javaClass
+                .getDeclaredField("offset")
+                .apply { isAccessible = true }
+                .getInt(end)
         return sid == eid && so == eo
     }
 
@@ -330,12 +357,14 @@ private object SelectionRuntime {
         managerCls: Class<*>,
     ): Boolean {
         val registrar =
-            managerCls.getDeclaredField("selectionRegistrar")
+            managerCls
+                .getDeclaredField("selectionRegistrar")
                 .apply { isAccessible = true }
                 .get(manager)!!
 
         val coords =
-            managerCls.getDeclaredField("containerLayoutCoordinates")
+            managerCls
+                .getDeclaredField("containerLayoutCoordinates")
                 .apply { isAccessible = true }
                 .get(manager) ?: error("Container layout coordinates are missing.")
 
@@ -363,15 +392,15 @@ private object SelectionRuntime {
                         (
                             it.parameterTypes[0] == java.lang.Long.TYPE ||
                                 it.parameterTypes[0] == java.lang.Long::class.java
-                            )
-                }
-                .apply { isAccessible = true }
+                        )
+                }.apply { isAccessible = true }
 
         for (sel in selectables) {
             if (sel == null) continue
 
             val textObj =
-                sel.javaClass.getDeclaredMethod("getText")
+                sel.javaClass
+                    .getDeclaredMethod("getText")
                     .apply { isAccessible = true }
                     .invoke(sel)
 
@@ -381,24 +410,42 @@ private object SelectionRuntime {
                     null -> 0
                     else ->
                         (
-                            textObj.javaClass.getDeclaredField("text")
+                            textObj.javaClass
+                                .getDeclaredField("text")
                                 .apply { isAccessible = true }
                                 .get(textObj) as String
-                            ).length
+                        ).length
                 }
             if (len == ZERO_LENGTH) continue
 
             val id =
-                sel.javaClass.getDeclaredMethod("getSelectableId")
+                sel.javaClass
+                    .getDeclaredMethod("getSelectableId")
                     .apply { isAccessible = true }
                     .invoke(sel) as Long
 
             val sub = subsGet.invoke(subs, id) ?: return false
 
-            val start = sub.javaClass.getDeclaredField("start").apply { isAccessible = true }.get(sub)
-            val end = sub.javaClass.getDeclaredField("end").apply { isAccessible = true }.get(sub)
-            val so = start.javaClass.getDeclaredField("offset").apply { isAccessible = true }.getInt(start)
-            val eo = end.javaClass.getDeclaredField("offset").apply { isAccessible = true }.getInt(end)
+            val start =
+                sub.javaClass
+                    .getDeclaredField("start")
+                    .apply { isAccessible = true }
+                    .get(sub)
+            val end =
+                sub.javaClass
+                    .getDeclaredField("end")
+                    .apply { isAccessible = true }
+                    .get(sub)
+            val so =
+                start.javaClass
+                    .getDeclaredField("offset")
+                    .apply { isAccessible = true }
+                    .getInt(start)
+            val eo =
+                end.javaClass
+                    .getDeclaredField("offset")
+                    .apply { isAccessible = true }
+                    .getInt(end)
 
             if (abs(so - eo) != len) return false
         }
@@ -457,9 +504,10 @@ private object ComposeLookup {
             }
             runCatching {
                 logger.debug { "LocalSelectionRegistrar resolved via $h.getter." }
-                return c.getDeclaredMethod(
-                    "getLocalSelectionRegistrar",
-                ).invoke(null) as ProvidableCompositionLocal<Any?>
+                return c
+                    .getDeclaredMethod(
+                        "getLocalSelectionRegistrar",
+                    ).invoke(null) as ProvidableCompositionLocal<Any?>
             }
         }
         error(

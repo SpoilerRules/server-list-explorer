@@ -21,10 +21,15 @@ package com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common
 sealed class OnlineServerDataResourceResult<out T> {
     object Loading : OnlineServerDataResourceResult<Nothing>()
 
-    data class Success<T>(val data: T) : OnlineServerDataResourceResult<T>()
+    data class Success<T>(
+        val data: T,
+    ) : OnlineServerDataResourceResult<T>()
 
-    data class Error(val throwable: Throwable) : OnlineServerDataResourceResult<Nothing>()
+    data class Error(
+        val throwable: Throwable,
+    ) : OnlineServerDataResourceResult<Nothing>()
 
-    data class RateLimited(val data: McSrvStatRateLimitedServerData) :
-        OnlineServerDataResourceResult<Nothing>()
+    data class RateLimited(
+        val data: McSrvStatRateLimitedServerData,
+    ) : OnlineServerDataResourceResult<Nothing>()
 }

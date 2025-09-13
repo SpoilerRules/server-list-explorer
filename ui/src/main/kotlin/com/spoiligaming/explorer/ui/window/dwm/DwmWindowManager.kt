@@ -53,7 +53,9 @@ internal object DwmWindowAttribute {
     const val SYSTEM_BACKDROP_TYPE = 38 // DWMWA_SYSTEMBACKDROP_TYPE
 }
 
-internal enum class BackdropType(val value: Int) {
+internal enum class BackdropType(
+    val value: Int,
+) {
     AUTO(0),
     NONE(1),
     MICA(2),
@@ -61,14 +63,18 @@ internal enum class BackdropType(val value: Int) {
     MicaAlt(4),
 }
 
-internal enum class CornerPreference(val value: Int) {
+internal enum class CornerPreference(
+    val value: Int,
+) {
     Default(0),
     DoNotRound(1),
     Round(2),
     RoundSmall(3),
 }
 
-internal class DwmWindowStyler private constructor(private val hWnd: HWND) {
+internal class DwmWindowStyler private constructor(
+    private val hWnd: HWND,
+) {
     companion object {
         fun fromFrame(frame: JFrame): DwmWindowStyler {
             val awtWindow = frame.rootPane.topLevelAncestor as Window

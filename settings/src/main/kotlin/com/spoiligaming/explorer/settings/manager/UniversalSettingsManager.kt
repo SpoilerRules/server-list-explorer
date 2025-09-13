@@ -43,8 +43,8 @@ class UniversalSettingsManager<T : Any>(
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.Default + job)
 
-    private val _stateFlow: MutableStateFlow<T>
-    val settingsFlow get() = _stateFlow
+    private val _settingsFlow: MutableStateFlow<T>
+    val settingsFlow get() = _settingsFlow
 
     @Volatile
     private var cachedSettings: T
@@ -62,15 +62,14 @@ class UniversalSettingsManager<T : Any>(
                                 .onFailure { e ->
                                     logger.error(e) { "Could not write defaults to $fileName." }
                                 }
-                        }
-                        .getOrElse {
+                        }.getOrElse {
                             defaultValueProvider()
                         }
                 }
             }
 
         cachedSettings = initial
-        _stateFlow = MutableStateFlow(initial)
+        _settingsFlow = MutableStateFlow(initial)
 
         logger.debug { "Ready with settings from $fileName: $initial" }
     }
@@ -84,14 +83,13 @@ class UniversalSettingsManager<T : Any>(
                         logger.error(e) { "Could not load $fileName. Using defaults." }
                         defaultValueProvider().also {
                             runCatching { file.write(it) }
-                                .onFailure {
-                                        e ->
+                                .onFailure { e ->
                                     logger.error(e) { "Could not write defaults to $fileName." }
                                 }
                         }
                     }
             cachedSettings = loaded
-            _stateFlow.value = loaded
+            _settingsFlow.value = loaded
             logger.debug { "Loaded settings from $fileName: $loaded" }
             loaded
         }
@@ -106,11 +104,10 @@ class UniversalSettingsManager<T : Any>(
                 runCatching { file.write(settings) }
                     .onSuccess {
                         cachedSettings = settings
-                        _stateFlow.value = settings
+                        _settingsFlow.value = settings
                         logger.debug { "Saved to $fileName: $settings" }
                         onComplete?.invoke()
-                    }
-                    .onFailure { e ->
+                    }.onFailure { e ->
                         logger.error(e) { "Could not save to $fileName." }
                     }
             }
@@ -120,17 +117,16 @@ class UniversalSettingsManager<T : Any>(
     fun updateSettings(updater: (T) -> T) =
         scope.launch {
             mutex.withLock {
-                val oldSettings = _stateFlow.value
+                val oldSettings = _settingsFlow.value
                 val updated = updater(oldSettings)
                 logger.debug { "Updating $fileName from $oldSettings to $updated" }
 
                 runCatching { file.write(updated) }
                     .onSuccess {
                         cachedSettings = updated
-                        _stateFlow.value = updated
+                        _settingsFlow.value = updated
                         logger.debug { "Updated $fileName to $updated" }
-                    }
-                    .onFailure { e ->
+                    }.onFailure { e ->
                         logger.error(e) { "Could not update $fileName." }
                     }
             }

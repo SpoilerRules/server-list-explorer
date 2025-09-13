@@ -64,7 +64,9 @@ import server_list_explorer.ui.generated.resources.button_next
 import server_list_explorer.ui.generated.resources.setup_wizard_step_counter
 import java.nio.file.Path
 
-internal enum class SetupStep(val order: Int) {
+internal enum class SetupStep(
+    val order: Int,
+) {
     LANGUAGE_SELECTION(0),
     PATH_CONFIGURATION(1),
     ;

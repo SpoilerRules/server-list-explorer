@@ -39,7 +39,9 @@ import java.util.Base64
 import javax.imageio.ImageIO
 import kotlin.uuid.ExperimentalUuidApi
 
-class ServerListRepository(internal val serverDatPath: Path) {
+class ServerListRepository(
+    internal val serverDatPath: Path,
+) {
     private val ds = FileServerListDataSource(serverDatPath, false)
 
     private val mutex = Mutex()

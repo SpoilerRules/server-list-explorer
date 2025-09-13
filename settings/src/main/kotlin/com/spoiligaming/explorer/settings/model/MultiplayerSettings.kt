@@ -24,7 +24,9 @@ import kotlinx.serialization.Serializable
 import java.nio.file.Path
 
 @Serializable
-enum class ActionBarOrientation(val displayName: String) {
+enum class ActionBarOrientation(
+    val displayName: String,
+) {
     @SerialName("right")
     Right("Right"),
 
@@ -39,7 +41,9 @@ enum class ActionBarOrientation(val displayName: String) {
 }
 
 @Serializable
-enum class ServerQueryMethod(val displayName: String) {
+enum class ServerQueryMethod(
+    val displayName: String,
+) {
     @SerialName("mcsrvstat")
     McSrvStat("MCSrvStatus"),
 

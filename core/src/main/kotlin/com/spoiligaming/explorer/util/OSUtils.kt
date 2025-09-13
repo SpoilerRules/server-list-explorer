@@ -34,9 +34,15 @@ object OSUtils {
             val minorVersion: Int,
         ) : OSType()
 
-        data class MacOS(val version: MacOSVersion) : OSType()
+        data class MacOS(
+            val version: MacOSVersion,
+        ) : OSType()
 
-        data class Linux(val distro: String, val version: String, val codename: String) : OSType()
+        data class Linux(
+            val distro: String,
+            val version: String,
+            val codename: String,
+        ) : OSType()
 
         object Other : OSType()
     }
@@ -82,10 +88,11 @@ object OSUtils {
                 OSType.MacOS(MacOSVersion(maj, min, pat))
             }
 
-            "linux" in family || (
-                os.family.isNotEmpty() &&
-                    !("windows" in family || "mac" in family)
-            ) -> {
+            "linux" in family ||
+                (
+                    os.family.isNotEmpty() &&
+                        !("windows" in family || "mac" in family)
+                ) -> {
                 val distroName = os.family
                 val distroVersion = versionInfo.version
                 val codename = versionInfo.codeName.ifBlank { "unknown" }

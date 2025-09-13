@@ -78,11 +78,9 @@ object ClipboardUtils {
                 runCatching {
                     buffered.mark(Int.MAX_VALUE)
                     ImageIO.read(buffered).also { buffered.reset() }
-                }
-                    .onFailure { e ->
-                        logger.error(e) { "Failed to decode image from InputStream." }
-                    }
-                    .getOrNull()
+                }.onFailure { e ->
+                    logger.error(e) { "Failed to decode image from InputStream." }
+                }.getOrNull()
 
             if (image == null) {
                 logger.warn { "ImageIO.read() could not decode an image from the provided InputStream." }
@@ -99,7 +97,9 @@ object ClipboardUtils {
             }
         }
 
-    private class BufferedImageTransferable(private val image: BufferedImage) : Transferable {
+    private class BufferedImageTransferable(
+        private val image: BufferedImage,
+    ) : Transferable {
         override fun getTransferData(flavor: DataFlavor) =
             if (flavor.equals(DataFlavor.imageFlavor)) {
                 image

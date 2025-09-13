@@ -97,8 +97,7 @@ class OnlineServerDataFacade(
                             )
                         }
                     }
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
                     logger.error(e) { "Failed to fetch server data for $serverAddress" }
                     emit(OnlineServerDataResourceResult.Error(e))
                 }

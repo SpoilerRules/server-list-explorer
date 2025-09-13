@@ -114,7 +114,9 @@ internal class DialogSpec {
 }
 
 @JvmInline
-internal value class DialogButton(private val data: DialogButtonData) {
+internal value class DialogButton(
+    private val data: DialogButtonData,
+) {
     val text: String get() = data.text
     val onClick: () -> Unit get() = data.onClick
     val isProminent: Boolean get() = data.isProminent
@@ -132,7 +134,9 @@ internal val String.prominent: ProminentLabel
     get() = ProminentLabel(this)
 
 @JvmInline
-internal value class ProminentLabel(val text: String)
+internal value class ProminentLabel(
+    val text: String,
+)
 
 internal infix fun ProminentLabel.onClick(action: () -> Unit) =
     DialogButton(DialogButtonData(text, action, isProminent = true))

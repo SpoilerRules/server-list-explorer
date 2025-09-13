@@ -75,14 +75,12 @@ internal fun ItemColorPicker(
                 .background(
                     color = currentColor,
                     shape = CardDefaults.shape,
-                )
-                .clickable(
+                ).clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
                 ) {
                     showColorDialog = true
-                }
-                .pointerHoverIcon(PointerIcon.Hand),
+                }.pointerHoverIcon(PointerIcon.Hand),
     )
 
     if (showColorDialog) {
