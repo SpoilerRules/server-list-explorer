@@ -36,7 +36,7 @@ dependencies {
     implementation(libs.ktor.client.cio.jvm)
     testImplementation(libs.ktor.client.core.jvm)
     testImplementation(libs.ktor.client.cio.jvm)
-    testImplementation("io.ktor:ktor-client-mock:3.2.3")
+    testImplementation("io.ktor:ktor-client-mock:3.3.0")
 
     implementation(libs.oshi.core)
 }
