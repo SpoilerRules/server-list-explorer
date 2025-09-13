@@ -19,7 +19,6 @@
 @file:OptIn(
     ExperimentalUuidApi::class,
     ExperimentalMaterial3Api::class,
-    ExperimentalFoundationApi::class,
 )
 
 package com.spoiligaming.explorer.ui.screens.multiplayer
@@ -35,13 +34,10 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuDataProvider
 import androidx.compose.foundation.ContextMenuItem
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,7 +47,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -77,7 +72,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Surface
@@ -113,9 +107,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
@@ -150,8 +142,8 @@ import com.spoiligaming.explorer.ui.widgets.ActionItem
 import com.spoiligaming.explorer.ui.widgets.DropdownOption
 import com.spoiligaming.explorer.ui.widgets.HackedSelectionContainer
 import com.spoiligaming.explorer.ui.widgets.HierarchicalDropdownMenu
+import com.spoiligaming.explorer.ui.widgets.InlineEditableLabel
 import com.spoiligaming.explorer.ui.widgets.SelectableGroupItem
-import com.spoiligaming.explorer.ui.widgets.SlickTextButton
 import com.spoiligaming.explorer.util.ClipboardUtils
 import com.spoiligaming.explorer.util.toHumanReadableDuration
 import com.valentinilk.shimmer.Shimmer
@@ -1225,189 +1217,20 @@ private fun ServerNameAddress(
                     .fillMaxSize()
                     .padding(MotdInnerPadding),
         ) {
-            EditableText(
+            InlineEditableLabel(
                 text = serverName,
                 textStyle = MaterialTheme.typography.titleMedium,
-                x = "Edit server name",
-                onSave = { onNameSave(it) },
+                onSave = onNameSave,
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            EditableText(
+            InlineEditableLabel(
                 text = serverAddress,
                 textStyle = MaterialTheme.typography.bodyMedium,
-                x = "Edit server address",
-                onSave = { onAddressSave(it) },
+                onSave = onAddressSave,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
-    }
-}
-
-@Composable
-private fun EditableText(
-    text: AnnotatedString,
-    textStyle: TextStyle,
-    x: String,
-    onSave: (String) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    var showEditor by remember { mutableStateOf(false) }
-    var editedText by remember { mutableStateOf(text.text) }
-
-    LaunchedEffect(showEditor) {
-        if (!showEditor) {
-            editedText = text.text
-        }
-    }
-
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(modifier = Modifier.weight(1f)) {
-            OverflowAwareTooltipText(text = text, textStyle = textStyle)
-        }
-        SlickTextButton(
-            onClick = { showEditor = true },
-            modifier = Modifier.height(32.dp),
-        ) {
-            Text(
-                text = "Edit",
-                style = MaterialTheme.typography.labelMedium,
-                maxLines = 1,
-            )
-            FloatingDialogBuilder(
-                visible = showEditor,
-                onDismissRequest = { showEditor = false },
-            ) {
-                RichTooltip(
-                    title = { Text(x) },
-                    text = {
-                        OutlinedTextField(
-                            value = editedText,
-                            onValueChange = { editedText = it },
-                            singleLine = true,
-                            label = { Text("New value") },
-                            placeholder = { Text("Type here...") },
-                            modifier =
-                                Modifier.fillMaxWidth().padding(top = 4.dp).onKeyEvent { e ->
-                                    if (e.key == Key.Enter || e.key == Key.NumPadEnter) {
-                                        onSave(editedText)
-                                        showEditor = false
-                                        true
-                                    } else {
-                                        false
-                                    }
-                                },
-                        )
-                    },
-                    action = {
-                        TextButton(
-                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                            onClick = {
-                                onSave(editedText)
-                                showEditor = false
-                            },
-                        ) {
-                            Text("Save")
-                        }
-                    },
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun OverflowAwareTooltipText(
-    text: AnnotatedString,
-    textStyle: TextStyle,
-) {
-    var isOverflowing by remember { mutableStateOf(false) }
-    var canShowTooltip by remember { mutableStateOf(false) }
-    var isPressed by remember { mutableStateOf(false) }
-
-    LaunchedEffect(isOverflowing) {
-        canShowTooltip = false
-        if (isOverflowing) {
-            delay(2000)
-            if (isOverflowing && !isPressed) {
-                canShowTooltip = true
-            }
-        }
-    }
-
-    val datext: @Composable () -> Unit = {
-        SelectionContainer {
-            Text(
-                text = text,
-                style = textStyle,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                onTextLayout = { layout ->
-                    isOverflowing = layout.hasVisualOverflow
-                },
-                modifier =
-                    Modifier
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onPress = {
-                                    isPressed = true
-                                    tryAwaitRelease()
-                                    isPressed = false
-                                },
-                            )
-                        },
-            )
-        }
-    }
-
-    if (isOverflowing && canShowTooltip) {
-        TooltipArea(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onPress = {
-                                isPressed = true
-                                tryAwaitRelease()
-                                isPressed = false
-                                if (isOverflowing) {
-                                    canShowTooltip = false
-                                    delay(2_000)
-                                    if (isOverflowing && !isPressed) canShowTooltip = true
-                                }
-                            },
-                        )
-                    },
-            tooltip = {
-                Surface(
-                    modifier = Modifier.heightIn(min = 24.dp),
-                    shape = MaterialTheme.shapes.extraSmall,
-                    color = MaterialTheme.colorScheme.inverseSurface,
-                ) {
-                    Box(
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = text,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.inverseOnSurface,
-                            textAlign = TextAlign.Center,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                }
-            },
-        ) {
-            datext()
-        }
-    } else {
-        datext()
     }
 }
 

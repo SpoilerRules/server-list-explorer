@@ -122,4 +122,9 @@
     <string name="sort_skip_message">You can skip this step — we'll sort using what we've already learned.</string>
     <string name="sort_status_in_progress">In progress</string>
     <string name="sort_status_next">Next</string>
+
+    <string name="inline_edit_button_edit">Edit</string>
+    <string name="inline_edit_dialog_title">Edit value</string>
+    <string name="inline_edit_label_new_value">New value</string>
+    <string name="inline_edit_textfield_placeholder">Type here…</string>
 </resources>
