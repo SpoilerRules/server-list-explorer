@@ -61,13 +61,11 @@ tasks.jar {
 
 tasks.shadowJar {
     archiveFileName.set("ServerListExplorer-all.jar")
-    duplicatesStrategy = DuplicatesStrategy.FAIL
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
         attributes["Main-Class"] = mainFunction
         attributes["Multi-Release"] = "true"
     }
-    mergeServiceFiles()
-    configurations = listOf(project.configurations.runtimeClasspath.get())
 
     doLast {
         println("Shadow JAR generated at: ${archiveFile.get().asFile.absolutePath}")
