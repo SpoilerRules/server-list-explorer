@@ -8,7 +8,10 @@ build/
 !**/src/test/**/build/
 
 ### IntelliJ IDEA ###
-.idea/
+.idea/*
+!.idea/
+!.idea/copyright/
+!.idea/copyright/*.xml
 *.iws
 *.iml
 *.ipr
