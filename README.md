@@ -12,12 +12,28 @@ check out the [User Interface Preview](#user-interface-preview) to see the proje
 
 ## User Interface Preview
 
-| [![Screenshot 1](https://i.imgur.com/sQzIVyL.png)](https://i.imgur.com/sQzIVyL.png) | [![Screenshot 2](https://i.imgur.com/s3yGMjq.png)](https://i.imgur.com/s3yGMjq.png)  |
-|-------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
-| [![Screenshot 3](https://i.imgur.com/nXdLGW1.png)](https://i.imgur.com/nXdLGW1.png) | [![Screenshot 4](https://i.imgur.com/eMH8Hq6.png)](https://i.imgur.com/eMH8Hq6.png)  |
-| [![Screenshot 5](https://i.imgur.com/SGZOFtL.png)](https://i.imgur.com/SGZOFtL.png) | [![Screenshot 6](https://i.imgur.com/AGBC5Js.png)](https://i.imgur.com/AGBC5Js.png)  |
-| [![Screenshot 7](https://i.imgur.com/zHec8SU.png)](https://i.imgur.com/zHec8SU.png) | [![Screenshot 8](https://i.imgur.com/bsewslp.png)](https://i.imgur.com/bsewslp.png)  |
-| [![Screenshot 9](https://i.imgur.com/lPcWLLU.png)](https://i.imgur.com/lPcWLLU.png) | [![Screenshot 10](https://i.imgur.com/encWz5c.png)](https://i.imgur.com/encWz5c.png) |
+<table>
+  <tr>
+    <td><a href="https://i.imgur.com/sQzIVyL.png" target="_blank"><img src="https://i.imgur.com/sQzIVyL.png" alt="Screenshot 1"></a></td>
+    <td><a href="https://i.imgur.com/s3yGMjq.png" target="_blank"><img src="https://i.imgur.com/s3yGMjq.png" alt="Screenshot 2"></a></td>
+  </tr>
+  <tr>
+    <td><a href="https://i.imgur.com/nXdLGW1.png" target="_blank"><img src="https://i.imgur.com/nXdLGW1.png" alt="Screenshot 3"></a></td>
+    <td><a href="https://i.imgur.com/eMH8Hq6.png" target="_blank"><img src="https://i.imgur.com/eMH8Hq6.png" alt="Screenshot 4"></a></td>
+  </tr>
+  <tr>
+    <td><a href="https://i.imgur.com/SGZOFtL.png" target="_blank"><img src="https://i.imgur.com/SGZOFtL.png" alt="Screenshot 5"></a></td>
+    <td><a href="https://i.imgur.com/AGBC5Js.png" target="_blank"><img src="https://i.imgur.com/AGBC5Js.png" alt="Screenshot 6"></a></td>
+  </tr>
+  <tr>
+    <td><a href="https://i.imgur.com/zHec8SU.png" target="_blank"><img src="https://i.imgur.com/zHec8SU.png" alt="Screenshot 7"></a></td>
+    <td><a href="https://i.imgur.com/bsewslp.png" target="_blank"><img src="https://i.imgur.com/bsewslp.png" alt="Screenshot 8"></a></td>
+  </tr>
+  <tr>
+    <td><a href="https://i.imgur.com/lPcWLLU.png" target="_blank"><img src="https://i.imgur.com/lPcWLLU.png" alt="Screenshot 9"></a></td>
+    <td><a href="https://i.imgur.com/encWz5c.png" target="_blank"><img src="https://i.imgur.com/encWz5c.png" alt="Screenshot 10"></a></td>
+  </tr>
+</table>
 
 ## Table of Contents
 
