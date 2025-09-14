@@ -80,7 +80,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
@@ -781,8 +780,6 @@ internal fun MultiplayerScreen(
                                         modifier =
                                             Modifier
                                                 .animateItem()
-                                                .graphicsLayer { rotationZ = shakeRotation }
-                                                .clip(CardDefaults.elevatedShape)
                                                 .draggableHandle(
                                                     onDragStarted = {
                                                         isShaking = true
@@ -830,7 +827,12 @@ internal fun MultiplayerScreen(
                                             historyService = historyService,
                                             searchQuery = searchQuery,
                                             scope = scope,
-                                            modifier = Modifier.fillMaxWidth(),
+                                            modifier =
+                                                Modifier
+                                                    .fillMaxWidth()
+                                                    .graphicsLayer {
+                                                        rotationZ = shakeRotation
+                                                    },
                                             highlight = (serverEntry.id == flashId.value),
                                             onHighlightFinished = {
                                                 if (flashId.value == serverEntry.id) {
