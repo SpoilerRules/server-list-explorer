@@ -12,12 +12,12 @@ check out the [User Interface Preview](#user-interface-preview) to see the proje
 
 ## User Interface Preview
 
-| ![Screenshot 1](https://i.imgur.com/sQzIVyL.png) | ![Screenshot 2](https://i.imgur.com/s3yGMjq.png)  |
-|--------------------------------------------------|---------------------------------------------------|
-| ![Screenshot 3](https://i.imgur.com/nXdLGW1.png) | ![Screenshot 4](https://i.imgur.com/eMH8Hq6.png)  |
-| ![Screenshot 5](https://i.imgur.com/SGZOFtL.png) | ![Screenshot 6](https://i.imgur.com/AGBC5Js.png)  |
-| ![Screenshot 7](https://i.imgur.com/zHec8SU.png) | ![Screenshot 8](https://i.imgur.com/bsewslp.png)  |
-| ![Screenshot 9](https://i.imgur.com/lPcWLLU.png) | ![Screenshot 10](https://i.imgur.com/encWz5c.png) |
+| [![Screenshot 1](https://i.imgur.com/sQzIVyL.png)](https://i.imgur.com/sQzIVyL.png) | [![Screenshot 2](https://i.imgur.com/s3yGMjq.png)](https://i.imgur.com/s3yGMjq.png)  |
+|-------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| [![Screenshot 3](https://i.imgur.com/nXdLGW1.png)](https://i.imgur.com/nXdLGW1.png) | [![Screenshot 4](https://i.imgur.com/eMH8Hq6.png)](https://i.imgur.com/eMH8Hq6.png)  |
+| [![Screenshot 5](https://i.imgur.com/SGZOFtL.png)](https://i.imgur.com/SGZOFtL.png) | [![Screenshot 6](https://i.imgur.com/AGBC5Js.png)](https://i.imgur.com/AGBC5Js.png)  |
+| [![Screenshot 7](https://i.imgur.com/zHec8SU.png)](https://i.imgur.com/zHec8SU.png) | [![Screenshot 8](https://i.imgur.com/bsewslp.png)](https://i.imgur.com/bsewslp.png)  |
+| [![Screenshot 9](https://i.imgur.com/lPcWLLU.png)](https://i.imgur.com/lPcWLLU.png) | [![Screenshot 10](https://i.imgur.com/encWz5c.png)](https://i.imgur.com/encWz5c.png) |
 
 ## Table of Contents
 
