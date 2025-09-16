@@ -27,7 +27,7 @@ check out the [User Interface Preview](#user-interface-preview) to see the proje
 
 ## How to Run the Project
 
-This project is built using Gradle and requires **Java 17 or higher** to run. Follow the steps below to build and execute the application:
+This project is built using Gradle and requires **Java 21 or higher** to run. Follow the steps below to build and execute the application:
 
 ### 1. Build the Project
 
@@ -53,7 +53,7 @@ Once the build completes, the generated JAR files can be found in the `app/build
 
 ### 3. Run the Application
 
-Run the shadow JAR using Java 17 or higher:
+Run the shadow JAR using Java 21 or higher:
 
 ```
 java -jar app/build/libs/ServerListExplorer-all.jar
