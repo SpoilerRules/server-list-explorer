@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-   <a href="https://kotlinlang.org">
+  <a href="https://kotlinlang.org">
     <img alt="Kotlin/JVM" src="https://img.shields.io/badge/Kotlin-JVM-007396?style=flat-square&colorA=7F52FF&colorB=007396&logo=kotlin&logoColor=white"/>
   </a>
   <a href="https://jb.gg/cmp">
