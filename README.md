@@ -1,4 +1,4 @@
-# Server List Explorer
+# <p align="center">Server List Explorer</p>
 
 <p align="center">
   <a href="https://github.com/SpoilerRules/server-list-explorer/releases/latest">
@@ -22,11 +22,9 @@
    <a href="https://kotlinlang.org">
     <img alt="Kotlin/JVM" src="https://img.shields.io/badge/Kotlin-JVM-007396?style=flat-square&colorA=7F52FF&colorB=007396&logo=kotlin&logoColor=white"/>
   </a>
-
   <a href="https://jb.gg/cmp">
     <img alt="Compose Desktop" src="https://img.shields.io/badge/Desktop-4CAF50.svg?style=flat&logo=jetpackcompose&logoColor=FFFFFF&labelColor=4CAF50&label=Compose&colorA=4CAF50&colorB=6A1B9A"/>
   </a>
-
   <a href="https://discord.gg/fVA5Wr6Nns">
     <img alt="Discord" src="https://dcbadge.limes.pink/api/server/https://discord.gg/fVA5Wr6Nns?style=flat-square"/>
   </a>
@@ -38,11 +36,13 @@
   </a>
 </p>
 
-**Server List Explorer** is the ultimate tool for effortlessly managing
-your [Minecraft: Java Edition](https://www.minecraft.net/) server list and, soon, your single-player world list. It has
-a sleek, utilitarian design that follows [Material 3 Design](https://m3.material.io/) principles. Discover all the
-features on our [Feature List on the wiki](https://github.com/SpoilerRules/server-list-explorer/wiki/Feature-List), and
-check out the [User Interface Preview](#user-interface-preview) to see the project up close.
+<p align="center">
+  <b>Server List Explorer</b> is the ultimate tool for effortlessly managing
+  your <a href="https://www.minecraft.net/">Minecraft: Java Edition</a> server list and, soon, your single-player world list.
+  It has a sleek, utilitarian design that follows <a href="https://m3.material.io/">Material 3 Design</a> principles.
+  Discover all the features on our <a href="https://github.com/SpoilerRules/server-list-explorer/wiki/Feature-List">Feature List on the wiki</a>,
+  and check out the <a href="#user-interface-preview">User Interface Preview</a> to see the project up close.
+</p>
 
 ## User Interface Preview
 
