@@ -1,8 +1,42 @@
 # Server List Explorer
 
-[![Compose Desktop](https://img.shields.io/badge/Desktop-4CAF50.svg?style=flat&logo=jetpackcompose&logoColor=FFFFFF&labelColor=4CAF50&label=Compose&colorA=4CAF50&colorB=6A1B9A)](https://jb.gg/cmp)
+<p align="center">
+  <a href="https://github.com/SpoilerRules/server-list-explorer/releases/latest">
+    <img alt="Release" src="https://img.shields.io/github/v/release/SpoilerRules/server-list-explorer?label=release&style=flat-square"/>
+  </a>
+  <a href="https://github.com/SpoilerRules/server-list-explorer/releases">
+    <img alt="Downloads" src="https://img.shields.io/github/downloads/SpoilerRules/server-list-explorer/total?style=flat-square"/>
+  </a>
+  <a href="https://github.com/SpoilerRules/server-list-explorer/stargazers">
+    <img alt="Stars" src="https://img.shields.io/github/stars/SpoilerRules/server-list-explorer?style=flat-square&logo=github"/>
+  </a>
+  <a href="https://www.codefactor.io/repository/github/SpoilerRules/server-list-explorer">
+    <img alt="CodeFactor Grade" src="https://img.shields.io/codefactor/grade/github/SpoilerRules/server-list-explorer?style=flat-square"/>
+  </a>
+  <a href="https://github.com/SpoilerRules/server-list-explorer/blob/main/LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/SpoilerRules/server-list-explorer?style=flat-square"/>
+  </a>
+</p>
 
-[![](https://dcbadge.limes.pink/api/server/https://discord.gg/fVA5Wr6Nns?style=flat)](https://discord.gg/fVA5Wr6Nns)
+<p align="center">
+   <a href="https://kotlinlang.org">
+    <img alt="Kotlin/JVM" src="https://img.shields.io/badge/Kotlin-JVM-007396?style=flat-square&colorA=7F52FF&colorB=007396&logo=kotlin&logoColor=white"/>
+  </a>
+
+  <a href="https://jb.gg/cmp">
+    <img alt="Compose Desktop" src="https://img.shields.io/badge/Desktop-4CAF50.svg?style=flat&logo=jetpackcompose&logoColor=FFFFFF&labelColor=4CAF50&label=Compose&colorA=4CAF50&colorB=6A1B9A"/>
+  </a>
+
+  <a href="https://discord.gg/fVA5Wr6Nns">
+    <img alt="Discord" src="https://dcbadge.limes.pink/api/server/https://discord.gg/fVA5Wr6Nns?style=flat-square"/>
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/SpoilerRules/server-list-explorer/releases/latest">
+    <img alt="Download latest" src="https://img.shields.io/badge/Download-Latest%20Release-blue?style=for-the-badge"/>
+  </a>
+</p>
 
 **Server List Explorer** is the ultimate tool for effortlessly managing
 your [Minecraft: Java Edition](https://www.minecraft.net/) server list and, soon, your single-player world list. It has
