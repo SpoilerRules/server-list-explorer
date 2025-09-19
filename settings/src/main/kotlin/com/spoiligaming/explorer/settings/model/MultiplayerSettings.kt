@@ -58,8 +58,8 @@ data class MultiplayerSettings(
     val serverListFile: Path? = null,
     @SerialName("server_query_method")
     val serverQueryMethod: ServerQueryMethod = ServerQueryMethod.McServerPing,
-    @SerialName("entry_size_pct")
-    val serverEntrySizePercent: Int = 20,
+    @SerialName("entry_size_scale")
+    val serverEntryScale: Int = 1,
     @SerialName("drag_shake_intensity_deg")
     val dragShakeIntensityDegrees: Int = 1,
     @SerialName("action_bar_orientation")
