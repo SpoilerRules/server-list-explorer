@@ -10,7 +10,7 @@ on:
     workflow_dispatch:
         inputs:
             version:
-                description: 'Version (e.g. 2.0.0, 2.1.0-beta1, 2.1.0-rc1)'
+                description: 'Version (e.g. 2.0.0, 2.0.0-alpha.01, 2.0.0-beta.01, 2.0.0-rc.01)'
                 required: true
 
 jobs:
