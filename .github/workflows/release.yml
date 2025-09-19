@@ -50,7 +50,7 @@ jobs:
         with:
           # Note: GraalVM locks files
           distribution: temurin
-          java-version: 21
+          java-version: 25
 
       - name: Generate ktlint baseline
         if: env.ACT != 'true'
