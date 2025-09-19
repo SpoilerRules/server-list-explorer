@@ -70,41 +70,43 @@ internal fun MultiplayerScreenContainer(navController: NavController) {
     val loadingInitRepoText = t(Res.string.loading_init_repo)
     val loadingSetupMonitorText = t(Res.string.loading_setup_monitor)
 
-    val loadingSteps = remember(Unit) {
-        listOf(
-            loadingInitRepoText to suspend {
-                val result =
-                    UnifiedModeInitializer.initialize<ServerListRepository>(
-                        IModuleKind.Multiplayer,
-                        mp.serverListFile,
-                    )
+    val loadingSteps =
+        remember(Unit) {
+            listOf(
+                loadingInitRepoText to
+                    suspend {
+                        val result =
+                            UnifiedModeInitializer.initialize<ServerListRepository>(
+                                IModuleKind.Multiplayer,
+                                mp.serverListFile,
+                            )
 
-                result
-                    .onSuccess { initialized ->
-                        repo = initialized
-                    }
-                    .onFailure {
-                        logger.error(it) { "Error initializing server list repository" }
-                        screenState = MultiplayerScreenState.Error
-                    }
+                        result
+                            .onSuccess { initialized ->
+                                repo = initialized
+                            }.onFailure {
+                                logger.error(it) { "Error initializing server list repository" }
+                                screenState = MultiplayerScreenState.Error
+                            }
 
-                Unit
-            },
-            loadingSetupMonitorText to suspend {
-                val r = repo
-                if (r != null) {
-                    monitor =
-                        ServerListMonitor(
-                            repo = r,
-                            scope = scope,
-                            intervalMillis = MONITOR_INTERVAL_MILLIS,
-                        ).also { r.monitor = it }
-                }
+                        Unit
+                    },
+                loadingSetupMonitorText to
+                    suspend {
+                        val r = repo
+                        if (r != null) {
+                            monitor =
+                                ServerListMonitor(
+                                    repo = r,
+                                    scope = scope,
+                                    intervalMillis = MONITOR_INTERVAL_MILLIS,
+                                ).also { r.monitor = it }
+                        }
 
-                Unit
-            },
-        )
-    }
+                        Unit
+                    },
+            )
+        }
 
     // lifecycle effect to start and stop the file monitor
     DisposableEffect(monitor) {
