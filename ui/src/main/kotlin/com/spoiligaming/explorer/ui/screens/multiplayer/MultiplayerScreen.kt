@@ -97,7 +97,6 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.window.DialogProperties
 import com.spoiligaming.explorer.multiplayer.MultiplayerServer
 import com.spoiligaming.explorer.multiplayer.history.ServerListHistoryService
@@ -643,15 +642,19 @@ internal fun MultiplayerScreen(
         }
 
         Row(modifier = Modifier.weight(1f)) {
-            val percentage = mpSettings.serverEntrySizePercent.coerceIn(1, 100).toFloat()
+            val scale = mpSettings.serverEntryScale
+                .coerceAtLeast(1)
+                .toFloat()
+                .also { coerced ->
+                    if (mpSettings.serverEntryScale < 1) {
+                        logger.warn { "serverEntryScale was below 1, coerced to $coerced" }
+                    }
+                }
             val cellMinWidth =
-                remember(percentage) {
-                    val (minWidth, maxWidth) = 260.dp to 1100.dp
+                remember(scale) {
                     val step = 4.dp
-                    val fraction = (percentage - 1f) / 99f
-                    val interpolated = lerp(minWidth, maxWidth, fraction)
-                    val units = (interpolated.value / step.value).roundToInt()
-                    (units * step.value).dp
+                    val target = 420.dp.value * scale
+                    ((target / step.value).roundToInt() * step.value).dp
                 }
 
             if (mpSettings.actionBarOrientation == ActionBarOrientation.Right) {

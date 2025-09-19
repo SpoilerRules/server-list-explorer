@@ -56,13 +56,13 @@ internal fun MultiplayerSettings() {
                        },
                    )*/
                 ItemValueSlider(
-                    title = "Server entry size (%)",
-                    description = "Adjust the minimum width of each server-entry card (1% = 140 dp, 100% = 1000 dp).",
-                    value = mpSettings.serverEntrySizePercent,
-                    valueRange = 1f..100f,
-                    onValueChange = { newPct ->
+                    title = "Server entry scale",
+                    description = "Change how wide server entries appear in the list.",
+                    value = mpSettings.serverEntryScale,
+                    valueRange = 1f..4f,
+                    onValueChange = { newScale ->
                         multiplayerSettingsManager.updateSettings {
-                            it.copy(serverEntrySizePercent = newPct)
+                            it.copy(serverEntryScale = newScale)
                         }
                     },
                 )
