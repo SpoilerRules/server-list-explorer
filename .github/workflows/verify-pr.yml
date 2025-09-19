@@ -39,14 +39,15 @@ jobs:
           gradle-version: wrapper
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-      - name: Normalize gradlew line endings and make executable
+      - name: Normalize gradlew line endings
         if: env.ACT == 'true'
         run: |
           # remove CR at end-of-line
           sed -i 's/\r$//' ./gradlew
-          chmod +x ./gradlew
-          ls -l ./gradlew
         shell: bash
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
 
       - name: Gradle build
         run: ./gradlew build
