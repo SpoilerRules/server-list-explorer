@@ -49,8 +49,6 @@ internal fun NavGraph(navController: NavHostController) {
             MultiplayerScreenContainer(navController)
         }
 
-        composable<SingleplayerWorldListScreen> { }
-
         composable<SettingsScreen> {
             AppLocaleProvider {
                 LoadingScreen(

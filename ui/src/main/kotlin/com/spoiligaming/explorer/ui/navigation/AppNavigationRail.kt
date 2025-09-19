@@ -49,12 +49,10 @@ import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Terrain
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Terrain
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -95,7 +93,6 @@ import server_list_explorer.ui.generated.resources.cd_switch_to_dark_mode
 import server_list_explorer.ui.generated.resources.cd_switch_to_light_mode
 import server_list_explorer.ui.generated.resources.nav_label_multiplayer
 import server_list_explorer.ui.generated.resources.nav_label_settings
-import server_list_explorer.ui.generated.resources.nav_label_singleplayer
 
 @Composable
 internal fun AppNavigationRail(
@@ -462,12 +459,14 @@ private fun getNavigationRailItems() =
             filledIcon = Icons.Filled.Group,
             outlinedIcon = Icons.Outlined.Group,
         ),
+        /*
         Item(
             screen = SingleplayerWorldListScreen,
             label = t(Res.string.nav_label_singleplayer),
             filledIcon = Icons.Filled.Terrain,
             outlinedIcon = Icons.Outlined.Terrain,
         ),
+         */
         Item(
             screen = SettingsScreen,
             label = t(Res.string.nav_label_settings),
