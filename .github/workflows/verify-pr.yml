@@ -1,0 +1,63 @@
+name: Build and Verify
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened, ready_for_review ]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-pr:
+    name: Verify with Gradle build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Node 24
+        if: env.ACT == 'true'
+        run: |
+          curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
+          apt-get install -y nodejs
+          node -v
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: graalvm
+          java-version: 25
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4.4.3
+        with:
+          gradle-version: wrapper
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - name: Normalize gradlew line endings and make executable
+        if: env.ACT == 'true'
+        run: |
+          # remove CR at end-of-line
+          sed -i 's/\r$//' ./gradlew
+          chmod +x ./gradlew
+          ls -l ./gradlew
+        shell: bash
+
+      - name: Gradle build
+        run: ./gradlew build
+
+      - name: Upload reports
+        if: env.ACT != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-verification-reports
+          path: |
+            **/build/reports/ktlint/**
+            **/build/reports/**/ktlint*.html
+            **/build/reports/tests/**
+            **/build/test-results/**
