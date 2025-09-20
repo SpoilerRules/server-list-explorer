@@ -272,13 +272,13 @@ private suspend fun ServerListChange.applyTo(
                 when (direction) {
                     Direction.UNDO ->
                         repo.indexOfServer(serverId)?.let { idx ->
-                            repo.updateIcon(idx, oldIconBase64)
+                            if (oldIconBase64.isBlank()) repo.removeIconAt(idx) else repo.updateIcon(idx, oldIconBase64)
                             true
                         } ?: false
 
                     Direction.REDO ->
                         repo.indexOfServer(serverId)?.let { idx ->
-                            repo.updateIcon(idx, newIconBase64)
+                            if (newIconBase64.isBlank()) repo.removeIconAt(idx) else repo.updateIcon(idx, newIconBase64)
                             true
                         } ?: false
                 }
