@@ -45,7 +45,7 @@ jobs:
              $content -replace '^version=.*', "version=$($env:VERSION)" | Set-Content $file
           }
 
-      - name: Set up JDK 21
+      - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
           # Note: GraalVM locks files
