@@ -302,13 +302,6 @@ internal object ServerEntryController {
         logger.debug { "Starting icon sync for server ${server.id} (${server.ip})." }
 
         runCatching {
-            historyService.recordChange(
-                UpdateIconChange(
-                    serverId = server.id,
-                    oldIconBase64 = oldIconBase64,
-                    newIconBase64 = favicon,
-                ),
-            )
             repo.updateIcon(idx, favicon)
             repo.commit()
             lastAppliedRemoteIcon[server.id] = favicon
@@ -317,6 +310,14 @@ internal object ServerEntryController {
             logger.info { "Successfully synced and persisted new icon for ${server.ip}." }
         }.onFailure { e ->
             logger.warn(e) { "Failed to persist icon for ${server.ip}." }
+        }.onSuccess {
+            historyService.recordChange(
+                UpdateIconChange(
+                    serverId = server.id,
+                    oldIconBase64 = oldIconBase64,
+                    newIconBase64 = favicon,
+                ),
+            )
         }
     }
 
