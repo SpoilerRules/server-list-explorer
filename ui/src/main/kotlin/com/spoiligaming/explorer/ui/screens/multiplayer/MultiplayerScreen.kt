@@ -642,14 +642,15 @@ internal fun MultiplayerScreen(
         }
 
         Row(modifier = Modifier.weight(1f)) {
-            val scale = mpSettings.serverEntryScale
-                .coerceAtLeast(1)
-                .toFloat()
-                .also { coerced ->
-                    if (mpSettings.serverEntryScale < 1) {
-                        logger.warn { "serverEntryScale was below 1, coerced to $coerced" }
+            val scale =
+                mpSettings.serverEntryScale
+                    .coerceAtLeast(1)
+                    .toFloat()
+                    .also { coerced ->
+                        if (mpSettings.serverEntryScale < 1) {
+                            logger.warn { "serverEntryScale was below 1, coerced to $coerced" }
+                        }
                     }
-                }
             val cellMinWidth =
                 remember(scale) {
                     val step = 4.dp
