@@ -28,7 +28,11 @@ dependencies {
     implementation(project(":nbt"))
 
     // Compose Desktop
-    implementation(compose.desktop.currentOs)
+    implementation(compose.desktop.currentOs) {
+        exclude(group = "org.jetbrains.compose.material", module = "material")
+        exclude(group = "org.jetbrains.compose.material", module = "material-desktop")
+        exclude(group = "org.jetbrains.compose.material", module = "material-ripple")
+    }
     implementation(compose.components.resources)
     implementation(compose.material3)
     implementation(compose.materialIconsExtended)
