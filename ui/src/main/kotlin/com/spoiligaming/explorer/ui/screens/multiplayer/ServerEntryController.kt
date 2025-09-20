@@ -173,6 +173,7 @@ internal object ServerEntryController {
 
             repo.replace(index, old.copy(ip = newAddress))
             repo.commit()
+            lastAppliedRemoteIcon.remove(serverId)
             logger.info { "Changed address for server $serverId from '${old.ip}' to '$newAddress'" }
         }
     }
@@ -200,6 +201,8 @@ internal object ServerEntryController {
 
         repo.removeIconAt(index)
         repo.commit()
+        lastAppliedRemoteIcon.remove(server.id)
+        getSyncVersionFlow(server.id).value += 1
         logger.info { "Removed icon for server ${server.id}" }
     }
 
@@ -298,7 +301,14 @@ internal object ServerEntryController {
             return@launch
         }
 
-        val oldIconBase64 = server.iconBase64.orEmpty()
+        val current = servers[idx]
+        if (favicon == current.iconBase64) {
+            lastAppliedRemoteIcon[server.id] = favicon
+            logger.debug { "Icon for ${server.ip} is already up to date. Cache refreshed." }
+            return@launch
+        }
+
+        val oldIconBase64 = current.iconBase64.orEmpty()
         logger.debug { "Starting icon sync for server ${server.id} (${server.ip})." }
 
         runCatching {
