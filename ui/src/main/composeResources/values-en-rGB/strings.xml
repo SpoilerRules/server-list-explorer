@@ -127,4 +127,39 @@
     <string name="inline_edit_dialog_title">Edit value</string>
     <string name="inline_edit_label_new_value">New value</string>
     <string name="inline_edit_textfield_placeholder">Type here…</string>
+
+    <string name="accept_textures_enabled">Enabled</string>
+    <string name="accept_textures_disabled">Disabled</string>
+    <string name="accept_textures_prompt">Prompt</string>
+    <string name="hidden_state_hidden">Hidden</string>
+    <string name="hidden_state_not_hidden">Not Hidden</string>
+
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_delete">Delete</string>
+    <string name="menu_hidden">Hidden</string>
+    <string name="menu_server_resource_packs">Server Resource Packs</string>
+    <string name="cd_server_info">Server information</string>
+
+    <string name="context_copy_icon_png">Copy icon image as PNG file</string>
+    <string name="context_copy_icon_base64">Copy icon image as Base64-encoded PNG data</string>
+    <string name="context_revert_default_icon">Revert to default icon</string>
+    <string name="error_copy_icon_png_failed">Failed to copy icon as PNG for %1$s</string>
+    <string name="error_copy_icon_base64_failed">Failed to copy icon as Base64 for %1$s</string>
+    <string name="error_revert_icon_failed">Failed to revert icon for %1$s</string>
+
+    <string name="invalid_server_data">Invalid server data.</string>
+    <string name="server_unreachable">Server is unreachable.</string>
+    <string name="rate_limited_message">You have been rate limited by MCSrvStatus for this server.\nPlease try again in a few minutes.</string>
+
+    <string name="description_label">Description</string>
+    <string name="server_description_title">Server description</string>
+    <string name="ok_label">OK</string>
+    <string name="info_blocked_by_mojang">Blocked by Mojang</string>
+    <string name="protocol_format">Protocol %1$s</string>
+    <string name="cd_icon_custom">Custom server icon for %1$s</string>
+    <string name="cd_icon_default">Default server icon for %1$s</string>
+    <string name="cd_info_chip_icon">Icon representing %1$s</string>
+    <string name="copy_with_color_codes">Copy with colour codes</string>
+    <string name="infochip_expand_label">Expand</string>
+    <string name="infochip_compact_label">Compact</string>
 </resources>
