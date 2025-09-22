@@ -209,4 +209,19 @@
     <string name="window_corner_preference_rounded">Rounded</string>
     <string name="window_corner_preference_elevated_square">Elevated Square</string>
     <string name="window_corner_preference_flat_square">Flat Square</string>
+
+    <!-- Settings: Theme -->
+    <string name="setting_theme_mode">Theme mode</string>
+    <string name="setting_theme_mode_desc">Choose Light for a bright theme, Dark for a darker look, or System Default to match your device's current setting.</string>
+
+    <string name="theme_mode_light">Light</string>
+    <string name="theme_mode_dark">Dark</string>
+    <string name="theme_mode_system_default">System Default</string>
+
+    <string name="setting_theme_seed_color">Seed color</string>
+    <string name="setting_theme_seed_color_desc">Pick the primary hue that drives the entire color theme. From this single color, the system algorithmically generates all related shades and accents for both light and dark modes.</string>
+    <string name="setting_theme_amoled_mode">AMOLED mode</string>
+    <string name="setting_theme_amoled_mode_desc">Enable pure-black backgrounds on OLED screens when dark mode is active.</string>
+    <string name="setting_theme_use_system_accent">Use system accent color</string>
+    <string name="setting_theme_use_system_accent_desc">When enabled, Server List Explorer will adopt your Windows accent color as the seed color. Toggle on to keep your Server List Explorer in sync with your OS accent.</string>
 </resources>
