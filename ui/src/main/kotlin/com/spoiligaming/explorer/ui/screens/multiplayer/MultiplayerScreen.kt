@@ -644,13 +644,13 @@ internal fun MultiplayerScreen(
         Row(modifier = Modifier.weight(1f)) {
             val scale =
                 mpSettings.serverEntryScale
-                    .coerceAtLeast(1)
-                    .toFloat()
+                    .coerceAtLeast(1f)
                     .also { coerced ->
-                        if (mpSettings.serverEntryScale < 1) {
+                        if (mpSettings.serverEntryScale < 1f) {
                             logger.warn { "serverEntryScale was below 1, coerced to $coerced" }
                         }
                     }
+
             val cellMinWidth =
                 remember(scale) {
                     val step = 4.dp
