@@ -184,4 +184,29 @@
 
     <string name="cd_undo">Undo</string>
     <string name="cd_redo">Redo</string>
+
+    <!-- Settings: Window Appearance -->
+    <string name="setting_window_title_bar_color">Title bar color</string>
+    <string name="setting_window_title_bar_color_desc">Choose a custom color for the title bar.</string>
+    <string name="setting_window_title_bar_color_note">Only applies when title bar color mode is set to Custom.</string>
+    <string name="setting_window_custom_border_color">Custom window border color</string>
+    <string name="setting_window_custom_border_color_desc">Enable to apply your selected border color instead of the automatically derived one.</string>
+    <string name="setting_window_border_color">Border color</string>
+    <string name="setting_window_border_color_desc">Select a custom window border color.</string>
+    <string name="setting_window_border_color_note">Only applies when custom border color is enabled.</string>
+
+    <string name="setting_window_title_bar_color_mode">Title bar color mode</string>
+    <string name="setting_window_title_bar_color_mode_desc">Select how your title bar's color is determined.</string>
+
+    <string name="title_bar_color_mode_auto">Automatic</string>
+    <string name="title_bar_color_mode_manual">Custom</string>
+
+    <string name="setting_window_corners">Window corners</string>
+    <string name="setting_window_corners_desc">Choose how window corners should appear. Rounded corners give a modern look, while square corners are more traditional.</string>
+    <string name="setting_window_corners_note">Rounded corners require Windows 11 (build 22000 or later).</string>
+
+    <string name="window_corner_preference_system_default">System Default</string>
+    <string name="window_corner_preference_rounded">Rounded</string>
+    <string name="window_corner_preference_elevated_square">Elevated Square</string>
+    <string name="window_corner_preference_flat_square">Flat Square</string>
 </resources>

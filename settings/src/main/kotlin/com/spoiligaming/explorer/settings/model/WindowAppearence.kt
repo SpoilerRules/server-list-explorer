@@ -42,31 +42,28 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 enum class WindowCornerPreferenceSetting(
-    val displayName: String,
     val dwmValue: Int,
 ) {
     @SerialName("system_default")
-    SYSTEM_DEFAULT("System Default", 0), // DWMWCP_DEFAULT
+    SYSTEM_DEFAULT(0), // DWMWCP_DEFAULT
 
     @SerialName("rounded")
-    ROUNDED("Rounded", 2), // DWMWCP_ROUND,
+    ROUNDED(2), // DWMWCP_ROUND,
 
     @SerialName("square_elevated")
-    ELEVATED_SQUARE("Elevated Square", 1), // DWMWCP_DONOTROUND
+    ELEVATED_SQUARE(1), // DWMWCP_DONOTROUND
 
     @SerialName("square_flat")
-    FLAT_SQUARE("Flat Square", 3), // DWMWCP_ROUNDSMALL
+    FLAT_SQUARE(3), // DWMWCP_ROUNDSMALL
 }
 
 @Serializable
-enum class TitleBarColorMode(
-    val displayName: String,
-) {
+enum class TitleBarColorMode {
     @SerialName("auto")
-    AUTO("Automatic"),
+    AUTO,
 
     @SerialName("manual")
-    MANUAL("Custom"),
+    MANUAL,
 }
 
 @Serializable
