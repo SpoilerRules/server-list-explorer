@@ -162,4 +162,26 @@
     <string name="copy_with_color_codes">Copy with colour codes</string>
     <string name="infochip_expand_label">Expand</string>
     <string name="infochip_compact_label">Compact</string>
+
+    <string name="dialog_title_external_change">External file change detected</string>
+    <string name="dialog_support_text_external_change">The server list file at %1$s has been modified externally</string>
+
+    <string name="delete_all_title_question">Delete all?</string>
+    <string name="delete_all_support_text">Are you sure you want to delete all entries? This action cannot be undone</string>
+
+    <string name="sort_dialog_title_select_sort">Sort server list</string>
+    <string name="sort_dialog_support_text_mcping">Uses MCServerPing as the server query method</string>
+
+    <string name="query_method_title">Select query method</string>
+    <string name="query_method_support_text">Select how Server List Explorer should check server status and information. This setting controls the method used to fetch data for all servers in your list.</string>
+    <string name="query_method_mc_srv_stat">MCSrvStatus</string>
+    <string name="query_method_mc_server_ping">MCServerPing</string>
+    <string name="query_method_save_and_refresh_all_entries">Save and refresh all entries</string>
+
+    <string name="cd_no_search_results">No search results</string>
+    <string name="no_search_results_for">No results for "%1$s"</string>
+    <string name="no_search_matches_message">We couldn't find anything matching your search</string>
+
+    <string name="cd_undo">Undo</string>
+    <string name="cd_redo">Redo</string>
 </resources>
