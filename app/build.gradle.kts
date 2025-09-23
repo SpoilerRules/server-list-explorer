@@ -100,7 +100,7 @@ compose.desktop.application {
     javaHome = sequenceOf(
         System.getenv("JDK_17"),
         System.getenv("JAVA_HOME"),
-        (findProperty("org.gradle.java.home") as? String),
+        findProperty("org.gradle.java.home") as? String,
         runCatching {
             extensions
                 .getByType(JavaToolchainService::class.java)

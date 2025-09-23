@@ -184,21 +184,19 @@ internal fun SetupWizard(
                         val isMovingForward = targetState.order > initialState.order
 
                         if (isMovingForward) {
-                            (
-                                slideInHorizontally(animationSpec = intOffsetAnimationSpec) { it } +
-                                    fadeIn(animationSpec = floatAnimationSpec)
-                            ) togetherWith (
-                                slideOutHorizontally(animationSpec = intOffsetAnimationSpec) { -it } +
-                                    fadeOut(animationSpec = floatAnimationSpec)
-                            )
+                            slideInHorizontally(animationSpec = intOffsetAnimationSpec) { it } +
+                                fadeIn(animationSpec = floatAnimationSpec) togetherWith
+                                (
+                                    slideOutHorizontally(animationSpec = intOffsetAnimationSpec) { -it } +
+                                        fadeOut(animationSpec = floatAnimationSpec)
+                                )
                         } else {
-                            (
-                                slideInHorizontally(animationSpec = intOffsetAnimationSpec) { -it } +
-                                    fadeIn(animationSpec = floatAnimationSpec)
-                            ) togetherWith (
-                                slideOutHorizontally(animationSpec = intOffsetAnimationSpec) { it } +
-                                    fadeOut(animationSpec = floatAnimationSpec)
-                            )
+                            slideInHorizontally(animationSpec = intOffsetAnimationSpec) { -it } +
+                                fadeIn(animationSpec = floatAnimationSpec) togetherWith
+                                (
+                                    slideOutHorizontally(animationSpec = intOffsetAnimationSpec) { it } +
+                                        fadeOut(animationSpec = floatAnimationSpec)
+                                )
                         }
                     },
                 ) { targetStep ->
