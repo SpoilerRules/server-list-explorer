@@ -696,7 +696,7 @@ internal fun MultiplayerScreen(
                     ((target / step.value).roundToInt() * step.value).dp
                 }
 
-            if (mpSettings.actionBarOrientation == ActionBarOrientation.Right) {
+            if (mpSettings.actionBarOrientation == ActionBarOrientation.Left) {
                 quickActionsToolbar()
             }
 
@@ -765,13 +765,13 @@ internal fun MultiplayerScreen(
                         contentPadding =
                             PaddingValues(
                                 start =
-                                    if (mpSettings.actionBarOrientation == ActionBarOrientation.Right) {
+                                    if (mpSettings.actionBarOrientation == ActionBarOrientation.Left) {
                                         12.dp
                                     } else {
                                         0.dp
                                     },
                                 end =
-                                    if (mpSettings.actionBarOrientation == ActionBarOrientation.Left) {
+                                    if (mpSettings.actionBarOrientation == ActionBarOrientation.Right) {
                                         12.dp
                                     } else {
                                         0.dp
@@ -899,7 +899,7 @@ internal fun MultiplayerScreen(
                     }
                 }
             }
-            if (mpSettings.actionBarOrientation == ActionBarOrientation.Left) {
+            if (mpSettings.actionBarOrientation == ActionBarOrientation.Right) {
                 quickActionsToolbar()
             }
         }
