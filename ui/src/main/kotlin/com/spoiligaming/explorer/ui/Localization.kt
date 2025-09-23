@@ -64,3 +64,9 @@ internal fun AppLocaleProvider(content: @Composable () -> Unit) {
 
 @Composable
 internal fun t(stringRes: StringResource) = stringResource(stringRes)
+
+@Composable
+internal fun t(
+    stringRes: StringResource,
+    vararg args: Any,
+) = stringResource(stringRes, *args)

@@ -112,6 +112,7 @@ import com.spoiligaming.explorer.ui.dialog.ExpressiveDialog
 import com.spoiligaming.explorer.ui.dialog.onClick
 import com.spoiligaming.explorer.ui.dialog.prominent
 import com.spoiligaming.explorer.ui.extensions.clickWithModifiers
+import com.spoiligaming.explorer.ui.t
 import com.spoiligaming.explorer.ui.window.WindowManager
 import com.spoiligaming.explorer.util.OSUtils
 import com.valentinilk.shimmer.ShimmerBounds
@@ -122,9 +123,29 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
+import server_list_explorer.ui.generated.resources.Res
+import server_list_explorer.ui.generated.resources.cd_no_search_results
+import server_list_explorer.ui.generated.resources.cd_redo
+import server_list_explorer.ui.generated.resources.cd_undo
+import server_list_explorer.ui.generated.resources.delete_all_support_text
+import server_list_explorer.ui.generated.resources.delete_all_title_question
+import server_list_explorer.ui.generated.resources.dialog_cancel_button
+import server_list_explorer.ui.generated.resources.dialog_support_text_external_change
+import server_list_explorer.ui.generated.resources.dialog_title_external_change
+import server_list_explorer.ui.generated.resources.no_search_matches_message
+import server_list_explorer.ui.generated.resources.no_search_results_for
+import server_list_explorer.ui.generated.resources.ok_label
+import server_list_explorer.ui.generated.resources.query_method_mc_server_ping
+import server_list_explorer.ui.generated.resources.query_method_mc_srv_stat
+import server_list_explorer.ui.generated.resources.query_method_save_and_refresh_all_entries
+import server_list_explorer.ui.generated.resources.query_method_support_text
+import server_list_explorer.ui.generated.resources.query_method_title
+import server_list_explorer.ui.generated.resources.quick_action_delete_all
+import server_list_explorer.ui.generated.resources.quick_action_sort
+import server_list_explorer.ui.generated.resources.sort_dialog_support_text_mcping
+import server_list_explorer.ui.generated.resources.sort_dialog_title_select_sort
 import sh.calvin.reorderable.DragGestureDetector
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
@@ -141,8 +162,7 @@ import kotlin.uuid.Uuid
  * Goals:
  * 1. Replace magic numbers with named constants
  * 2. Break this code into smaller, well-defined functions without over-fragmenting
- * 3. Add localization support
- * 4. Improve documentation and inline comments to help future contributors understand the code
+ * 3. Improve documentation and inline comments to help future contributors understand the code
  */
 
 @Composable
@@ -169,6 +189,11 @@ internal fun MultiplayerScreen(
     }
 
     if (showConflictDialog && conflictPath != null) {
+        val dialogTitleExternalChangeText = t(Res.string.dialog_title_external_change)
+        val dialogSupportTextExternalChangeText =
+            t(Res.string.dialog_support_text_external_change, conflictPath.toString())
+        val okLabelText = t(Res.string.ok_label)
+
         ExpressiveDialog(
             onDismissRequest = { /* no-op: require acknowledgment */ },
             properties =
@@ -178,10 +203,10 @@ internal fun MultiplayerScreen(
                 ),
         ) {
             icon(Icons.Filled.DatasetLinked)
-            title("External File Change Detected")
-            supportText("The server list file at $conflictPath has been modified externally")
+            title(dialogTitleExternalChangeText)
+            supportText(dialogSupportTextExternalChangeText)
             accept(
-                "OK".prominent onClick {
+                okLabelText.prominent onClick {
                     scope.launch {
                         Files.deleteIfExists(repo.createTempServerListFile())
                         repo.load()
@@ -341,22 +366,25 @@ internal fun MultiplayerScreen(
     }
 
     if (showDeleteAllDialog) {
+        val deleteAllTitleQuestionText = t(Res.string.delete_all_title_question)
+        val deleteAllSupportText = t(Res.string.delete_all_support_text)
+        val quickActionDeleteAllText = t(Res.string.quick_action_delete_all)
+        val dialogCancelButtonText = t(Res.string.dialog_cancel_button)
+
         ExpressiveDialog(
             onDismissRequest = { showDeleteAllDialog = false },
         ) {
-            title("Delete All?")
+            title(deleteAllTitleQuestionText)
             icon(Icons.Filled.DeleteForever)
-            supportText(
-                "Are you sure you want to delete all entries? This action cannot be undone",
-            )
+            supportText(deleteAllSupportText)
             accept(
-                "Delete All".prominent onClick {
+                quickActionDeleteAllText.prominent onClick {
                     controller.deleteAll()
                     showDeleteAllDialog = false
                 },
             )
             cancel(
-                "Cancel" onClick {
+                dialogCancelButtonText onClick {
                     showDeleteAllDialog = false
                 },
             )
@@ -381,13 +409,19 @@ internal fun MultiplayerScreen(
     }
 
     if (showSortDialog) {
+        val sortDialogTitleSelectSortText = t(Res.string.sort_dialog_title_select_sort)
+        val sortDialogSupportTextMcpingText = t(Res.string.sort_dialog_support_text_mcping)
+        val quickActionSortText = t(Res.string.quick_action_sort)
+        val dialogCancelButtonText = t(Res.string.dialog_cancel_button)
+
         var selectedSortType by remember { mutableStateOf(SortType.Ping) }
         ExpressiveDialog(onDismissRequest = { showSortDialog = false }) {
-            title("Sort server list")
-            supportText("Uses MCServerPing as the server query method")
+            title(sortDialogTitleSelectSortText)
+            supportText(sortDialogSupportTextMcpingText)
             body {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     SortType.entries.forEach { mode ->
+                        val modeLabelText = t(mode.label)
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -397,22 +431,29 @@ internal fun MultiplayerScreen(
                                 onClick = { selectedSortType = mode },
                                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                             )
-                            Text(stringResource(mode.label))
+                            Text(modeLabelText)
                         }
                     }
                 }
             }
             accept(
-                "Sort".prominent onClick {
+                quickActionSortText.prominent onClick {
                     showSortDialog = false
                     onSortRequest(selectedSortType, pendingOrder)
                 },
             )
-            cancel("Cancel" onClick { showSortDialog = false })
+            cancel(dialogCancelButtonText onClick { showSortDialog = false })
         }
     }
 
     if (showQueryMethodDialog) {
+        val queryMethodTitleText = t(Res.string.query_method_title)
+        val queryMethodSupportText = t(Res.string.query_method_support_text)
+        val queryMethodMcSrvStatText = t(Res.string.query_method_mc_srv_stat)
+        val queryMethodMcServerPingText = t(Res.string.query_method_mc_server_ping)
+        val queryMethodSaveAndRefreshAllEntriesText = t(Res.string.query_method_save_and_refresh_all_entries)
+        val dialogCancelButtonText = t(Res.string.dialog_cancel_button)
+
         var pendingQueryMethod by remember(mpSettings.serverQueryMethod) {
             mutableStateOf(mpSettings.serverQueryMethod)
         }
@@ -420,11 +461,8 @@ internal fun MultiplayerScreen(
         ExpressiveDialog(
             onDismissRequest = { showQueryMethodDialog = false },
         ) {
-            title("Select Query Method")
-            supportText(
-                "Select how Server List Explorer should check server status and information. " +
-                    "This setting controls the method used to fetch data for all servers in your list.",
-            )
+            title(queryMethodTitleText)
+            supportText(queryMethodSupportText)
             body {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Row(
@@ -436,7 +474,7 @@ internal fun MultiplayerScreen(
                             onClick = { pendingQueryMethod = ServerQueryMethod.McSrvStat },
                             modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                         )
-                        Text(ServerQueryMethod.McSrvStat.displayName)
+                        Text(queryMethodMcSrvStatText)
                     }
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -447,12 +485,12 @@ internal fun MultiplayerScreen(
                             onClick = { pendingQueryMethod = ServerQueryMethod.McServerPing },
                             modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                         )
-                        Text(ServerQueryMethod.McServerPing.displayName)
+                        Text(queryMethodMcServerPingText)
                     }
                 }
             }
             accept(
-                "Save and refresh all entries".prominent onClick {
+                queryMethodSaveAndRefreshAllEntriesText.prominent onClick {
                     multiplayerSettingsManager.updateSettings {
                         it.copy(serverQueryMethod = pendingQueryMethod)
                     }
@@ -467,7 +505,7 @@ internal fun MultiplayerScreen(
                 },
             )
             cancel(
-                "Cancel" onClick {
+                dialogCancelButtonText onClick {
                     showQueryMethodDialog = false
                 },
             )
@@ -886,20 +924,20 @@ private fun NoSearchResultsPlaceholder(
     ) {
         Icon(
             imageVector = Icons.Outlined.SearchOff,
-            contentDescription = "No search results found",
+            contentDescription = t(Res.string.cd_no_search_results),
             modifier = Modifier.size(72.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(Modifier.height(20.dp))
         Text(
-            text = "No results for \"$query\"",
+            text = t(Res.string.no_search_results_for, query),
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(10.dp))
         Text(
-            text = "We couldn't find anything matching your search.",
+            text = t(Res.string.no_search_matches_message),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -950,7 +988,7 @@ private fun ServerListHistoryControlCard(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Undo,
-                    contentDescription = "Undo",
+                    contentDescription = t(Res.string.cd_undo),
                     modifier = Modifier.size(24.dp),
                     tint =
                         MaterialTheme.colorScheme.onSurfaceVariant.copy(
@@ -975,7 +1013,7 @@ private fun ServerListHistoryControlCard(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Redo,
-                    contentDescription = "Redo",
+                    contentDescription = t(Res.string.cd_redo),
                     modifier = Modifier.size(24.dp),
                     tint =
                         MaterialTheme.colorScheme.onSurfaceVariant.copy(

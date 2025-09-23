@@ -22,20 +22,45 @@ import androidx.compose.runtime.Composable
 import com.spoiligaming.explorer.settings.manager.preferenceSettingsManager
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
 import com.spoiligaming.explorer.ui.screens.settings.components.SettingsSection
+import com.spoiligaming.explorer.ui.t
 import com.spoiligaming.explorer.ui.widgets.ItemLanguagePickerDropdownMenu
 import com.spoiligaming.explorer.ui.widgets.ItemSwitch
 import com.spoiligaming.explorer.ui.widgets.ItemValueSlider
+import server_list_explorer.ui.generated.resources.Res
+import server_list_explorer.ui.generated.resources.setting_prefs_fps_overlay
+import server_list_explorer.ui.generated.resources.setting_prefs_fps_overlay_desc
+import server_list_explorer.ui.generated.resources.setting_prefs_highlight_after_scroll
+import server_list_explorer.ui.generated.resources.setting_prefs_highlight_after_scroll_desc
+import server_list_explorer.ui.generated.resources.setting_prefs_highlight_delay
+import server_list_explorer.ui.generated.resources.setting_prefs_highlight_delay_desc
+import server_list_explorer.ui.generated.resources.setting_prefs_highlight_delay_note
+import server_list_explorer.ui.generated.resources.setting_prefs_language
+import server_list_explorer.ui.generated.resources.setting_prefs_scroll_after_add
+import server_list_explorer.ui.generated.resources.setting_prefs_scroll_after_add_desc
+import server_list_explorer.ui.generated.resources.setting_prefs_snackbar_at_top
+import server_list_explorer.ui.generated.resources.setting_prefs_snackbar_at_top_desc
+import server_list_explorer.ui.generated.resources.setting_prefs_undo_history_size
+import server_list_explorer.ui.generated.resources.setting_prefs_undo_history_size_desc
+import server_list_explorer.ui.generated.resources.setting_prefs_undo_redo_delay
+import server_list_explorer.ui.generated.resources.setting_prefs_undo_redo_delay_desc
+import server_list_explorer.ui.generated.resources.setting_prefs_undo_redo_interval
+import server_list_explorer.ui.generated.resources.setting_prefs_undo_redo_interval_desc
+import server_list_explorer.ui.generated.resources.setting_prefs_undo_redo_note
+import server_list_explorer.ui.generated.resources.setting_prefs_vsync
+import server_list_explorer.ui.generated.resources.setting_prefs_vsync_desc
+import server_list_explorer.ui.generated.resources.setting_prefs_vsync_note
+import server_list_explorer.ui.generated.resources.settings_section_preferences
 
 @Composable
 internal fun PreferenceSettings() {
     val prefs = LocalPrefs.current
 
     SettingsSection(
-        header = "Preferences",
+        header = t(Res.string.settings_section_preferences),
         settings =
             listOf {
                 ItemLanguagePickerDropdownMenu(
-                    title = "Language",
+                    title = t(Res.string.setting_prefs_language),
                     selectedLocale = prefs.locale,
                     onLocaleSelected = { locale ->
                         preferenceSettingsManager.updateSettings {
@@ -44,8 +69,8 @@ internal fun PreferenceSettings() {
                     },
                 )
                 ItemSwitch(
-                    title = "Show snackbar at top",
-                    description = "Display snackbar notifications at the top of the screen instead of the bottom.",
+                    title = t(Res.string.setting_prefs_snackbar_at_top),
+                    description = t(Res.string.setting_prefs_snackbar_at_top_desc),
                     isChecked = prefs.snackbarAtTop,
                     onCheckedChange = { newValue ->
                         preferenceSettingsManager.updateSettings {
@@ -54,10 +79,8 @@ internal fun PreferenceSettings() {
                     },
                 )
                 ItemValueSlider(
-                    title = "Undo history size",
-                    description =
-                        "The maximum number of changes that can be undone. " +
-                            "Higher values allow you to undo more steps but require more memory.",
+                    title = t(Res.string.setting_prefs_undo_history_size),
+                    description = t(Res.string.setting_prefs_undo_history_size_desc),
                     value = prefs.maxUndoHistorySize,
                     valueRange = 0f..1000f,
                     onValueChange = { newSize ->
@@ -67,12 +90,9 @@ internal fun PreferenceSettings() {
                     },
                 )
                 ItemValueSlider(
-                    title = "Undo/Redo shortcut repeat delay (ms)",
-                    description =
-                        "Defines how long the app waits before starting to repeat Undo or Redo actions " +
-                            "when you hold down their keyboard shortcuts. " +
-                            "Lower values make repeated actions begin sooner.",
-                    note = UNDO_REDO_SHORTCUT_NOTE,
+                    title = t(Res.string.setting_prefs_undo_redo_delay),
+                    description = t(Res.string.setting_prefs_undo_redo_delay_desc),
+                    note = t(Res.string.setting_prefs_undo_redo_note),
                     value = prefs.undoRedoRepeatInitialDelayMillis,
                     valueRange = 100f..1000f,
                     onValueChange = { newDelay ->
@@ -82,12 +102,9 @@ internal fun PreferenceSettings() {
                     },
                 )
                 ItemValueSlider(
-                    title = "Undo/Redo shortcut repeat interval (ms)",
-                    description =
-                        "Controls the speed of repeated Undo or Redo actions while holding their " +
-                            "keyboard shortcuts. " +
-                            "Lower values make the actions repeat more quickly.",
-                    note = UNDO_REDO_SHORTCUT_NOTE,
+                    title = t(Res.string.setting_prefs_undo_redo_interval),
+                    description = t(Res.string.setting_prefs_undo_redo_interval_desc),
+                    note = t(Res.string.setting_prefs_undo_redo_note),
                     value = prefs.undoRedoRepeatIntervalMillis,
                     valueRange = 20f..300f,
                     onValueChange = { newInterval ->
@@ -97,8 +114,8 @@ internal fun PreferenceSettings() {
                     },
                 )
                 ItemSwitch(
-                    title = "Enable scroll after adding",
-                    description = "Automatically scroll to a newly added multiplayer server or singleplayer world.",
+                    title = t(Res.string.setting_prefs_scroll_after_add),
+                    description = t(Res.string.setting_prefs_scroll_after_add_desc),
                     isChecked = prefs.scrollAfterAdd,
                     onCheckedChange = { newValue ->
                         preferenceSettingsManager.updateSettings {
@@ -107,8 +124,8 @@ internal fun PreferenceSettings() {
                     },
                 )
                 ItemSwitch(
-                    title = "Highlight after scrolling to new entry",
-                    description = "Highlight a newly added multiplayer server or singleplayer world once it's scrolled into view.",
+                    title = t(Res.string.setting_prefs_highlight_after_scroll),
+                    description = t(Res.string.setting_prefs_highlight_after_scroll_desc),
                     isChecked = prefs.highlightAfterScroll,
                     onCheckedChange = { newValue ->
                         preferenceSettingsManager.updateSettings {
@@ -117,9 +134,9 @@ internal fun PreferenceSettings() {
                     },
                 )
                 ItemValueSlider(
-                    title = "Highlight delay after scroll (ms)",
-                    description = "How long to wait before highlighting a newly added multiplayer server or singleplayer world after scrolling to it.",
-                    note = "Only applies when highlighting after scrolling to new entry is enabled.",
+                    title = t(Res.string.setting_prefs_highlight_delay),
+                    description = t(Res.string.setting_prefs_highlight_delay_desc),
+                    note = t(Res.string.setting_prefs_highlight_delay_note),
                     value = prefs.highlightAfterScrollDelayMillis,
                     valueRange = 0f..1000f,
                     onValueChange = { newMs ->
@@ -129,9 +146,9 @@ internal fun PreferenceSettings() {
                     },
                 )
                 ItemSwitch(
-                    title = "VSync",
-                    description = "Limits frame rate to save system resources, but may reduce UI smoothness.",
-                    note = "Changes will apply after you restart the app.",
+                    title = t(Res.string.setting_prefs_vsync),
+                    description = t(Res.string.setting_prefs_vsync_desc),
+                    note = t(Res.string.setting_prefs_vsync_note),
                     isChecked = prefs.vsync,
                     onCheckedChange = { newValue ->
                         preferenceSettingsManager.updateSettings {
@@ -140,8 +157,8 @@ internal fun PreferenceSettings() {
                     },
                 )
                 ItemSwitch(
-                    title = "Show FPS Overlay",
-                    description = "Displays the current frames per second to help with debugging and benchmarking.",
+                    title = t(Res.string.setting_prefs_fps_overlay),
+                    description = t(Res.string.setting_prefs_fps_overlay_desc),
                     isChecked = prefs.showFpsOverlay,
                     onCheckedChange = { newValue ->
                         preferenceSettingsManager.updateSettings {
@@ -152,8 +169,3 @@ internal fun PreferenceSettings() {
             },
     )
 }
-
-private const val UNDO_REDO_SHORTCUT_NOTE =
-    "Supported shortcuts:\n" +
-        "• Undo: Ctrl+Z (Windows/Linux), Cmd+Z (macOS)\n" +
-        "• Redo: Ctrl+Shift+Z or Ctrl+Y (Windows/Linux), Cmd+Shift+Z (macOS)"

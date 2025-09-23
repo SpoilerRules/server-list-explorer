@@ -25,12 +25,6 @@
     <string name="detecting_server_list">Detecting server list file...</string>
     <string name="detection_wait">This may take a few moments.</string>
 
-    <string name="settings_section_theme">Theme</string>
-    <string name="settings_section_preferences">Preferences</string>
-    <string name="settings_section_multiplayer">Multiplayer Server List</string>
-    <string name="settings_section_window_appearance">Window Appearance &amp; Effects</string>
-    <string name="settings_navigator_title">Sections</string>
-
     <string name="error_unable_load_servers">Unable to load servers</string>
     <string name="error_unable_load_servers_message">An unexpected error occurred while reading your server list.\nPlease check that the file exists and you have permission to read it.</string>
     <string name="server_list_file_not_set">null (not set)</string>
@@ -127,4 +121,150 @@
     <string name="inline_edit_dialog_title">Edit value</string>
     <string name="inline_edit_label_new_value">New value</string>
     <string name="inline_edit_textfield_placeholder">Type here...</string>
+
+    <string name="accept_textures_enabled">Enabled</string>
+    <string name="accept_textures_disabled">Disabled</string>
+    <string name="accept_textures_prompt">Prompt</string>
+    <string name="hidden_state_hidden">Hidden</string>
+    <string name="hidden_state_not_hidden">Not Hidden</string>
+
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_delete">Delete</string>
+    <string name="menu_hidden">Hidden</string>
+    <string name="menu_server_resource_packs">Server Resource Packs</string>
+    <string name="cd_server_info">Server information</string>
+
+    <string name="context_copy_icon_png">Copy icon image as PNG file</string>
+    <string name="context_copy_icon_base64">Copy icon image as Base64-encoded PNG data</string>
+    <string name="context_revert_default_icon">Revert to default icon</string>
+    <string name="error_copy_icon_png_failed">Failed to copy icon as PNG for %1$s</string>
+    <string name="error_copy_icon_base64_failed">Failed to copy icon as Base64 for %1$s</string>
+    <string name="error_revert_icon_failed">Failed to revert icon for %1$s</string>
+
+    <string name="invalid_server_data">Invalid server data.</string>
+    <string name="server_unreachable">Server is unreachable.</string>
+    <string name="rate_limited_message">You have been rate limited by MCSrvStatus for this server.\nPlease try again in a few minutes.</string>
+
+    <string name="description_label">Description</string>
+    <string name="server_description_title">Server description</string>
+    <string name="ok_label">OK</string>
+    <string name="info_blocked_by_mojang">Blocked by Mojang</string>
+    <string name="protocol_format">Protocol %1$s</string>
+    <string name="cd_icon_custom">Custom server icon for %1$s</string>
+    <string name="cd_icon_default">Default server icon for %1$s</string>
+    <string name="cd_info_chip_icon">Icon representing %1$s</string>
+    <string name="copy_with_color_codes">Copy with color codes</string>
+    <string name="infochip_expand_label">Expand</string>
+    <string name="infochip_compact_label">Compact</string>
+
+    <string name="dialog_title_external_change">External file change detected</string>
+    <string name="dialog_support_text_external_change">The server list file at %1$s has been modified externally</string>
+
+    <string name="delete_all_title_question">Delete all?</string>
+    <string name="delete_all_support_text">Are you sure you want to delete all entries? This action cannot be undone</string>
+
+    <string name="sort_dialog_title_select_sort">Sort server list</string>
+    <string name="sort_dialog_support_text_mcping">Uses MCServerPing as the server query method</string>
+
+    <string name="query_method_title">Select query method</string>
+    <string name="query_method_support_text">Select how Server List Explorer should check server status and information. This setting controls the method used to fetch data for all servers in your list.</string>
+    <string name="query_method_mc_srv_stat">MCSrvStatus</string>
+    <string name="query_method_mc_server_ping">MCServerPing</string>
+    <string name="query_method_save_and_refresh_all_entries">Save and refresh all entries</string>
+
+    <string name="cd_no_search_results">No search results</string>
+    <string name="no_search_results_for">No results for "%1$s"</string>
+    <string name="no_search_matches_message">We couldn't find anything matching your search</string>
+
+    <string name="cd_undo">Undo</string>
+    <string name="cd_redo">Redo</string>
+
+    <!-- Settings Sections -->
+    <string name="settings_navigator_title">Sections</string>
+    <string name="settings_section_theme">Theme</string>
+    <string name="settings_section_preferences">Preferences</string>
+    <string name="settings_section_multiplayer">Multiplayer Server List</string>
+    <string name="settings_section_window_appearance">Window Appearance &amp; Effects</string>
+
+    <!-- Settings: Window Appearance -->
+    <string name="setting_window_title_bar_color">Title bar color</string>
+    <string name="setting_window_title_bar_color_desc">Choose a custom color for the title bar.</string>
+    <string name="setting_window_title_bar_color_note">Only applies when title bar color mode is set to Custom.</string>
+    <string name="setting_window_custom_border_color">Custom window border color</string>
+    <string name="setting_window_custom_border_color_desc">Enable to apply your selected border color instead of the automatically derived one.</string>
+    <string name="setting_window_border_color">Border color</string>
+    <string name="setting_window_border_color_desc">Select a custom window border color.</string>
+    <string name="setting_window_border_color_note">Only applies when custom border color is enabled.</string>
+
+    <string name="setting_window_title_bar_color_mode">Title bar color mode</string>
+    <string name="setting_window_title_bar_color_mode_desc">Select how your title bar's color is determined.</string>
+
+    <string name="title_bar_color_mode_auto">Automatic</string>
+    <string name="title_bar_color_mode_manual">Custom</string>
+
+    <string name="setting_window_corners">Window corners</string>
+    <string name="setting_window_corners_desc">Choose how window corners should appear. Rounded corners give a modern look, while square corners are more traditional.</string>
+    <string name="setting_window_corners_note">Rounded corners require Windows 11 (build 22000 or later).</string>
+
+    <string name="window_corner_preference_system_default">System Default</string>
+    <string name="window_corner_preference_rounded">Rounded</string>
+    <string name="window_corner_preference_elevated_square">Elevated Square</string>
+    <string name="window_corner_preference_flat_square">Flat Square</string>
+
+    <!-- Settings: Theme -->
+    <string name="setting_theme_mode">Theme mode</string>
+    <string name="setting_theme_mode_desc">Choose Light for a bright theme, Dark for a darker look, or System Default to match your device's current setting.</string>
+
+    <string name="theme_mode_light">Light</string>
+    <string name="theme_mode_dark">Dark</string>
+    <string name="theme_mode_system_default">System Default</string>
+
+    <string name="setting_theme_seed_color">Seed color</string>
+    <string name="setting_theme_seed_color_desc">Pick the primary hue that drives the entire color theme. From this single color, the system algorithmically generates all related shades and accents for both light and dark modes.</string>
+    <string name="setting_theme_amoled_mode">AMOLED mode</string>
+    <string name="setting_theme_amoled_mode_desc">Enable pure-black backgrounds on OLED screens when dark mode is active.</string>
+    <string name="setting_theme_use_system_accent">Use system accent color</string>
+    <string name="setting_theme_use_system_accent_desc">When enabled, Server List Explorer will adopt your Windows accent color as the seed color. Toggle on to keep your Server List Explorer in sync with your OS accent.</string>
+
+    <!-- Settings: Multiplayer Server List -->
+    <string name="setting_mp_entry_scale">Server entry scale</string>
+    <string name="setting_mp_entry_scale_desc">Change how wide server entries appear in the list.</string>
+    <string name="setting_mp_action_bar_orientation">Action bar orientation</string>
+    <string name="setting_mp_action_bar_orientation_desc">Set where the server list's action bar appears: Right, Top, Left, or Bottom.</string>
+
+    <string name="action_bar_orientation_right">Right</string>
+    <string name="action_bar_orientation_top">Top</string>
+    <string name="action_bar_orientation_left">Left</string>
+    <string name="action_bar_orientation_bottom">Bottom</string>
+
+    <string name="setting_mp_drag_shake_intensity">Drag shake intensity (degrees)</string>
+    <string name="setting_mp_drag_shake_intensity_desc">Controls how much a server entry shakes when dragged.</string>
+    <string name="setting_mp_connection_timeout">Connection timeout (s)</string>
+    <string name="setting_mp_connection_timeout_desc">Time to wait while connecting to a server.</string>
+    <string name="setting_mp_socket_timeout">Socket timeout (s)</string>
+    <string name="setting_mp_socket_timeout_desc">Time to wait for a server to send data.</string>
+
+    <!-- Settings: Preferences -->
+    <string name="setting_prefs_language">Language</string>
+    <string name="setting_prefs_snackbar_at_top">Show snackbar at top</string>
+    <string name="setting_prefs_snackbar_at_top_desc">Display snackbar notifications at the top of the screen instead of the bottom.</string>
+    <string name="setting_prefs_undo_history_size">Undo history size</string>
+    <string name="setting_prefs_undo_history_size_desc">The maximum number of changes that can be undone. Higher values allow you to undo more steps but require more memory.</string>
+    <string name="setting_prefs_undo_redo_delay">Undo/Redo shortcut repeat delay (ms)</string>
+    <string name="setting_prefs_undo_redo_delay_desc">Defines how long the app waits before starting to repeat Undo or Redo actions when you hold down their keyboard shortcuts. Lower values make repeated actions begin sooner.</string>
+    <string name="setting_prefs_undo_redo_interval">Undo/Redo shortcut repeat interval (ms)</string>
+    <string name="setting_prefs_undo_redo_interval_desc">Controls the speed of repeated Undo or Redo actions while holding their keyboard shortcuts. Lower values make the actions repeat more quickly.</string>
+    <string name="setting_prefs_undo_redo_note">Supported shortcuts:\n• Undo: Ctrl+Z (Windows/Linux), Cmd+Z (macOS)\n• Redo: Ctrl+Shift+Z or Ctrl+Y (Windows/Linux), Cmd+Shift+Z (macOS)</string>
+    <string name="setting_prefs_scroll_after_add">Enable scroll after adding</string>
+    <string name="setting_prefs_scroll_after_add_desc">Automatically scroll to a newly added multiplayer server or singleplayer world.</string>
+    <string name="setting_prefs_highlight_after_scroll">Highlight after scrolling to new entry</string>
+    <string name="setting_prefs_highlight_after_scroll_desc">Highlight a newly added multiplayer server or singleplayer world once it's scrolled into view.</string>
+    <string name="setting_prefs_highlight_delay">Highlight delay after scroll (ms)</string>
+    <string name="setting_prefs_highlight_delay_desc">How long to wait before highlighting a newly added multiplayer server or singleplayer world after scrolling to it.</string>
+    <string name="setting_prefs_highlight_delay_note">Only applies when highlighting after scrolling to new entry is enabled.</string>
+    <string name="setting_prefs_vsync">VSync</string>
+    <string name="setting_prefs_vsync_desc">Limits frame rate to save system resources, but may reduce UI smoothness.</string>
+    <string name="setting_prefs_vsync_note">Changes will apply after you restart the app.</string>
+    <string name="setting_prefs_fps_overlay">Show FPS Overlay</string>
+    <string name="setting_prefs_fps_overlay_desc">Displays the current frames per second to help with debugging and benchmarking.</string>
 </resources>

@@ -33,17 +33,31 @@ import com.spoiligaming.explorer.settings.model.ThemeMode
 import com.spoiligaming.explorer.ui.extensions.toComposeColor
 import com.spoiligaming.explorer.ui.extensions.toHex
 import com.spoiligaming.explorer.ui.screens.settings.components.SettingsSection
+import com.spoiligaming.explorer.ui.t
 import com.spoiligaming.explorer.ui.widgets.DropdownOption
 import com.spoiligaming.explorer.ui.widgets.ItemColorPicker
 import com.spoiligaming.explorer.ui.widgets.ItemSelectableDropdownMenu
 import com.spoiligaming.explorer.ui.widgets.ItemSwitch
+import server_list_explorer.ui.generated.resources.Res
+import server_list_explorer.ui.generated.resources.setting_theme_amoled_mode
+import server_list_explorer.ui.generated.resources.setting_theme_amoled_mode_desc
+import server_list_explorer.ui.generated.resources.setting_theme_mode
+import server_list_explorer.ui.generated.resources.setting_theme_mode_desc
+import server_list_explorer.ui.generated.resources.setting_theme_seed_color
+import server_list_explorer.ui.generated.resources.setting_theme_seed_color_desc
+import server_list_explorer.ui.generated.resources.setting_theme_use_system_accent
+import server_list_explorer.ui.generated.resources.setting_theme_use_system_accent_desc
+import server_list_explorer.ui.generated.resources.settings_section_theme
+import server_list_explorer.ui.generated.resources.theme_mode_dark
+import server_list_explorer.ui.generated.resources.theme_mode_light
+import server_list_explorer.ui.generated.resources.theme_mode_system_default
 
 @Composable
 internal fun ThemeSettings() {
     val themeSettings by themeSettingsManager.settingsFlow.collectAsState()
 
     SettingsSection(
-        header = "Theme",
+        header = t(Res.string.settings_section_theme),
         settings =
             listOf {
                 ThemeModeDropdown(
@@ -55,8 +69,8 @@ internal fun ThemeSettings() {
                     },
                 )
                 ItemColorPicker(
-                    title = "Seed color",
-                    description = "Pick the primary hue that drives the entire color theme. From this single color, the system algorithmically generates all related shades and accents for both light and dark modes.",
+                    title = t(Res.string.setting_theme_seed_color),
+                    description = t(Res.string.setting_theme_seed_color_desc),
                     currentColor = themeSettings.seedColor.toComposeColor(),
                     restoreButton = true,
                     onConfirm = { newColor ->
@@ -66,8 +80,8 @@ internal fun ThemeSettings() {
                     },
                 )
                 ItemSwitch(
-                    title = "AMOLED mode",
-                    description = "Enable pure-black backgrounds on OLED screens when dark mode is active.",
+                    title = t(Res.string.setting_theme_amoled_mode),
+                    description = t(Res.string.setting_theme_amoled_mode_desc),
                     isChecked = themeSettings.amoledMode,
                     onCheckedChange = { newValue ->
                         themeSettingsManager.updateSettings { current ->
@@ -76,10 +90,8 @@ internal fun ThemeSettings() {
                     },
                 )
                 ItemSwitch(
-                    title = "Use system accent color",
-                    description =
-                        "When enabled, the app will adopt your Windows accent color as the seed color. " +
-                            "Toggle on to keep your app in sync with your OS accent.",
+                    title = t(Res.string.setting_theme_use_system_accent),
+                    description = t(Res.string.setting_theme_use_system_accent_desc),
                     isChecked = themeSettings.useSystemAccentColor,
                     onCheckedChange = { newValue ->
                         themeSettingsManager.updateSettings { current ->
@@ -96,8 +108,18 @@ private fun ThemeModeDropdown(
     currentMode: ThemeMode,
     onModeSelected: (ThemeMode) -> Unit,
 ) {
+    val modeToDisplayName =
+        ThemeMode.entries.associateWith { mode ->
+            when (mode) {
+                ThemeMode.Light -> t(Res.string.theme_mode_light)
+                ThemeMode.Dark -> t(Res.string.theme_mode_dark)
+                ThemeMode.System -> t(Res.string.theme_mode_system_default)
+            }
+        }
+    val displayNameToMode = modeToDisplayName.entries.associate { (k, v) -> v to k }
+
     val options =
-        ThemeMode.entries.map { mode ->
+        modeToDisplayName.map { (mode, displayName) ->
             val (icon, selectedIcon) =
                 when (mode) {
                     ThemeMode.Light -> Icons.Outlined.LightMode to Icons.Filled.LightMode
@@ -105,22 +127,20 @@ private fun ThemeModeDropdown(
                     ThemeMode.System -> Icons.Outlined.Settings to Icons.Filled.Settings
                 }
             DropdownOption(
-                text = mode.displayName,
+                text = displayName,
                 icon = icon,
                 selectedIcon = selectedIcon,
             )
         }
 
-    val selectedOption = options.first { it.text == currentMode.displayName }
+    val selectedOption = options.first { it.text == modeToDisplayName[currentMode] }
 
     ItemSelectableDropdownMenu(
-        title = "Theme mode",
-        description = "Choose Light for a bright theme, Dark for a darker look, or System Default to match your device's current setting.",
+        title = t(Res.string.setting_theme_mode),
+        description = t(Res.string.setting_theme_mode_desc),
         selectedOption = selectedOption,
         options = options,
-    ) { selectedOption ->
-        ThemeMode.entries
-            .firstOrNull { it.displayName == selectedOption.text }
-            ?.let(onModeSelected)
+    ) { selected ->
+        displayNameToMode[selected.text]?.let(onModeSelected)
     }
 }

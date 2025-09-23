@@ -117,7 +117,7 @@ requests.
    val offset = (-1).dp
    val negativeIndex = (-list.size)
    ```
-3. If `t` or `stringResource` can't be used inline because the current scope isn’t composable, create a variable instead
+3. If `t` can't be used inline because the current scope isn’t composable, create a variable instead
     - Contain the full, descriptive name of the string resource (no vague abbreviations).
     - Be converted to snake_case in the resource name but camelCase in the variable.
     - End with the word 'Text' so nobody mistakes it for anything else.
@@ -129,12 +129,23 @@ requests.
        Text(pleaseDoNotPushTheBigRedButtonText)
    }
    ```
+   - Good with overload (using args):
+   ```kotlin
+   val reactorOverheatingWarningText =
+       t(Res.string.reactor_overheating_warning, reactorTemperature, reactorPressure)
+
+   LaunchedEffect(nuclearReactor) {
+       Text(reactorOverheatingWarningText)
+   }
+   ```
     - Bad:
    ```kotlin
-   // What even is this? Mystery meat variable names
+   // What even is this? "txt"? Which text? Where from?
    val txt = t(Res.string.txt)
+
    LaunchedEffect(nuclearReactor) {
-       // Will this save the world or order a pizza? Nobody knows
+       // Is this a warning? A tooltip? A button label?
+       // Future maintainers have to dig into resources to find out
        Text(txt)
    }
    ```

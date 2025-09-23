@@ -137,6 +137,7 @@ import com.spoiligaming.explorer.ui.extensions.toPngInputStream
 import com.spoiligaming.explorer.ui.layout.TwinSpillRows
 import com.spoiligaming.explorer.ui.snackbar.SnackbarController
 import com.spoiligaming.explorer.ui.snackbar.SnackbarEvent
+import com.spoiligaming.explorer.ui.t
 import com.spoiligaming.explorer.ui.theme.isDarkTheme
 import com.spoiligaming.explorer.ui.widgets.ActionItem
 import com.spoiligaming.explorer.ui.widgets.DropdownOption
@@ -156,6 +157,36 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.imageResource
 import server_list_explorer.ui.generated.resources.Res
+import server_list_explorer.ui.generated.resources.accept_textures_disabled
+import server_list_explorer.ui.generated.resources.accept_textures_enabled
+import server_list_explorer.ui.generated.resources.accept_textures_prompt
+import server_list_explorer.ui.generated.resources.cd_icon_custom
+import server_list_explorer.ui.generated.resources.cd_icon_default
+import server_list_explorer.ui.generated.resources.cd_info_chip_icon
+import server_list_explorer.ui.generated.resources.cd_server_info
+import server_list_explorer.ui.generated.resources.context_copy_icon_base64
+import server_list_explorer.ui.generated.resources.context_copy_icon_png
+import server_list_explorer.ui.generated.resources.context_revert_default_icon
+import server_list_explorer.ui.generated.resources.copy_with_color_codes
+import server_list_explorer.ui.generated.resources.description_label
+import server_list_explorer.ui.generated.resources.error_copy_icon_base64_failed
+import server_list_explorer.ui.generated.resources.error_copy_icon_png_failed
+import server_list_explorer.ui.generated.resources.error_revert_icon_failed
+import server_list_explorer.ui.generated.resources.hidden_state_hidden
+import server_list_explorer.ui.generated.resources.hidden_state_not_hidden
+import server_list_explorer.ui.generated.resources.info_blocked_by_mojang
+import server_list_explorer.ui.generated.resources.infochip_compact_label
+import server_list_explorer.ui.generated.resources.infochip_expand_label
+import server_list_explorer.ui.generated.resources.invalid_server_data
+import server_list_explorer.ui.generated.resources.menu_delete
+import server_list_explorer.ui.generated.resources.menu_hidden
+import server_list_explorer.ui.generated.resources.menu_refresh
+import server_list_explorer.ui.generated.resources.menu_server_resource_packs
+import server_list_explorer.ui.generated.resources.ok_label
+import server_list_explorer.ui.generated.resources.protocol_format
+import server_list_explorer.ui.generated.resources.rate_limited_message
+import server_list_explorer.ui.generated.resources.server_description_title
+import server_list_explorer.ui.generated.resources.server_unreachable
 import server_list_explorer.ui.generated.resources.texture_unknown_server
 import kotlin.random.Random
 import kotlin.random.Random.Default.nextInt
@@ -168,8 +199,7 @@ import kotlin.uuid.Uuid
  * Goals:
  * 1. Replace magic numbers with named constants
  * 2. Break this code into smaller, well-defined functions without over-fragmenting
- * 3. Add localization support
- * 4. Improve documentation and inline comments to help future contributors understand the code
+ * 3. Improve documentation and inline comments to help future contributors understand the code
  */
 
 @Composable
@@ -349,42 +379,76 @@ internal fun ServerEntry(
                 }
             }
 
-            val textureOptions by remember {
-                mutableStateOf(
-                    AcceptTexturesState.entries.map { DropdownOption(it.displayName) },
-                )
-            }
             var selectedState by remember(data.acceptTextures) {
                 mutableStateOf(data.acceptTextures)
-            }
-            val hiddenOptions by remember {
-                mutableStateOf(
-                    HiddenState.entries.map { DropdownOption(it.displayName) },
-                )
             }
             var selectedHiddenState by remember(data.hidden) {
                 mutableStateOf(data.hidden)
             }
 
+            val hiddenOptions =
+                HiddenState.entries.map { state ->
+                    val label =
+                        when (state) {
+                            HiddenState.Hidden -> t(Res.string.hidden_state_hidden)
+                            HiddenState.NotHidden -> t(Res.string.hidden_state_not_hidden)
+                        }
+                    DropdownOption(label)
+                }
+            val textureOptions =
+                AcceptTexturesState.entries.map { state ->
+                    val label =
+                        when (state) {
+                            AcceptTexturesState.Enabled -> t(Res.string.accept_textures_enabled)
+                            AcceptTexturesState.Disabled -> t(Res.string.accept_textures_disabled)
+                            AcceptTexturesState.Prompt -> t(Res.string.accept_textures_prompt)
+                        }
+                    DropdownOption(label)
+                }
+
+            val hiddenStateHiddenText = t(Res.string.hidden_state_hidden)
+            val hiddenStateNotHiddenText = t(Res.string.hidden_state_not_hidden)
+
+            val acceptTexturesEnabledText = t(Res.string.accept_textures_enabled)
+            val acceptTexturesDisabledText = t(Res.string.accept_textures_disabled)
+            val acceptTexturesPromptText = t(Res.string.accept_textures_prompt)
+
+            val selectedHiddenLabel =
+                when (selectedHiddenState) {
+                    HiddenState.Hidden -> hiddenStateHiddenText
+                    HiddenState.NotHidden -> hiddenStateNotHiddenText
+                }
+            val selectedTextureLabel =
+                when (selectedState) {
+                    AcceptTexturesState.Enabled -> acceptTexturesEnabledText
+                    AcceptTexturesState.Disabled -> acceptTexturesDisabledText
+                    AcceptTexturesState.Prompt -> acceptTexturesPromptText
+                }
+
             HierarchicalDropdownMenu(
                 entries =
                     listOf(
                         ActionItem(
-                            text = "Refresh",
+                            text = t(Res.string.menu_refresh),
                             icon = Icons.Filled.Refresh,
                             onClick = onRefresh,
                         ),
                         ActionItem(
-                            text = "Delete",
+                            text = t(Res.string.menu_delete),
                             icon = Icons.Filled.Delete,
                             onClick = onDelete,
                         ),
                         SelectableGroupItem(
-                            text = "Hidden",
+                            text = t(Res.string.menu_hidden),
                             options = hiddenOptions,
-                            selected = DropdownOption(selectedHiddenState.displayName),
+                            selected = DropdownOption(selectedHiddenLabel),
                             onOptionSelected = { option ->
-                                val state = HiddenState.valueOf(option.text)
+                                val state =
+                                    when (option.text) {
+                                        hiddenStateHiddenText -> HiddenState.Hidden
+                                        hiddenStateNotHiddenText -> HiddenState.NotHidden
+                                        else -> selectedHiddenState
+                                    }
                                 selectedHiddenState = state
                                 ServerEntryController.changeHiddenState(
                                     server = data,
@@ -395,11 +459,17 @@ internal fun ServerEntry(
                             },
                         ),
                         SelectableGroupItem(
-                            text = "Server Resource Packs",
+                            text = t(Res.string.menu_server_resource_packs),
                             options = textureOptions,
-                            selected = DropdownOption(selectedState.displayName),
+                            selected = DropdownOption(selectedTextureLabel),
                             onOptionSelected = { option ->
-                                val state = AcceptTexturesState.valueOf(option.text)
+                                val state =
+                                    when (option.text) {
+                                        acceptTexturesEnabledText -> AcceptTexturesState.Enabled
+                                        acceptTexturesDisabledText -> AcceptTexturesState.Disabled
+                                        acceptTexturesPromptText -> AcceptTexturesState.Prompt
+                                        else -> selectedState
+                                    }
                                 selectedState = state
                                 ServerEntryController.changeTexturesMode(
                                     server = data,
@@ -420,7 +490,7 @@ internal fun ServerEntry(
                 IconButton(onClick = toggle) {
                     Icon(
                         imageVector = Icons.Filled.MoreVert,
-                        contentDescription = "Server information",
+                        contentDescription = t(Res.string.cd_server_info),
                         modifier = Modifier.size(24.dp),
                     )
                 }
@@ -437,88 +507,86 @@ private fun IconColumn(
     scope: CoroutineScope,
     animateIcon: Boolean,
     onClearCustomIcon: suspend () -> Unit,
-) = ContextMenuArea(
-    items = {
-        val items =
-            mutableListOf(
-                ContextMenuItem("Copy icon image as PNG file") {
-                    runCatching {
-                        ClipboardUtils.copyImageFromStream(
-                            (serverIcon ?: defaultServerIcon).toPngInputStream(),
-                        )
-                    }.onFailure {
-                        scope.launch {
-                            SnackbarController.sendEvent(
-                                SnackbarEvent(
-                                    "Failed to copy icon as PNG for $serverAddress}",
-                                    SnackbarDuration.Short,
-                                ),
-                            )
-                        }
-                    }
-                },
-                ContextMenuItem("Copy icon image as Base64-encoded PNG data") {
-                    runCatching {
-                        ClipboardUtils.copy(
-                            (serverIcon ?: defaultServerIcon).toPngBase64(),
-                        )
-                    }.onFailure {
-                        scope.launch {
-                            SnackbarController.sendEvent(
-                                SnackbarEvent(
-                                    "Failed to copy icon as Base64 for $serverAddress",
-                                    SnackbarDuration.Short,
-                                ),
-                            )
-                        }
-                    }
-                },
-            )
-        if (serverIcon != null) {
-            items +=
-                ContextMenuItem("Revert to default icon") {
-                    scope.launch {
-                        runCatching {
-                            onClearCustomIcon()
-                        }.onFailure {
-                            SnackbarController.sendEvent(
-                                SnackbarEvent(
-                                    "Failed to revert icon for $serverAddress",
-                                    SnackbarDuration.Short,
-                                ),
-                            )
-                        }
-                    }
-                }
-        }
-        items
-    },
 ) {
-    if (animateIcon) {
-        AnimatedContent(
-            targetState = serverIcon,
-            transitionSpec = { fadeIn() togetherWith fadeOut() },
-        ) { icon ->
+    val contextCopyIconPngText = t(Res.string.context_copy_icon_png)
+    val contextCopyIconBase64Text = t(Res.string.context_copy_icon_base64)
+    val contextRevertDefaultIconText = t(Res.string.context_revert_default_icon)
+
+    val errorCopyIconPngFailedText = t(Res.string.error_copy_icon_png_failed, serverAddress)
+    val errorCopyIconBase64FailedText = t(Res.string.error_copy_icon_base64_failed, serverAddress)
+    val errorRevertIconFailedText = t(Res.string.error_revert_icon_failed, serverAddress)
+
+    ContextMenuArea(
+        items = {
+            val items =
+                mutableListOf(
+                    ContextMenuItem(contextCopyIconPngText) {
+                        runCatching {
+                            ClipboardUtils.copyImageFromStream(
+                                (serverIcon ?: defaultServerIcon).toPngInputStream(),
+                            )
+                        }.onFailure {
+                            scope.launch {
+                                SnackbarController.sendEvent(
+                                    SnackbarEvent(errorCopyIconPngFailedText, SnackbarDuration.Short),
+                                )
+                            }
+                        }
+                    },
+                    ContextMenuItem(contextCopyIconBase64Text) {
+                        runCatching {
+                            ClipboardUtils.copy((serverIcon ?: defaultServerIcon).toPngBase64())
+                        }.onFailure {
+                            scope.launch {
+                                SnackbarController.sendEvent(
+                                    SnackbarEvent(errorCopyIconBase64FailedText, SnackbarDuration.Short),
+                                )
+                            }
+                        }
+                    },
+                )
+            if (serverIcon != null) {
+                items +=
+                    ContextMenuItem(contextRevertDefaultIconText) {
+                        scope.launch {
+                            runCatching { onClearCustomIcon() }
+                                .onFailure {
+                                    SnackbarController.sendEvent(
+                                        SnackbarEvent(errorRevertIconFailedText, SnackbarDuration.Short),
+                                    )
+                                }
+                        }
+                    }
+            }
+            items
+        },
+    ) {
+        if (animateIcon) {
+            AnimatedContent(
+                targetState = serverIcon,
+                transitionSpec = { fadeIn() togetherWith fadeOut() },
+            ) { icon ->
+                Image(
+                    bitmap = icon ?: defaultServerIcon,
+                    contentDescription =
+                        serverIcon?.let {
+                            t(Res.string.cd_icon_custom, serverAddress)
+                        } ?: t(Res.string.cd_icon_default, serverAddress),
+                    modifier = Modifier.size(64.dp),
+                    contentScale = ContentScale.Fit,
+                )
+            }
+        } else {
             Image(
-                bitmap = icon ?: defaultServerIcon,
+                bitmap = serverIcon ?: defaultServerIcon,
                 contentDescription =
                     serverIcon?.let {
-                        "Custom server icon for $serverAddress"
-                    } ?: "Default server icon for $serverAddress",
+                        t(Res.string.cd_icon_custom, serverAddress)
+                    } ?: t(Res.string.cd_icon_default, serverAddress),
                 modifier = Modifier.size(64.dp),
                 contentScale = ContentScale.Fit,
             )
         }
-    } else {
-        Image(
-            bitmap = serverIcon ?: defaultServerIcon,
-            contentDescription =
-                serverIcon?.let {
-                    "Custom server icon for $serverAddress"
-                } ?: "Default server icon for $serverAddress",
-            modifier = Modifier.size(64.dp),
-            contentScale = ContentScale.Fit,
-        )
     }
 }
 
@@ -570,7 +638,7 @@ private fun MotdCard(
                     val data = result.data
                     if (data !is OnlineServerData) {
                         Text(
-                            text = "Invalid server data.",
+                            text = t(Res.string.invalid_server_data),
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.error,
                             lineHeight = MotdLineHeight,
@@ -618,12 +686,13 @@ private fun MotdCard(
                             motdRaw.toMinecraftAnnotatedString(obfuscationSeed)
                         }
 
+                    val copyWithColorCodesText = t(Res.string.copy_with_color_codes)
                     ContextMenuDataProvider(
                         items = {
                             buildList {
                                 if (allSelected && motdRaw.isNotEmpty()) {
                                     add(
-                                        ContextMenuItem("Copy with color codes") {
+                                        ContextMenuItem(copyWithColorCodesText) {
                                             ClipboardUtils.copy(motdRaw)
                                         },
                                     )
@@ -672,7 +741,7 @@ private fun MotdCard(
                             },
                     ) {
                         Text(
-                            text = "Server is unreachable.",
+                            text = t(Res.string.server_unreachable),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.error,
                         )
@@ -693,9 +762,7 @@ private fun MotdCard(
                             },
                     ) {
                         Text(
-                            text =
-                                "You have been rate limited by MCSrvStatus for this server.\n" +
-                                    "Please try again in a few minutes.",
+                            text = t(Res.string.rate_limited_message),
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.error,
                             maxLines = MotdMaxLines,
@@ -716,13 +783,9 @@ private fun OnlineServerDataRow(
 
     val onlineData = (result as OnlineServerDataResourceResult.Success).data as OnlineServerData
 
-    val protocolVersionText = onlineData.protocolVersion.let { "Protocol $it" }
+    val protocolVersionText = t(Res.string.protocol_format, onlineData.protocolVersion.toString())
     val playerCountText =
-        "${onlineData.onlinePlayers.toGroupedString(locale)} / ${
-            onlineData.maxPlayers.toGroupedString(
-                locale,
-            )
-        }"
+        "${onlineData.onlinePlayers.toGroupedString(locale)} / ${onlineData.maxPlayers.toGroupedString(locale)}"
 
     var obfuscationSeed by remember { mutableStateOf(0) }
     LaunchedEffect(result) {
@@ -745,7 +808,7 @@ private fun OnlineServerDataRow(
                         add {
                             InfoChip(
                                 Icons.Filled.Error,
-                                "Blocked by Mojang",
+                                t(Res.string.info_blocked_by_mojang),
                                 tint = MaterialTheme.colorScheme.error,
                             )
                         }
@@ -771,28 +834,29 @@ private fun OnlineServerDataRow(
                             add {
                                 AssistChip(
                                     onClick = { showDescription = true },
-                                    label = { Text("Description") },
+                                    label = { Text(t(Res.string.description_label)) },
                                     modifier = Modifier.height(32.dp).pointerHoverIcon(PointerIcon.Hand),
                                     enabled = true,
                                     leadingIcon = {
                                         Icon(
                                             imageVector = Icons.AutoMirrored.Default.Subject,
-                                            contentDescription = "Custom server description",
+                                            contentDescription = t(Res.string.description_label),
                                             modifier = Modifier.size(18.dp),
                                         )
+                                        val copyWithColorCodesText = t(Res.string.copy_with_color_codes)
                                         FloatingDialogBuilder(
                                             visible = showDescription,
                                             onDismissRequest = { showDescription = false },
                                         ) {
                                             RichTooltip(
-                                                title = { Text("Server description") },
+                                                title = { Text(t(Res.string.server_description_title)) },
                                                 text = {
                                                     ContextMenuDataProvider(
                                                         items = {
                                                             buildList {
                                                                 if (descAllSelected && serverData.isNotEmpty()) {
                                                                     add(
-                                                                        ContextMenuItem("Copy with color codes") {
+                                                                        ContextMenuItem(copyWithColorCodesText) {
                                                                             ClipboardUtils.copy(serverData)
                                                                         },
                                                                     )
@@ -825,8 +889,7 @@ private fun OnlineServerDataRow(
                                                                                             PointerEventType.Press
                                                                                         ) {
                                                                                             event.changes.forEach {
-                                                                                                it
-                                                                                                    .consume()
+                                                                                                it.consume()
                                                                                             }
                                                                                         }
                                                                                     }
@@ -852,7 +915,7 @@ private fun OnlineServerDataRow(
                                                     TextButton(
                                                         modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                                                         onClick = { showDescription = false },
-                                                    ) { Text("OK") }
+                                                    ) { Text(t(Res.string.ok_label)) }
                                                 },
                                             )
                                         }
@@ -870,23 +933,15 @@ private fun OnlineServerDataRow(
                     }
                     if (onlineData is McSrvStatOnlineServerData) {
                         onlineData.versionName?.let {
-                            add {
-                                InfoChip(Icons.AutoMirrored.Filled.Label, it)
-                            }
+                            add { InfoChip(Icons.AutoMirrored.Filled.Label, it) }
                         }
                     }
-                    add {
-                        InfoChip(Icons.Filled.SettingsEthernet, protocolVersionText)
-                    }
+                    add { InfoChip(Icons.Filled.SettingsEthernet, protocolVersionText) }
                 },
             secondRowItems =
                 buildList {
-                    add {
-                        InfoChip(Icons.Filled.People, playerCountText)
-                    }
-                    add {
-                        InfoChip(Icons.Filled.Dns, onlineData.ip)
-                    }
+                    add { InfoChip(Icons.Filled.People, playerCountText) }
+                    add { InfoChip(Icons.Filled.Dns, onlineData.ip) }
                     if (onlineData is McServerPingOnlineServerData) {
                         add {
                             InfoChip(
@@ -939,16 +994,18 @@ private fun InfoChip(
 
     val menuItems =
         if (sizeToggleEnabled) {
+            val infoChipExpandLabelText = t(Res.string.infochip_expand_label)
+            val infoChipCompactLabelText = t(Res.string.infochip_compact_label)
             buildList {
                 if (isCompact) {
                     add(
-                        ContextMenuItem("Expand") {
+                        ContextMenuItem(infoChipExpandLabelText) {
                             isCompact = false
                         },
                     )
                 } else {
                     add(
-                        ContextMenuItem("Compact") {
+                        ContextMenuItem(infoChipCompactLabelText) {
                             isCompact = true
                         },
                     )
@@ -958,7 +1015,7 @@ private fun InfoChip(
             emptyList()
         }
 
-    val chipContent: @Composable () -> Unit = {
+    val chipContent = @Composable {
         Row(
             modifier = Modifier.padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -966,7 +1023,7 @@ private fun InfoChip(
         ) {
             Icon(
                 imageVector = icon,
-                contentDescription = "Icon representing $labelText",
+                contentDescription = t(Res.string.cd_info_chip_icon, labelText),
                 tint = tint,
                 modifier = Modifier.size(18.dp),
             )
