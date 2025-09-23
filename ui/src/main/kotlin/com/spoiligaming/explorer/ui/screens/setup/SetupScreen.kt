@@ -186,17 +186,13 @@ internal fun SetupWizard(
                         if (isMovingForward) {
                             slideInHorizontally(animationSpec = intOffsetAnimationSpec) { it } +
                                 fadeIn(animationSpec = floatAnimationSpec) togetherWith
-                                (
-                                    slideOutHorizontally(animationSpec = intOffsetAnimationSpec) { -it } +
-                                        fadeOut(animationSpec = floatAnimationSpec)
-                                )
+                                slideOutHorizontally(animationSpec = intOffsetAnimationSpec) { -it } +
+                                fadeOut(animationSpec = floatAnimationSpec)
                         } else {
                             slideInHorizontally(animationSpec = intOffsetAnimationSpec) { -it } +
                                 fadeIn(animationSpec = floatAnimationSpec) togetherWith
-                                (
-                                    slideOutHorizontally(animationSpec = intOffsetAnimationSpec) { it } +
-                                        fadeOut(animationSpec = floatAnimationSpec)
-                                )
+                                slideOutHorizontally(animationSpec = intOffsetAnimationSpec) { it } +
+                                fadeOut(animationSpec = floatAnimationSpec)
                         }
                     },
                 ) { targetStep ->
