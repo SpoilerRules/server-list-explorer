@@ -33,8 +33,7 @@ internal object WindowSettingsBinder {
                 override fun componentResized(event: ComponentEvent) {
                     val frame = event.component as JFrame
                     // same surgical procedure as in listenMaximization
-                    val isMaximized =
-                        (frame.extendedState and Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH
+                    val isMaximized = frame.extendedState and Frame.MAXIMIZED_BOTH == Frame.MAXIMIZED_BOTH
 
                     frame.size.let { newSize ->
                         windowStateSettingsManager.updateSettings { current ->
@@ -62,7 +61,7 @@ internal object WindowSettingsBinder {
     inline fun JFrame.listenMaximization() {
         addWindowStateListener { event: WindowEvent ->
             // check if both bits of MAXIMIZED_BOTH are set
-            val isMaximized = (event.newState and Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH
+            val isMaximized = event.newState and Frame.MAXIMIZED_BOTH == Frame.MAXIMIZED_BOTH
 
             windowStateSettingsManager.updateSettings {
                 it.copy(

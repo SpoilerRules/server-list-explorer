@@ -67,7 +67,7 @@ internal class McServerPingServerQueryHandler(
                 !forceQuery &&
                 !skipCache &&
                 cache?.serverIp == resolvedIp &&
-                (cache!!.timestamp + cacheDelay) > now
+                cache!!.timestamp + cacheDelay > now
             ) {
                 logger.info { "Cache hit for server IP $resolvedIp - returning cached data." }
                 return@withContext cache!!.serverData

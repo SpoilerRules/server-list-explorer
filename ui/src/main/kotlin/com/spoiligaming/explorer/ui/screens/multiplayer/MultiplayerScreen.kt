@@ -875,7 +875,7 @@ internal fun MultiplayerScreen(
                                                     .graphicsLayer {
                                                         rotationZ = shakeRotation
                                                     },
-                                            highlight = (serverEntry.id == flashId.value),
+                                            highlight = serverEntry.id == flashId.value,
                                             onHighlightFinished = {
                                                 if (flashId.value == serverEntry.id) {
                                                     flashId.value =

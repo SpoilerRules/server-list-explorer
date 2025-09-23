@@ -153,9 +153,9 @@ internal class DwmWindowStyler private constructor(
         val hr = DwmApi.INSTANCE.DwmSetWindowAttribute(hWnd, attribute, mem, Int.SIZE_BYTES)
         val hex =
             "#%02X%02X%02X".format(
-                ((color.red * 255).toInt() and 0xFF),
-                ((color.green * 255).toInt() and 0xFF),
-                ((color.blue * 255).toInt() and 0xFF),
+                (color.red * 255).toInt() and 0xFF,
+                (color.green * 255).toInt() and 0xFF,
+                (color.blue * 255).toInt() and 0xFF,
             )
         return if (hr.succeeded()) {
             logger.debug { "DWM attribute $attribute <- $hex" }
