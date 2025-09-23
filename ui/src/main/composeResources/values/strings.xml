@@ -25,12 +25,6 @@
     <string name="detecting_server_list">Detecting server list file...</string>
     <string name="detection_wait">This may take a few moments.</string>
 
-    <string name="settings_section_theme">Theme</string>
-    <string name="settings_section_preferences">Preferences</string>
-    <string name="settings_section_multiplayer">Multiplayer Server List</string>
-    <string name="settings_section_window_appearance">Window Appearance &amp; Effects</string>
-    <string name="settings_navigator_title">Sections</string>
-
     <string name="error_unable_load_servers">Unable to load servers</string>
     <string name="error_unable_load_servers_message">An unexpected error occurred while reading your server list.\nPlease check that the file exists and you have permission to read it.</string>
     <string name="server_list_file_not_set">null (not set)</string>
@@ -185,6 +179,13 @@
     <string name="cd_undo">Undo</string>
     <string name="cd_redo">Redo</string>
 
+    <!-- Settings Sections -->
+    <string name="settings_navigator_title">Sections</string>
+    <string name="settings_section_theme">Theme</string>
+    <string name="settings_section_preferences">Preferences</string>
+    <string name="settings_section_multiplayer">Multiplayer Server List</string>
+    <string name="settings_section_window_appearance">Window Appearance &amp; Effects</string>
+
     <!-- Settings: Window Appearance -->
     <string name="setting_window_title_bar_color">Title bar color</string>
     <string name="setting_window_title_bar_color_desc">Choose a custom color for the title bar.</string>
@@ -224,4 +225,22 @@
     <string name="setting_theme_amoled_mode_desc">Enable pure-black backgrounds on OLED screens when dark mode is active.</string>
     <string name="setting_theme_use_system_accent">Use system accent color</string>
     <string name="setting_theme_use_system_accent_desc">When enabled, Server List Explorer will adopt your Windows accent color as the seed color. Toggle on to keep your Server List Explorer in sync with your OS accent.</string>
+
+    <!-- Settings: Multiplayer Server List -->
+    <string name="setting_mp_entry_scale">Server entry scale</string>
+    <string name="setting_mp_entry_scale_desc">Change how wide server entries appear in the list.</string>
+    <string name="setting_mp_action_bar_orientation">Action bar orientation</string>
+    <string name="setting_mp_action_bar_orientation_desc">Set where the server list's action bar appears: Right, Top, Left, or Bottom.</string>
+
+    <string name="action_bar_orientation_right">Right</string>
+    <string name="action_bar_orientation_top">Top</string>
+    <string name="action_bar_orientation_left">Left</string>
+    <string name="action_bar_orientation_bottom">Bottom</string>
+
+    <string name="setting_mp_drag_shake_intensity">Drag shake intensity (degrees)</string>
+    <string name="setting_mp_drag_shake_intensity_desc">Controls how much a server entry shakes when dragged.</string>
+    <string name="setting_mp_connection_timeout">Connection timeout (s)</string>
+    <string name="setting_mp_connection_timeout_desc">Time to wait while connecting to a server.</string>
+    <string name="setting_mp_socket_timeout">Socket timeout (s)</string>
+    <string name="setting_mp_socket_timeout_desc">Time to wait for a server to send data.</string>
 </resources>

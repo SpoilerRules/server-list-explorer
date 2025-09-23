@@ -24,31 +24,27 @@ import kotlinx.serialization.Serializable
 import java.nio.file.Path
 
 @Serializable
-enum class ActionBarOrientation(
-    val displayName: String,
-) {
+enum class ActionBarOrientation {
     @SerialName("right")
-    Right("Right"),
+    Right,
 
     @SerialName("top")
-    Top("Top"),
+    Top,
 
     @SerialName("left")
-    Left("Left"),
+    Left,
 
     @SerialName("bottom")
-    Bottom("Bottom"),
+    Bottom,
 }
 
 @Serializable
-enum class ServerQueryMethod(
-    val displayName: String,
-) {
+enum class ServerQueryMethod {
     @SerialName("mcsrvstat")
-    McSrvStat("MCSrvStatus"),
+    McSrvStat,
 
     @SerialName("mcserverping")
-    McServerPing("MCServerPing"),
+    McServerPing,
 }
 
 @Serializable

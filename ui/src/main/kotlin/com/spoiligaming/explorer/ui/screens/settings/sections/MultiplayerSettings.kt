@@ -33,16 +33,33 @@ import androidx.compose.runtime.getValue
 import com.spoiligaming.explorer.settings.manager.multiplayerSettingsManager
 import com.spoiligaming.explorer.settings.model.ActionBarOrientation
 import com.spoiligaming.explorer.ui.screens.settings.components.SettingsSection
+import com.spoiligaming.explorer.ui.t
 import com.spoiligaming.explorer.ui.widgets.DropdownOption
 import com.spoiligaming.explorer.ui.widgets.ItemSelectableDropdownMenu
 import com.spoiligaming.explorer.ui.widgets.ItemValueSlider
+import server_list_explorer.ui.generated.resources.Res
+import server_list_explorer.ui.generated.resources.action_bar_orientation_bottom
+import server_list_explorer.ui.generated.resources.action_bar_orientation_left
+import server_list_explorer.ui.generated.resources.action_bar_orientation_right
+import server_list_explorer.ui.generated.resources.action_bar_orientation_top
+import server_list_explorer.ui.generated.resources.setting_mp_action_bar_orientation
+import server_list_explorer.ui.generated.resources.setting_mp_action_bar_orientation_desc
+import server_list_explorer.ui.generated.resources.setting_mp_connection_timeout
+import server_list_explorer.ui.generated.resources.setting_mp_connection_timeout_desc
+import server_list_explorer.ui.generated.resources.setting_mp_drag_shake_intensity
+import server_list_explorer.ui.generated.resources.setting_mp_drag_shake_intensity_desc
+import server_list_explorer.ui.generated.resources.setting_mp_entry_scale
+import server_list_explorer.ui.generated.resources.setting_mp_entry_scale_desc
+import server_list_explorer.ui.generated.resources.setting_mp_socket_timeout
+import server_list_explorer.ui.generated.resources.setting_mp_socket_timeout_desc
+import server_list_explorer.ui.generated.resources.settings_section_multiplayer
 
 @Composable
 internal fun MultiplayerSettings() {
     val mpSettings by multiplayerSettingsManager.settingsFlow.collectAsState()
 
     SettingsSection(
-        header = "Multiplayer Server List",
+        header = t(Res.string.settings_section_multiplayer),
         settings =
             listOf {
                 /* ItemSwitch(
@@ -56,8 +73,8 @@ internal fun MultiplayerSettings() {
                        },
                    )*/
                 ItemValueSlider(
-                    title = "Server entry scale",
-                    description = "Change how wide server entries appear in the list.",
+                    title = t(Res.string.setting_mp_entry_scale),
+                    description = t(Res.string.setting_mp_entry_scale_desc),
                     value = mpSettings.serverEntryScale,
                     valueRange = 1f..4f,
                     onValueChange = { newScale ->
@@ -75,8 +92,8 @@ internal fun MultiplayerSettings() {
                     },
                 )
                 ItemValueSlider(
-                    title = "Drag shake intensity (degrees)",
-                    description = "Controls how much a server entry shakes when dragged.",
+                    title = t(Res.string.setting_mp_drag_shake_intensity),
+                    description = t(Res.string.setting_mp_drag_shake_intensity_desc),
                     value = mpSettings.dragShakeIntensityDegrees,
                     valueRange = 0f..10f,
                     onValueChange = { newValue ->
@@ -86,8 +103,8 @@ internal fun MultiplayerSettings() {
                     },
                 )
                 ItemValueSlider(
-                    title = "Connection timeout (s)",
-                    description = "Time to wait while connecting to a server.",
+                    title = t(Res.string.setting_mp_connection_timeout),
+                    description = t(Res.string.setting_mp_connection_timeout_desc),
                     value = mpSettings.connectTimeoutMillis / 1000L,
                     valueRange = 1f..600f,
                     onValueChange = { newValueInSeconds ->
@@ -98,8 +115,8 @@ internal fun MultiplayerSettings() {
                 )
 
                 ItemValueSlider(
-                    title = "Socket timeout (s)",
-                    description = "Time to wait for a server to send data.",
+                    title = t(Res.string.setting_mp_socket_timeout),
+                    description = t(Res.string.setting_mp_socket_timeout_desc),
                     value = mpSettings.socketTimeoutMillis / 1000L,
                     valueRange = 1f..60f,
                     onValueChange = { newValueInSeconds ->
@@ -117,8 +134,19 @@ private fun ActionBarOrientationDropdown(
     current: ActionBarOrientation,
     onSelected: (ActionBarOrientation) -> Unit,
 ) {
+    val orientationToDisplayName =
+        ActionBarOrientation.entries.associateWith { orientation ->
+            when (orientation) {
+                ActionBarOrientation.Right -> t(Res.string.action_bar_orientation_right)
+                ActionBarOrientation.Top -> t(Res.string.action_bar_orientation_top)
+                ActionBarOrientation.Left -> t(Res.string.action_bar_orientation_left)
+                ActionBarOrientation.Bottom -> t(Res.string.action_bar_orientation_bottom)
+            }
+        }
+    val displayNameToOrientation = orientationToDisplayName.entries.associate { (k, v) -> v to k }
+
     val options =
-        ActionBarOrientation.entries.map { orientation ->
+        orientationToDisplayName.map { (orientation, displayName) ->
             val (icon, selectedIcon) =
                 when (orientation) {
                     ActionBarOrientation.Right ->
@@ -131,22 +159,20 @@ private fun ActionBarOrientationDropdown(
                         Icons.Outlined.ArrowDownward to Icons.Filled.ArrowDownward
                 }
             DropdownOption(
-                text = orientation.displayName,
+                text = displayName,
                 icon = icon,
                 selectedIcon = selectedIcon,
             )
         }
 
-    val selectedOption = options.first { it.text == current.displayName }
+    val selectedOption = options.first { it.text == orientationToDisplayName[current] }
 
     ItemSelectableDropdownMenu(
-        title = "Action bar orientation",
-        description = "Set where the server list's action bar appears: Right, Top, Left, or Bottom.",
+        title = t(Res.string.setting_mp_action_bar_orientation),
+        description = t(Res.string.setting_mp_action_bar_orientation_desc),
         selectedOption = selectedOption,
         options = options,
     ) { selected ->
-        ActionBarOrientation.entries
-            .firstOrNull { it.displayName == selected.text }
-            ?.let(onSelected)
+        displayNameToOrientation[selected.text]?.let(onSelected)
     }
 }
