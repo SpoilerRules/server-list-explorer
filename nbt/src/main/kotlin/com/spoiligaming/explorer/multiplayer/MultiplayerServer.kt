@@ -63,19 +63,13 @@ data class MultiplayerServer(
     }
 }
 
-// TODO: localize
-enum class AcceptTexturesState(
-    val displayName: String,
-) {
-    Enabled("Enabled"),
-    Disabled("Disabled"),
-    Prompt("Prompt"),
+enum class AcceptTexturesState {
+    Enabled,
+    Disabled,
+    Prompt,
 }
 
-// TODO: localize
-enum class HiddenState(
-    val displayName: String,
-) {
-    Hidden("Hidden"),
-    NotHidden("Not Hidden"),
+enum class HiddenState {
+    Hidden,
+    NotHidden,
 }

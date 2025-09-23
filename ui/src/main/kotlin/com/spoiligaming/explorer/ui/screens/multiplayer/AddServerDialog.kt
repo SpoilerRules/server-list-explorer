@@ -63,6 +63,9 @@ import com.spoiligaming.explorer.ui.dialog.prominent
 import com.spoiligaming.explorer.ui.t
 import com.spoiligaming.explorer.ui.util.rememberAdaptiveWidth
 import server_list_explorer.ui.generated.resources.Res
+import server_list_explorer.ui.generated.resources.accept_textures_disabled
+import server_list_explorer.ui.generated.resources.accept_textures_enabled
+import server_list_explorer.ui.generated.resources.accept_textures_prompt
 import server_list_explorer.ui.generated.resources.add_server_button_add
 import server_list_explorer.ui.generated.resources.add_server_hide_label
 import server_list_explorer.ui.generated.resources.add_server_hide_note
@@ -129,6 +132,11 @@ internal fun AddServerDialog(
                         text = t(Res.string.add_server_resource_packs),
                         style = MaterialTheme.typography.titleMedium,
                     )
+
+                    val acceptTexturesEnabledText = t(Res.string.accept_textures_enabled)
+                    val acceptTexturesDisabledText = t(Res.string.accept_textures_disabled)
+                    val acceptTexturesPromptText = t(Res.string.accept_textures_prompt)
+
                     SingleChoiceSegmentedButtonRow {
                         AcceptTexturesState.entries.forEach { stateOpt ->
                             SegmentedButton(
@@ -145,7 +153,13 @@ internal fun AddServerDialog(
                                         .colors()
                                         .copy(inactiveContainerColor = Color.Transparent),
                             ) {
-                                Text(stateOpt.displayName)
+                                val label =
+                                    when (stateOpt) {
+                                        AcceptTexturesState.Enabled -> acceptTexturesEnabledText
+                                        AcceptTexturesState.Disabled -> acceptTexturesDisabledText
+                                        AcceptTexturesState.Prompt -> acceptTexturesPromptText
+                                    }
+                                Text(label)
                             }
                         }
                     }
