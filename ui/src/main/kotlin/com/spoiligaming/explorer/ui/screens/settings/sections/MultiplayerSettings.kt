@@ -19,13 +19,13 @@
 package com.spoiligaming.explorer.ui.screens.settings.sections
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ArrowDownward
+import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -145,14 +145,15 @@ private fun ActionBarOrientationDropdown(
         }
     val displayNameToOrientation = orientationToDisplayName.entries.associate { (k, v) -> v to k }
 
+    @Suppress("DEPRECATION")
     val options =
         orientationToDisplayName.map { (orientation, displayName) ->
             val (icon, selectedIcon) =
                 when (orientation) {
                     ActionBarOrientation.Right ->
-                        Icons.AutoMirrored.Outlined.ArrowForward to Icons.AutoMirrored.Filled.ArrowForward
+                        Icons.Outlined.ArrowForward to Icons.Filled.ArrowForward
                     ActionBarOrientation.Left ->
-                        Icons.AutoMirrored.Outlined.ArrowBack to Icons.AutoMirrored.Filled.ArrowBack
+                        Icons.Outlined.ArrowBack to Icons.Filled.ArrowBack
                     ActionBarOrientation.Top ->
                         Icons.Outlined.ArrowUpward to Icons.Filled.ArrowUpward
                     ActionBarOrientation.Bottom ->
