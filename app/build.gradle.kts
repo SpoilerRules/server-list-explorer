@@ -52,7 +52,11 @@ dependencies {
 val mainFunction = "com.spoiligaming.explorer.MainKt"
 
 tasks.jar {
-    archiveFileName.set("ServerListExplorer.jar")
+    /*
+    The default JAR is named with an "-app" suffix to make it clear that this
+    artifact contains only the classes from the app module itself.
+     */
+    archiveFileName.set("ServerListExplorer-app.jar")
     duplicatesStrategy = DuplicatesStrategy.FAIL
     manifest {
         attributes["Main-Class"] = mainFunction
@@ -70,6 +74,34 @@ tasks.shadowJar {
 
     doLast {
         println("Shadow JAR generated at: ${archiveFile.get().asFile.absolutePath}")
+    }
+}
+
+val buildWithProjectModules by tasks.registering(Jar::class) {
+    archiveFileName.set("ServerListExplorer.jar")
+    destinationDirectory.set(layout.buildDirectory.dir("libs"))
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+
+    // include current project output
+    from(sourceSets["main"].output)
+
+    // find all project (module) dependencies declared on common configurations
+    val projectPaths: List<String> =
+        configurations
+            .filter { it.name in listOf("implementation", "api", "compileOnly", "runtimeOnly") }
+            .flatMap { conf ->
+                conf.dependencies.withType(ProjectDependency::class.java).map { dep -> dep.path }
+            }.distinct()
+
+    projectPaths.forEach { projectPath ->
+        val depProject = project.project(projectPath)
+        val jarProvider = depProject.tasks.named<Jar>("jar")
+
+        // ensure the subproject jar is built before this task
+        dependsOn(jarProvider)
+
+        // include contents of that jar
+        from({ project.zipTree(jarProvider.flatMap { it.archiveFile }) })
     }
 }
 
