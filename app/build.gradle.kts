@@ -38,6 +38,7 @@ dependencies {
     compileOnly(libs.log4j.core)
     runtimeOnly(libs.log4j.slf4j2.impl)
 
+    implementation(compose.runtime)
     listOf(
         compose.desktop.windows_x64,
         compose.desktop.windows_arm64,
