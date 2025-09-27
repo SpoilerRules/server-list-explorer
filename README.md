@@ -49,17 +49,17 @@
 | [![Screenshot 1](https://i.imgur.com/sQzIVyL.png)](https://i.imgur.com/sQzIVyL.png) | [![Screenshot 2](https://i.imgur.com/s3yGMjq.png)](https://i.imgur.com/s3yGMjq.png)  |
 |-------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
 | [![Screenshot 3](https://i.imgur.com/nXdLGW1.png)](https://i.imgur.com/nXdLGW1.png) | [![Screenshot 4](https://i.imgur.com/eMH8Hq6.png)](https://i.imgur.com/eMH8Hq6.png)  |
-| [![Screenshot 5](https://i.imgur.com/SGZOFtL.png)](https://i.imgur.com/SGZOFtL.png) | [![Screenshot 6](https://i.imgur.com/AGBC5Js.png)](https://i.imgur.com/AGBC5Js.png)  |
-| [![Screenshot 7](https://i.imgur.com/zHec8SU.png)](https://i.imgur.com/zHec8SU.png) | [![Screenshot 8](https://i.imgur.com/bsewslp.png)](https://i.imgur.com/bsewslp.png)  |
+| [![Screenshot 5](https://i.imgur.com/q3eO9L4.png)](https://i.imgur.com/SGZOFtL.png) | [![Screenshot 6](https://i.imgur.com/AGBC5Js.png)](https://i.imgur.com/AGBC5Js.png)  |
+| [![Screenshot 7](https://i.imgur.com/zHec8SU.png)](https://i.imgur.com/zHec8SU.png) | [![Screenshot 8](https://i.imgur.com/KnhzN9P.png)](https://i.imgur.com/bsewslp.png)  |
 | [![Screenshot 9](https://i.imgur.com/lPcWLLU.png)](https://i.imgur.com/lPcWLLU.png) | [![Screenshot 10](https://i.imgur.com/encWz5c.png)](https://i.imgur.com/encWz5c.png) |
 
 ## Table of Contents
 
 - [User Interface Preview](#user-interface-preview)
-- [How to Run the Project](#how-to-run-the-project)
+- [How to Build the Project](#how-to-build-the-project)
 - [Wiki](#wiki)
 
-## How to Run the Project
+## How to Build the Project
 
 This project is built using Gradle and requires **Java 21 or higher** to run. Follow the steps below to build and execute the application:
 
