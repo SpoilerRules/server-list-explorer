@@ -45,7 +45,7 @@ dependencies {
         compose.desktop.linux_arm64,
         compose.desktop.macos_x64,
         compose.desktop.macos_arm64,
-    ).forEach { compileOnly(it) }
+    ).forEach { runtimeOnly(it) }
 }
 
 val mainFunction = "com.spoiligaming.explorer.MainKt"
