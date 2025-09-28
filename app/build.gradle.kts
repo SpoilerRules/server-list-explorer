@@ -131,13 +131,13 @@ val copyrightYears =
 compose.desktop.application {
     mainClass = mainFunction
     javaHome = sequenceOf(
-        System.getenv("JDK_17"),
+        System.getenv("JDK_21"),
         System.getenv("JAVA_HOME"),
         findProperty("org.gradle.java.home") as? String,
         runCatching {
             extensions
                 .getByType(JavaToolchainService::class.java)
-                .launcherFor { languageVersion.set(JavaLanguageVersion.of(17)) }
+                .launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) }
                 .get()
                 .metadata.installationPath.asFile.absolutePath
         }.getOrNull(),
@@ -145,12 +145,12 @@ compose.desktop.application {
     ).filterNotNull().map { it.trim() }.firstOrNull { it.isNotEmpty() }
         ?: error(
             """
-            Could not locate a Java 17 installation.
+            Could not locate a Java 21 installation.
             Please do one of the following and retry:
-              - Set the JDK_17 environment variable
-              - Set JAVA_HOME to a Java 17 installation
+              - Set the JDK_21 environment variable
+              - Set JAVA_HOME to a Java 21 installation
               - Set org.gradle.java.home in gradle.properties
-              - Configure a Java 17 Gradle toolchain
+              - Configure a Java 21 Gradle toolchain
             """.trimIndent(),
         )
 
