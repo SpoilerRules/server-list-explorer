@@ -172,6 +172,8 @@ compose.desktop.application {
         targetFormats(
             org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi,
         )
+
+        modules("java.management", "java.naming", "jdk.unsupported")
     }
 
     buildTypes.release.proguard {
