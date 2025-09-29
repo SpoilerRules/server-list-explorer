@@ -81,6 +81,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.graphicsLayer
@@ -981,9 +982,10 @@ private fun ServerListHistoryControlCard(
                     }
                 },
                 modifier =
-                    Modifier.pointerHoverIcon(
-                        if (canUndo) PointerIcon.Hand else PointerIcon.Default,
-                    ),
+                    Modifier
+                        .pointerHoverIcon(
+                            if (canUndo) PointerIcon.Hand else PointerIcon.Default,
+                        ).focusProperties { canFocus = false },
                 enabled = canUndo,
             ) {
                 Icon(
@@ -1006,9 +1008,10 @@ private fun ServerListHistoryControlCard(
                     }
                 },
                 modifier =
-                    Modifier.pointerHoverIcon(
-                        if (canRedo) PointerIcon.Hand else PointerIcon.Default,
-                    ),
+                    Modifier
+                        .pointerHoverIcon(
+                            if (canRedo) PointerIcon.Hand else PointerIcon.Default,
+                        ).focusProperties { canFocus = false },
                 enabled = canRedo,
             ) {
                 Icon(
