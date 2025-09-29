@@ -70,6 +70,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -289,7 +290,7 @@ private fun <E> NavigationRailItem(
                 tint = contentColor,
             )
         },
-        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand).focusProperties { canFocus = false },
         enabled = !disabled,
         label = {
             Text(
@@ -326,7 +327,7 @@ private fun <E> NavigationDrawerItem(
         selected = isSelected,
         onClick = onClick,
         // disabled = disabled,
-        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand).focusProperties { canFocus = false },
         icon = {
             Icon(
                 modifier = Modifier.size(IconSize),
@@ -349,7 +350,7 @@ private fun ExpandCollapseButton(
 
     IconButton(
         onClick = onClick,
-        modifier = modifier.pointerHoverIcon(PointerIcon.Hand),
+        modifier = modifier.pointerHoverIcon(PointerIcon.Hand).focusProperties { canFocus = false },
     ) {
         Icon(
             modifier = Modifier.size(IconSize),
@@ -378,6 +379,7 @@ private fun ThemeToggleButton(onClick: () -> Unit) {
             Modifier
                 .size(ToggleButtonSize)
                 .pointerHoverIcon(PointerIcon.Hand)
+                .focusProperties { canFocus = false }
                 .onHover { isHovered = it }
                 .semantics {
                     contentDescription =
