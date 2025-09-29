@@ -26,6 +26,7 @@ package com.spoiligaming.explorer.ui.screens.multiplayer
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -981,38 +982,31 @@ private fun InfoChip(
     }
 
     val surfaceModifier =
-        if (isCompact) {
-            Modifier
-                .height(32.dp)
-                .width(100.dp)
-                .animateContentSize()
-        } else {
-            Modifier
-                .height(32.dp)
-                .animateContentSize()
-        }
+        Modifier
+            .height(32.dp)
+            .animateContentSize(
+                animationSpec =
+                    tween(
+                        durationMillis = 300,
+                        easing = LinearOutSlowInEasing,
+                    ),
+            ).then(
+                if (isCompact) Modifier.width(100.dp) else Modifier,
+            )
 
+    val infoChipExpandLabelText = t(Res.string.infochip_expand_label)
+    val infoChipCompactLabelText = t(Res.string.infochip_compact_label)
     val menuItems =
-        if (sizeToggleEnabled) {
-            val infoChipExpandLabelText = t(Res.string.infochip_expand_label)
-            val infoChipCompactLabelText = t(Res.string.infochip_compact_label)
-            buildList {
+        remember(sizeToggleEnabled, isCompact) {
+            if (!sizeToggleEnabled) {
+                emptyList()
+            } else {
                 if (isCompact) {
-                    add(
-                        ContextMenuItem(infoChipExpandLabelText) {
-                            isCompact = false
-                        },
-                    )
+                    listOf(ContextMenuItem(infoChipExpandLabelText) { isCompact = false })
                 } else {
-                    add(
-                        ContextMenuItem(infoChipCompactLabelText) {
-                            isCompact = true
-                        },
-                    )
+                    listOf(ContextMenuItem(infoChipCompactLabelText) { isCompact = true })
                 }
             }
-        } else {
-            emptyList()
         }
 
     val chipContent = @Composable {
