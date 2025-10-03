@@ -37,11 +37,10 @@
 </p>
 
 <p align="center">
-  <b>Server List Explorer</b> is the ultimate tool for effortlessly managing
-  your <a href="https://www.minecraft.net/">Minecraft: Java Edition</a> server list and, soon, your single-player world list.
-  It has a sleek, utilitarian design that follows <a href="https://m3.material.io/">Material 3 Design</a> principles.
-  Discover all the features on our <a href="https://github.com/SpoilerRules/server-list-explorer/wiki/Feature-List">Feature List on the wiki</a>,
-  and check out the <a href="#user-interface-preview">User Interface Preview</a> to see the project up close.
+  <b>Server List Explorer</b> is a tool for managing
+  your <a href="https://www.minecraft.net/">Minecraft: Java Edition</a> server list and, in the future, your single-player world list.
+  A complete overview of the features can be found on the
+  <a href="https://github.com/SpoilerRules/server-list-explorer/wiki/Feature-List">Feature List wiki page</a>.
 </p>
 
 ## User Interface Preview
