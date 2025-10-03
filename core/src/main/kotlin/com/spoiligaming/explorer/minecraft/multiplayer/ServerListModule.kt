@@ -36,12 +36,17 @@ object ServerListModule : IModeLoader<ServerListRepository> {
 
     override suspend fun initialize(target: Path?) =
         withContext(Dispatchers.Default) {
-            runCatching { ServerListPaths.validate(target) }
-                .onFailure { e ->
-                    logger.error(e) { "Validation failed for server list path: $target" }
-                }.map {
-                    ServerListRepository(target!!).also { it.load() }.also { repository = it }
+            runCatching {
+                ServerListPaths.validate(target)
+                val p = requireNotNull(target) { "target must not be null after validation" }
+
+                ServerListRepository(p).apply {
+                    load()
+                    repository = this
                 }
+            }.onFailure { e ->
+                logger.error(e) { "Validation failed for server list path: $target" }
+            }
         }
 }
 
