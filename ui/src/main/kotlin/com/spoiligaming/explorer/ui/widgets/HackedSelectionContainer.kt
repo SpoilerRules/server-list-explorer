@@ -548,7 +548,7 @@ private fun rememberCls(name: String) =
         runCatching { Class.forName(name) }
             .onFailure { e -> logger.error(e) { "Cannot load class $name." } }
             .getOrThrow()
-            .also { logger.debug { "Loaded class $name." } }
+            .also { logger.trace { "Loaded class $name." } }
     }
 
 @Composable
