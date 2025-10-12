@@ -59,6 +59,7 @@ import androidx.compose.material.icons.automirrored.filled.Subject
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.GppGood
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.NetworkPing
@@ -117,8 +118,8 @@ import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.IServerData
-import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.McServerPingOnlineServerData
 import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.McSrvStatOnlineServerData
+import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.McUtilsOnlineServerData
 import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.OnlineServerData
 import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.OnlineServerDataResourceResult
 import com.spoiligaming.explorer.multiplayer.AcceptTexturesState
@@ -126,7 +127,6 @@ import com.spoiligaming.explorer.multiplayer.HiddenState
 import com.spoiligaming.explorer.multiplayer.MultiplayerServer
 import com.spoiligaming.explorer.multiplayer.history.ServerListHistoryService
 import com.spoiligaming.explorer.multiplayer.repository.ServerListRepository
-import com.spoiligaming.explorer.settings.model.ServerQueryMethod
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalAmoledActive
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalMultiplayerSettings
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
@@ -140,6 +140,7 @@ import com.spoiligaming.explorer.ui.snackbar.SnackbarController
 import com.spoiligaming.explorer.ui.snackbar.SnackbarEvent
 import com.spoiligaming.explorer.ui.t
 import com.spoiligaming.explorer.ui.theme.isDarkTheme
+import com.spoiligaming.explorer.ui.theme.secureChatTint
 import com.spoiligaming.explorer.ui.widgets.ActionItem
 import com.spoiligaming.explorer.ui.widgets.DropdownOption
 import com.spoiligaming.explorer.ui.widgets.HackedSelectionContainer
@@ -176,6 +177,7 @@ import server_list_explorer.ui.generated.resources.error_revert_icon_failed
 import server_list_explorer.ui.generated.resources.hidden_state_hidden
 import server_list_explorer.ui.generated.resources.hidden_state_not_hidden
 import server_list_explorer.ui.generated.resources.info_blocked_by_mojang
+import server_list_explorer.ui.generated.resources.info_secure_chat_enforced
 import server_list_explorer.ui.generated.resources.infochip_compact_label
 import server_list_explorer.ui.generated.resources.infochip_expand_label
 import server_list_explorer.ui.generated.resources.invalid_server_data
@@ -184,6 +186,7 @@ import server_list_explorer.ui.generated.resources.menu_hidden
 import server_list_explorer.ui.generated.resources.menu_refresh
 import server_list_explorer.ui.generated.resources.menu_server_resource_packs
 import server_list_explorer.ui.generated.resources.ok_label
+import server_list_explorer.ui.generated.resources.ping_unknown
 import server_list_explorer.ui.generated.resources.protocol_format
 import server_list_explorer.ui.generated.resources.rate_limited_message
 import server_list_explorer.ui.generated.resources.server_description_title
@@ -219,17 +222,17 @@ internal fun ServerEntry(
 ) {
     val amoledOn = LocalAmoledActive.current
     val mpSettings = LocalMultiplayerSettings.current
-    val useMcSrvStat = mpSettings.serverQueryMethod == ServerQueryMethod.McSrvStat
+    val queryMode = mpSettings.serverQueryMethod
     val serverFlow =
         remember(
             data.ip,
-            useMcSrvStat,
+            queryMode,
             mpSettings.connectTimeoutMillis,
             mpSettings.socketTimeoutMillis,
         ) {
             ServerEntryController.getServerDataFlow(
                 address = data.ip,
-                useMCSrvStat = useMcSrvStat,
+                queryMode = queryMode,
                 connectTimeoutMillis = mpSettings.connectTimeoutMillis,
                 socketTimeoutMillis = mpSettings.socketTimeoutMillis,
             )
@@ -814,115 +817,124 @@ private fun OnlineServerDataRow(
                             )
                         }
                     }
-                    if (onlineData is McSrvStatOnlineServerData) {
-                        onlineData.info?.let { serverData ->
-                            var descriptionObfuscationSeed by remember { mutableStateOf(MotdObfuscationMinimumSeed) }
 
-                            var descIsSelecting by remember { mutableStateOf(false) }
-                            var descAllSelected by remember { mutableStateOf(false) }
-                            val descSelectingState = rememberUpdatedState(descIsSelecting)
+                    if (onlineData is McUtilsOnlineServerData && onlineData.secureChatEnforced) {
+                        add {
+                            InfoChip(
+                                icon = Icons.Filled.GppGood,
+                                label = t(Res.string.info_secure_chat_enforced),
+                                tint = MaterialTheme.colorScheme.secureChatTint,
+                            )
+                        }
+                    }
 
-                            LaunchedEffect(serverData) {
-                                while (true) {
-                                    if (!descSelectingState.value) {
-                                        descriptionObfuscationSeed =
-                                            (MotdObfuscationMinimumSeed..Int.MAX_VALUE).random()
-                                    }
-                                    delay(MotdObfuscationUpdateInterval)
+                    onlineData.info?.let { serverData ->
+                        var descriptionObfuscationSeed by remember { mutableStateOf(MotdObfuscationMinimumSeed) }
+
+                        var descIsSelecting by remember { mutableStateOf(false) }
+                        var descAllSelected by remember { mutableStateOf(false) }
+                        val descSelectingState = rememberUpdatedState(descIsSelecting)
+
+                        LaunchedEffect(serverData) {
+                            while (true) {
+                                if (!descSelectingState.value) {
+                                    descriptionObfuscationSeed =
+                                        (MotdObfuscationMinimumSeed..Int.MAX_VALUE).random()
                                 }
+                                delay(MotdObfuscationUpdateInterval)
                             }
+                        }
 
-                            add {
-                                AssistChip(
-                                    onClick = { showDescription = true },
-                                    label = { Text(t(Res.string.description_label)) },
-                                    modifier = Modifier.height(32.dp).pointerHoverIcon(PointerIcon.Hand),
-                                    enabled = true,
-                                    leadingIcon = {
-                                        Icon(
-                                            imageVector = Icons.AutoMirrored.Default.Subject,
-                                            contentDescription = t(Res.string.description_label),
-                                            modifier = Modifier.size(18.dp),
-                                        )
-                                        val copyWithColorCodesText = t(Res.string.copy_with_color_codes)
-                                        FloatingDialogBuilder(
-                                            visible = showDescription,
-                                            onDismissRequest = { showDescription = false },
-                                        ) {
-                                            RichTooltip(
-                                                title = { Text(t(Res.string.server_description_title)) },
-                                                text = {
-                                                    ContextMenuDataProvider(
-                                                        items = {
-                                                            buildList {
-                                                                if (descAllSelected && serverData.isNotEmpty()) {
-                                                                    add(
-                                                                        ContextMenuItem(copyWithColorCodesText) {
-                                                                            ClipboardUtils.copy(serverData)
-                                                                        },
-                                                                    )
-                                                                }
+                        add {
+                            AssistChip(
+                                onClick = { showDescription = true },
+                                label = { Text(t(Res.string.description_label)) },
+                                modifier = Modifier.height(32.dp).pointerHoverIcon(PointerIcon.Hand),
+                                enabled = true,
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Default.Subject,
+                                        contentDescription = t(Res.string.description_label),
+                                        modifier = Modifier.size(18.dp),
+                                    )
+                                    val copyWithColorCodesText = t(Res.string.copy_with_color_codes)
+                                    FloatingDialogBuilder(
+                                        visible = showDescription,
+                                        onDismissRequest = { showDescription = false },
+                                    ) {
+                                        RichTooltip(
+                                            title = { Text(t(Res.string.server_description_title)) },
+                                            text = {
+                                                ContextMenuDataProvider(
+                                                    items = {
+                                                        buildList {
+                                                            if (descAllSelected && serverData.isNotEmpty()) {
+                                                                add(
+                                                                    ContextMenuItem(copyWithColorCodesText) {
+                                                                        ClipboardUtils.copy(serverData)
+                                                                    },
+                                                                )
                                                             }
-                                                        },
-                                                    ) {
-                                                        Card(modifier = Modifier.padding(top = 12.dp)) {
-                                                            Box(
-                                                                Modifier
-                                                                    .fillMaxWidth()
-                                                                    .padding(MotdInnerPadding),
-                                                            ) {
-                                                                val focusRequester = remember { FocusRequester() }
+                                                        }
+                                                    },
+                                                ) {
+                                                    Card(modifier = Modifier.padding(top = 12.dp)) {
+                                                        Box(
+                                                            Modifier
+                                                                .fillMaxWidth()
+                                                                .padding(MotdInnerPadding),
+                                                        ) {
+                                                            val focusRequester = remember { FocusRequester() }
 
-                                                                LaunchedEffect(Unit) {
-                                                                    focusRequester.requestFocus()
-                                                                }
+                                                            LaunchedEffect(Unit) {
+                                                                focusRequester.requestFocus()
+                                                            }
 
-                                                                HackedSelectionContainer(
-                                                                    modifier =
-                                                                        Modifier
-                                                                            .focusRequester(focusRequester)
-                                                                            .focusable()
-                                                                            .pointerInput(Unit) {
-                                                                                awaitPointerEventScope {
-                                                                                    while (true) {
-                                                                                        val event = awaitPointerEvent()
-                                                                                        if (event.type ==
-                                                                                            PointerEventType.Press
-                                                                                        ) {
-                                                                                            event.changes.forEach {
-                                                                                                it.consume()
-                                                                                            }
+                                                            HackedSelectionContainer(
+                                                                modifier =
+                                                                    Modifier
+                                                                        .focusRequester(focusRequester)
+                                                                        .focusable()
+                                                                        .pointerInput(Unit) {
+                                                                            awaitPointerEventScope {
+                                                                                while (true) {
+                                                                                    val event = awaitPointerEvent()
+                                                                                    if (event.type ==
+                                                                                        PointerEventType.Press
+                                                                                    ) {
+                                                                                        event.changes.forEach {
+                                                                                            it.consume()
                                                                                         }
                                                                                     }
                                                                                 }
-                                                                            },
-                                                                    onSelectedChange = { descIsSelecting = it },
-                                                                    onAllSelectedChange = { descAllSelected = it },
-                                                                ) {
-                                                                    Text(
-                                                                        text =
-                                                                            serverData.toMinecraftAnnotatedString(
-                                                                                descriptionObfuscationSeed,
-                                                                            ),
-                                                                        style = MaterialTheme.typography.bodyMedium,
-                                                                        lineHeight = MotdLineHeight,
-                                                                    )
-                                                                }
+                                                                            }
+                                                                        },
+                                                                onSelectedChange = { descIsSelecting = it },
+                                                                onAllSelectedChange = { descAllSelected = it },
+                                                            ) {
+                                                                Text(
+                                                                    text =
+                                                                        serverData.toMinecraftAnnotatedString(
+                                                                            descriptionObfuscationSeed,
+                                                                        ),
+                                                                    style = MaterialTheme.typography.bodyMedium,
+                                                                    lineHeight = MotdLineHeight,
+                                                                )
                                                             }
                                                         }
                                                     }
-                                                },
-                                                action = {
-                                                    TextButton(
-                                                        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                                                        onClick = { showDescription = false },
-                                                    ) { Text(t(Res.string.ok_label)) }
-                                                },
-                                            )
-                                        }
-                                    },
-                                )
-                            }
+                                                }
+                                            },
+                                            action = {
+                                                TextButton(
+                                                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                                                    onClick = { showDescription = false },
+                                                ) { Text(t(Res.string.ok_label)) }
+                                            },
+                                        )
+                                    }
+                                },
+                            )
                         }
                     }
                     add {
@@ -943,13 +955,30 @@ private fun OnlineServerDataRow(
                 buildList {
                     add { InfoChip(Icons.Filled.People, playerCountText) }
                     add { InfoChip(Icons.Filled.Dns, onlineData.ip) }
-                    if (onlineData is McServerPingOnlineServerData) {
+
+                    if (onlineData is McUtilsOnlineServerData) {
                         add {
-                            InfoChip(
-                                icon = Icons.Filled.NetworkPing,
-                                label = onlineData.ping.toHumanReadableDuration(),
-                                tint = getPingColor(onlineData.ping),
-                            )
+                            val isUnknown = onlineData.ping < 0
+                            val pingLabel =
+                                if (isUnknown) {
+                                    t(Res.string.ping_unknown)
+                                } else {
+                                    onlineData.ping.toHumanReadableDuration()
+                                }
+
+                            if (isUnknown) {
+                                InfoChip(
+                                    icon = Icons.Filled.NetworkPing,
+                                    label = pingLabel,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                )
+                            } else {
+                                InfoChip(
+                                    icon = Icons.Filled.NetworkPing,
+                                    label = pingLabel,
+                                    tint = getPingColor(onlineData.ping),
+                                )
+                            }
                         }
                     }
                 },

@@ -14,26 +14,19 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Server List Explorer.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
-plugins {
-    alias(libs.plugins.kotlin.serialization)
-}
+package com.spoiligaming.explorer.ui.theme
 
-dependencies {
-    implementation(project(":settings"))
-    implementation(project(":nbt"))
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
-    implementation(libs.kotlinx.coroutines.core.jvm)
-    implementation(libs.kotlinx.serialization.json)
+internal val SecureChatLight = Color(0xFF1565C0) // blue 800
+internal val SecureChatDark = Color(0xFF64B5F6) // blue 300
 
-    implementation(libs.mcUtils)
-
-    implementation(libs.ktor.client.core.jvm)
-    implementation(libs.ktor.client.cio.jvm)
-    testImplementation(libs.ktor.client.core.jvm)
-    testImplementation(libs.ktor.client.cio.jvm)
-    testImplementation(libs.ktor.client.mock.jvm)
-
-    implementation(libs.oshi.core)
-}
+@Suppress("UnusedReceiverParameter")
+internal val ColorScheme.secureChatTint
+    @Composable
+    get() = if (isSystemInDarkTheme()) SecureChatDark else SecureChatLight

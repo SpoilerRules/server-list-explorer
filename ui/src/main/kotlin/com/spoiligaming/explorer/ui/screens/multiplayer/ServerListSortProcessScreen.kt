@@ -72,10 +72,11 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.McServerPingOnlineServerData
+import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.McUtilsOnlineServerData
 import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.OnlineServerData
 import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.OnlineServerDataResourceResult
 import com.spoiligaming.explorer.multiplayer.MultiplayerServer
+import com.spoiligaming.explorer.settings.model.ServerQueryMethod
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalMultiplayerSettings
 import com.spoiligaming.explorer.ui.extensions.formatMillis
 import com.spoiligaming.explorer.ui.t
@@ -190,8 +191,8 @@ private fun rememberSortProcessState(
                             val flow =
                                 ServerEntryController.getServerDataFlow(
                                     address = server.ip,
-                                    // use MCServerPing for reliability reasons
-                                    useMCSrvStat = false,
+                                    // use MCUtils for reliability reasons
+                                    queryMode = ServerQueryMethod.McUtils,
                                     connectTimeoutMillis = mp.connectTimeoutMillis,
                                     socketTimeoutMillis = mp.socketTimeoutMillis,
                                 )
@@ -220,7 +221,8 @@ private fun rememberSortProcessState(
                 SortType.Ping ->
                     servers.sortedWith(
                         compareBy { server ->
-                            (pingedData[server.id] as? McServerPingOnlineServerData)?.ping ?: Long.MAX_VALUE
+                            val ping = (pingedData[server.id] as? McUtilsOnlineServerData)?.ping ?: Long.MAX_VALUE
+                            if (ping < 0) Long.MAX_VALUE else ping
                         },
                     )
                 SortType.MaxPlayerCount ->
