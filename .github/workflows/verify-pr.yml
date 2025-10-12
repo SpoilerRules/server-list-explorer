@@ -50,7 +50,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Gradle build
-        run: ./gradlew build
+        run: ./gradlew app:buildWithProjectModules
 
       - name: Upload reports
         if: ${{ always() && !env.ACT }}
