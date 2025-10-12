@@ -46,7 +46,7 @@ internal fun TextComponent.toSectionString(): String {
         val targetBits = StyleBits.encode(node.styles)
 
         val colorChanged = nodeColor != activeColor
-        val styleRemoved = (activeStyleBits and targetBits.inv()) != 0
+        val styleRemoved = activeStyleBits and targetBits.inv() != 0
         val needReset = styleRemoved || (colorChanged && nodeColor.isEmpty() && activeColor.isNotEmpty())
 
         if (needReset) {
