@@ -64,7 +64,7 @@ internal fun MultiplayerSettings() {
             listOf {
                 /* ItemSwitch(
                        title = "Cache server status results",
-                       description = "Save responses from MCServerPing to load your list faster and use less data when checking server status.",
+                       description = "Save responses from MCUtils to load your list faster and use less data when checking server status.",
                        isChecked = mpSettings.enableServerQueryCache,
                        onCheckedChange = { newValue ->
                            multiplayerSettingsManager.updateSettings {

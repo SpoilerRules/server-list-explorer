@@ -138,14 +138,14 @@ import server_list_explorer.ui.generated.resources.dialog_title_external_change
 import server_list_explorer.ui.generated.resources.no_search_matches_message
 import server_list_explorer.ui.generated.resources.no_search_results_for
 import server_list_explorer.ui.generated.resources.ok_label
-import server_list_explorer.ui.generated.resources.query_method_mc_server_ping
 import server_list_explorer.ui.generated.resources.query_method_mc_srv_stat
+import server_list_explorer.ui.generated.resources.query_method_mc_utils
 import server_list_explorer.ui.generated.resources.query_method_save_and_refresh_all_entries
 import server_list_explorer.ui.generated.resources.query_method_support_text
 import server_list_explorer.ui.generated.resources.query_method_title
 import server_list_explorer.ui.generated.resources.quick_action_delete_all
 import server_list_explorer.ui.generated.resources.quick_action_sort
-import server_list_explorer.ui.generated.resources.sort_dialog_support_text_mcping
+import server_list_explorer.ui.generated.resources.sort_dialog_support_text_mc_utils
 import server_list_explorer.ui.generated.resources.sort_dialog_title_select_sort
 import sh.calvin.reorderable.DragGestureDetector
 import sh.calvin.reorderable.ReorderableItem
@@ -322,15 +322,15 @@ internal fun MultiplayerScreen(
     val refreshAction: (Boolean) -> Unit = { onlySelected ->
         if (onlySelected) {
             controller.refreshSelected(
-                mpSettings.serverQueryMethod == ServerQueryMethod.McSrvStat,
-                mpSettings.connectTimeoutMillis,
-                mpSettings.socketTimeoutMillis,
+                queryMode = mpSettings.serverQueryMethod,
+                connectTimeoutMillis = mpSettings.connectTimeoutMillis,
+                socketTimeoutMillis = mpSettings.socketTimeoutMillis,
             )
         } else {
             controller.refreshAll(
-                mpSettings.serverQueryMethod == ServerQueryMethod.McSrvStat,
-                mpSettings.connectTimeoutMillis,
-                mpSettings.socketTimeoutMillis,
+                queryMode = mpSettings.serverQueryMethod,
+                connectTimeoutMillis = mpSettings.connectTimeoutMillis,
+                socketTimeoutMillis = mpSettings.socketTimeoutMillis,
             )
         }
     }
@@ -411,7 +411,7 @@ internal fun MultiplayerScreen(
 
     if (showSortDialog) {
         val sortDialogTitleSelectSortText = t(Res.string.sort_dialog_title_select_sort)
-        val sortDialogSupportTextMcpingText = t(Res.string.sort_dialog_support_text_mcping)
+        val sortDialogSupportTextMcpingText = t(Res.string.sort_dialog_support_text_mc_utils)
         val quickActionSortText = t(Res.string.quick_action_sort)
         val dialogCancelButtonText = t(Res.string.dialog_cancel_button)
 
@@ -451,7 +451,7 @@ internal fun MultiplayerScreen(
         val queryMethodTitleText = t(Res.string.query_method_title)
         val queryMethodSupportText = t(Res.string.query_method_support_text)
         val queryMethodMcSrvStatText = t(Res.string.query_method_mc_srv_stat)
-        val queryMethodMcServerPingText = t(Res.string.query_method_mc_server_ping)
+        val queryMethodMcUtilsText = t(Res.string.query_method_mc_utils)
         val queryMethodSaveAndRefreshAllEntriesText = t(Res.string.query_method_save_and_refresh_all_entries)
         val dialogCancelButtonText = t(Res.string.dialog_cancel_button)
 
@@ -482,11 +482,11 @@ internal fun MultiplayerScreen(
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         RadioButton(
-                            selected = pendingQueryMethod == ServerQueryMethod.McServerPing,
-                            onClick = { pendingQueryMethod = ServerQueryMethod.McServerPing },
+                            selected = pendingQueryMethod == ServerQueryMethod.McUtils,
+                            onClick = { pendingQueryMethod = ServerQueryMethod.McUtils },
                             modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                         )
-                        Text(queryMethodMcServerPingText)
+                        Text(queryMethodMcUtilsText)
                     }
                 }
             }
@@ -497,7 +497,7 @@ internal fun MultiplayerScreen(
                     }
 
                     controller.refreshAll(
-                        useMCSrvStat = pendingQueryMethod == ServerQueryMethod.McSrvStat,
+                        queryMode = pendingQueryMethod,
                         connectTimeoutMillis = mpSettings.connectTimeoutMillis,
                         socketTimeoutMillis = mpSettings.socketTimeoutMillis,
                     )
@@ -752,8 +752,7 @@ internal fun MultiplayerScreen(
                                         // Refresh (refresh selected)
                                         isSelectionMod && e.key == Key.R -> {
                                             controller.refreshSelected(
-                                                useMCSrvStat =
-                                                    mpSettings.serverQueryMethod == ServerQueryMethod.McSrvStat,
+                                                queryMode = mpSettings.serverQueryMethod,
                                                 connectTimeoutMillis = mpSettings.connectTimeoutMillis,
                                                 socketTimeoutMillis = mpSettings.socketTimeoutMillis,
                                             )
@@ -886,9 +885,9 @@ internal fun MultiplayerScreen(
                                             onRefresh = {
                                                 controller.refreshSingle(
                                                     serverEntry.ip,
-                                                    mpSettings.serverQueryMethod == ServerQueryMethod.McSrvStat,
-                                                    mpSettings.connectTimeoutMillis,
-                                                    mpSettings.socketTimeoutMillis,
+                                                    queryMode = mpSettings.serverQueryMethod,
+                                                    connectTimeoutMillis = mpSettings.connectTimeoutMillis,
+                                                    socketTimeoutMillis = mpSettings.socketTimeoutMillis,
                                                 )
                                             },
                                             onDelete = { controller.deleteSingle(serverEntry) },

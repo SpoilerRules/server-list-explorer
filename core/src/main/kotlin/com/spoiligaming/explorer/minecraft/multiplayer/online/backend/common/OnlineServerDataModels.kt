@@ -26,6 +26,7 @@ sealed interface OnlineServerData : IServerData {
     val versionInfo: String
     val protocolVersion: Int
     val ip: String
+    val info: String?
 }
 
 data class McSrvStatOnlineServerData(
@@ -36,12 +37,12 @@ data class McSrvStatOnlineServerData(
     override val versionInfo: String,
     override val protocolVersion: Int,
     override val ip: String,
+    override val info: String?,
     val versionName: String?,
-    val info: String?,
     val eulaBlocked: Boolean,
 ) : OnlineServerData
 
-data class McServerPingOnlineServerData(
+data class McUtilsOnlineServerData(
     override val motd: String,
     override val onlinePlayers: Int,
     override val maxPlayers: Int,
@@ -49,5 +50,7 @@ data class McServerPingOnlineServerData(
     override val versionInfo: String,
     override val protocolVersion: Int,
     override val ip: String,
+    override val info: String?,
     val ping: Long,
+    val secureChatEnforced: Boolean,
 ) : OnlineServerData

@@ -34,6 +34,7 @@ import com.spoiligaming.explorer.multiplayer.history.ServerListHistoryService
 import com.spoiligaming.explorer.multiplayer.history.SetHiddenChange
 import com.spoiligaming.explorer.multiplayer.history.UpdateIconChange
 import com.spoiligaming.explorer.multiplayer.repository.ServerListRepository
+import com.spoiligaming.explorer.settings.model.ServerQueryMethod
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -56,11 +57,11 @@ internal object ServerEntryController {
 
     fun getServerDataFlow(
         address: String,
-        useMCSrvStat: Boolean,
+        queryMode: ServerQueryMethod,
         connectTimeoutMillis: Long,
         socketTimeoutMillis: Long,
     ): StateFlow<OnlineServerDataResourceResult<IServerData>> {
-        val key = Key(address, useMCSrvStat, connectTimeoutMillis, socketTimeoutMillis)
+        val key = Key(address, queryMode, connectTimeoutMillis, socketTimeoutMillis)
         return cache.getOrPut(key) {
             MutableStateFlow<OnlineServerDataResourceResult<IServerData>>(
                 OnlineServerDataResourceResult.Loading,
@@ -68,7 +69,7 @@ internal object ServerEntryController {
                 scope.launch {
                     OnlineServerDataFacade(
                         serverAddress = address,
-                        useMCSrvStat = useMCSrvStat,
+                        queryMode = queryMode,
                         connectTimeoutMillis = connectTimeoutMillis,
                         socketTimeoutMillis = socketTimeoutMillis,
                     ).serverDataFlow().collect { flow.value = it }
@@ -79,11 +80,11 @@ internal object ServerEntryController {
 
     fun refresh(
         address: String,
-        useMCSrvStat: Boolean,
+        queryMode: ServerQueryMethod,
         connectTimeoutMillis: Long,
         socketTimeoutMillis: Long,
     ) {
-        val key = Key(address, useMCSrvStat, connectTimeoutMillis, socketTimeoutMillis)
+        val key = Key(address, queryMode, connectTimeoutMillis, socketTimeoutMillis)
 
         val flow =
             cache
@@ -96,7 +97,7 @@ internal object ServerEntryController {
         scope.launch {
             OnlineServerDataFacade(
                 serverAddress = address,
-                useMCSrvStat = useMCSrvStat,
+                queryMode = queryMode,
                 connectTimeoutMillis = connectTimeoutMillis,
                 socketTimeoutMillis = socketTimeoutMillis,
             ).serverDataFlow().collect { flow.value = it }
@@ -342,7 +343,7 @@ internal object ServerEntryController {
 
 private data class Key(
     val address: String,
-    val useMCSrvStat: Boolean,
+    val queryMode: ServerQueryMethod,
     val connectTimeout: Long,
     val socketTimeout: Long,
 )

@@ -43,8 +43,8 @@ enum class ServerQueryMethod {
     @SerialName("mcsrvstat")
     McSrvStat,
 
-    @SerialName("mcserverping")
-    McServerPing,
+    @SerialName("mcutils")
+    McUtils,
 }
 
 @Serializable
@@ -53,7 +53,7 @@ data class MultiplayerSettings(
     @Serializable(with = PathSerializer::class)
     val serverListFile: Path? = null,
     @SerialName("server_query_method")
-    val serverQueryMethod: ServerQueryMethod = ServerQueryMethod.McServerPing,
+    val serverQueryMethod: ServerQueryMethod = ServerQueryMethod.McUtils,
     @SerialName("entry_size_scale")
     val serverEntryScale: Float = 1.0f,
     @SerialName("drag_shake_intensity_deg")

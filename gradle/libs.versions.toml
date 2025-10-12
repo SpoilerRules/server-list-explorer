@@ -30,9 +30,8 @@ oshi = "6.9.0"
 themeDetector = "3.9.1"
 
 # Minecraft
-bungeecord = "1.21-R0.3"
-mcServerPing = "deaa507bfd"
 nbt = "6.1"
+mcUtils = "1.6.0"
 
 [libraries]
 # Core language/runtime
@@ -67,8 +66,7 @@ theme-detector = { module = "com.github.Dansoftowner:jSystemThemeDetector", vers
 
 # Minecraft
 nbt = { module = "com.github.Querz:NBT", version.ref = "nbt" }
-mcServerPing = { module = "com.github.lucaazalim:minecraft-server-ping", version.ref = "mcServerPing" }
-bungeecord-api = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungeecord" }
+mcUtils = { module = "tech.aliorpse:mcutils", version.ref = "mcUtils" }
 
 [plugins]
 # Kotlin toolchain
