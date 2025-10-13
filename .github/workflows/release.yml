@@ -100,16 +100,16 @@ jobs:
              -NewName "ServerListExplorer-all-minified.jar"
 
           Rename-Item -Path (Get-ChildItem -Path "app/build/compose/binaries/main-release/msi/ServerListExplorer-*.msi").FullName `
-              -NewName "ServerListExplorer-minified-$($env:VERSION).msi"
+              -NewName "ServerListExplorer-minified_installer-$($env:VERSION).msi"
 
           Rename-Item -Path (Get-ChildItem -Path "app/build/compose/binaries/main/msi/ServerListExplorer-*.msi").FullName `
-              -NewName "ServerListExplorer-$($env:VERSION).msi"
+              -NewName "ServerListExplorer_installer-$($env:VERSION).msi"
 
           Rename-Item -Path (Get-ChildItem -Path "app/build/compose/binaries/main-release/exe/ServerListExplorer-*.exe").FullName `
-              -NewName "ServerListExplorer-minified-$($env:VERSION).exe"
+              -NewName "ServerListExplorer-minified_installer-$($env:VERSION).exe"
 
           Rename-Item -Path (Get-ChildItem -Path "app/build/compose/binaries/main/exe/ServerListExplorer-*.exe").FullName `
-              -NewName "ServerListExplorer-$($env:VERSION).exe"
+              -NewName "ServerListExplorer_installer-$($env:VERSION).exe"
 
       - name: Create GitHub Release
         if: env.ACT != 'true'
@@ -125,10 +125,10 @@ jobs:
             app/build/libs/ServerListExplorer.jar
             app/build/libs/ServerListExplorer-all.jar
             app/build/compose/jars/ServerListExplorer-all-minified.jar
-            app/build/compose/binaries/main-release/msi/ServerListExplorer-minified-${{ env.VERSION }}.msi
-            app/build/compose/binaries/main/msi/ServerListExplorer-${{ env.VERSION }}.msi
-            app/build/compose/binaries/main-release/exe/ServerListExplorer-minified-${{ env.VERSION }}.exe
-            app/build/compose/binaries/main/exe/ServerListExplorer-${{ env.VERSION }}.exe
+            app/build/compose/binaries/main-release/msi/ServerListExplorer-minified_installer-${{ env.VERSION }}.msi
+            app/build/compose/binaries/main/msi/ServerListExplorer_installer-${{ env.VERSION }}.msi
+            app/build/compose/binaries/main-release/exe/ServerListExplorer-minified_installer-${{ env.VERSION }}.exe
+            app/build/compose/binaries/main/exe/ServerListExplorer_installer-${{ env.VERSION }}.exe
             app/build/ServerListExplorer-minified_portable-${{ env.VERSION }}.zip
             app/build/ServerListExplorer_portable-${{ env.VERSION }}.zip
 
@@ -141,9 +141,9 @@ jobs:
             app/build/libs/ServerListExplorer.jar
             app/build/libs/ServerListExplorer-all.jar
             app/build/compose/jars/ServerListExplorer-all-minified.jar
-            app/build/compose/binaries/main-release/msi/ServerListExplorer-minified-${{ env.VERSION }}.msi
-            app/build/compose/binaries/main/msi/ServerListExplorer-${{ env.VERSION }}.msi
-            app/build/compose/binaries/main-release/exe/ServerListExplorer-minified-${{ env.VERSION }}.exe
-            app/build/compose/binaries/main/exe/ServerListExplorer-${{ env.VERSION }}.exe
+            app/build/compose/binaries/main-release/msi/ServerListExplorer-minified_installer-${{ env.VERSION }}.msi
+            app/build/compose/binaries/main/msi/ServerListExplorer_installer-${{ env.VERSION }}.msi
+            app/build/compose/binaries/main-release/exe/ServerListExplorer-minified_installer-${{ env.VERSION }}.exe
+            app/build/compose/binaries/main/exe/ServerListExplorer_installer-${{ env.VERSION }}.exe
             app/build/ServerListExplorer-minified_portable-${{ env.VERSION }}.zip
             app/build/ServerListExplorer_portable-${{ env.VERSION }}.zip
