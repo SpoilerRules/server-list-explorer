@@ -24,6 +24,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -77,7 +78,7 @@ import server_list_explorer.ui.generated.resources.settings_section_preferences
 import server_list_explorer.ui.generated.resources.settings_section_theme
 import server_list_explorer.ui.generated.resources.settings_section_window_appearance
 import kotlin.math.abs
-import kotlin.math.roundToInt
+import kotlin.math.absoluteValue
 
 @Composable
 internal fun SettingsScreen() {
@@ -229,6 +230,7 @@ private fun rememberSettingsScrollbarAdapter(
             sectionCount,
             itemHeights.values,
             averageItemHeightPx,
+            listState.layoutInfo,
         ) {
             val items =
                 (0 until sectionCount)
@@ -272,44 +274,19 @@ private fun rememberSettingsScrollbarAdapter(
                 get() = viewportHeightPx.toDouble()
 
             override suspend fun scrollTo(scrollOffset: Double) {
-                // clamp to [0, maxScroll]
-                val maxScroll = (totalContentHeightPx - viewportHeightPx).coerceAtLeast(0f)
-                val targetPx = scrollOffset.coerceIn(0.0, maxScroll.toDouble()).toFloat()
-
-                // walk sections to map an absolute pixel target into a section index and offset within that section
-                var accumulated = 0f
-                var targetIndex = 0
-                var offsetWithin = 0f
-
-                for (index in 0 until sectionCount) {
-                    // the block height is the section height plus the following spacing, except for the last section
-                    val sectionHeight = itemHeights[index]?.toFloat() ?: averageItemHeightPx
-                    val blockHeight = sectionHeight + if (index < sectionCount - 1) spacingPx else 0f
-                    if (accumulated + blockHeight > targetPx) {
-                        val delta = targetPx - accumulated
-                        // if delta falls inside the actual section, use it as the intra item offset
-                        // if it falls inside the spacing region, snap to the next section top
-                        if (delta <= sectionHeight) {
-                            targetIndex = index
-                            offsetWithin = delta
-                        } else {
-                            targetIndex = (index + 1).coerceAtMost(sectionCount - 1)
-                            offsetWithin = 0f
-                        }
-                        break
-                    }
-                    accumulated += blockHeight
-                }
-
-                // if the target is at or beyond the end of content, snap to the last section and put the offset just inside its bottom
-                if (targetPx >= totalContentHeightPx && sectionCount > 0) {
-                    targetIndex = sectionCount - 1
-                    offsetWithin = (itemHeights[targetIndex]?.toFloat() ?: averageItemHeightPx) - 1f
-                }
-
                 scope.launch {
-                    // scrollToItem expects an integer pixel offset, round the computed intra item offset
-                    listState.scrollToItem(targetIndex, offsetWithin.roundToInt())
+                    // compute the desired scroll position, clamped within valid bounds
+                    val maxScroll = (totalContentHeightPx - viewportHeightPx).coerceAtLeast(0f)
+                    val targetScroll = scrollOffset.coerceIn(0.0, maxScroll.toDouble()).toFloat()
+
+                    // calculate the difference between the desired and current scroll positions
+                    val delta = targetScroll - scrollOffsetPx
+
+                    // only scroll if the difference is large enough to be meaningful
+                    // this avoids tiny, jittery corrections caused by floating-point precision errors
+                    if (delta.absoluteValue > SCROLL_DELTA_THRESHOLD) {
+                        listState.scrollBy(delta)
+                    }
                 }
             }
         }
@@ -463,6 +440,7 @@ private const val ANIMATION_DURATION_MILLIS = 200
 private const val NAVIGATOR_SHAFT_OPACITY = 0.3f
 private const val COMPACT_WINDOW_WIDTH_FRACTION = 0.75f
 private const val EXPANDED_WINDOW_WIDTH_FRACTION = 0.6f
+private const val SCROLL_DELTA_THRESHOLD = 0.5f
 
 private val LazyColumnArrangement = 24.dp
 private val ColumnArrangement = 8.dp
