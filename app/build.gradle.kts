@@ -161,7 +161,7 @@ compose.desktop.application {
         windows {
             packageVersion = numericWindowsVersion
             msiPackageVersion = numericWindowsVersion
-            exePackageVersion = windowsVersion
+            exePackageVersion = numericWindowsVersion
 
             console = false
 
