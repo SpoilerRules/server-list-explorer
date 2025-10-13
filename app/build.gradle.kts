@@ -173,7 +173,7 @@ compose.desktop.application {
             org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi,
         )
 
-        modules("java.management", "java.naming", "jdk.unsupported")
+        modules("java.management", "jdk.unsupported")
     }
 
     buildTypes.release.proguard {
@@ -183,6 +183,7 @@ compose.desktop.application {
             rootProject.file("proguard/base.pro"),
             rootProject.file("proguard/compose.pro"),
             rootProject.file("proguard/jna.pro"),
+            rootProject.file("proguard/ktor.pro"),
             rootProject.file("proguard/kotlinlogging.pro"),
             rootProject.file("proguard/kotlinx-serialization.pro"),
             rootProject.file("proguard/log4j.pro"),
