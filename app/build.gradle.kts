@@ -56,7 +56,6 @@ tasks.jar {
     duplicatesStrategy = DuplicatesStrategy.FAIL
     manifest {
         attributes["Main-Class"] = mainFunction
-        attributes["Multi-Release"] = "true"
     }
 }
 
@@ -65,7 +64,6 @@ tasks.shadowJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
         attributes["Main-Class"] = mainFunction
-        attributes["Multi-Release"] = "true"
     }
 
     doLast {
