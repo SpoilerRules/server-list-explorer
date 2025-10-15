@@ -17,12 +17,7 @@
 */
 
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import java.io.FileOutputStream
 import java.time.Year
-import java.util.jar.JarEntry
-import java.util.jar.JarFile
-import java.util.jar.JarOutputStream
-import java.util.jar.Manifest
 
 plugins {
     alias(libs.plugins.kotlin.compose)
@@ -200,99 +195,5 @@ compose.desktop.application {
             rootProject.file("proguard/oshi.pro"),
             rootProject.file("proguard/slf4j.pro"),
         )
-    }
-}
-
-@UntrackedTask(because = "Patches jars in place after Compose packaging.")
-abstract class PatchComposeJarsTask : DefaultTask() {
-    @get:InputDirectory
-    abstract val jarsDir: DirectoryProperty
-
-    @get:InputFiles
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val mrSources: ConfigurableFileCollection
-
-    @TaskAction
-    fun run() {
-        val dir = jarsDir.get().asFile
-        val targets = dir.listFiles { f -> f.isFile && f.extension == "jar" }?.toList().orEmpty()
-        if (targets.isEmpty()) {
-            logger.lifecycle("No jars found under ${dir.absolutePath}")
-            return
-        }
-
-        val sourceJars = mrSources.files.filter { it.isFile && it.extension == "jar" }
-
-        fun copyEntries(
-            src: File,
-            out: JarOutputStream,
-            seen: MutableSet<String>,
-            filter: (String) -> Boolean,
-        ) {
-            JarFile(src).use { jf ->
-                val it = jf.entries()
-                while (it.hasMoreElements()) {
-                    val e = it.nextElement()
-                    val name = e.name
-                    if (name == "META-INF/MANIFEST.MF") continue
-                    if (!filter(name)) continue
-                    if (!seen.add(name)) continue
-                    val newEntry = JarEntry(name).also { je -> je.time = e.time }
-                    try {
-                        out.putNextEntry(newEntry)
-                        if (!name.endsWith("/")) jf.getInputStream(e).use { inp -> inp.copyTo(out) }
-                        out.closeEntry()
-                    } catch (_: java.util.zip.ZipException) {
-                        // ignore duplication
-                    }
-                }
-            }
-        }
-
-        targets.forEach { jar ->
-            val mf = JarFile(jar).use { it.manifest }
-            val merged =
-                Manifest().apply {
-                    if (mf != null) mainAttributes.putAll(mf.mainAttributes)
-                    mainAttributes.putValue("Multi-Release", "true")
-                }
-
-            val tmp = File(jar.parentFile, jar.nameWithoutExtension + "-mr.jar")
-            val seen = HashSet<String>(INITIAL_SEEN_CAPACITY)
-
-            JarOutputStream(FileOutputStream(tmp), merged).use { jos ->
-                copyEntries(jar, jos, seen) { true }
-                sourceJars.forEach { src ->
-                    copyEntries(src, jos, seen) { it.startsWith("META-INF/versions/") }
-                }
-            }
-
-            if (!jar.delete()) throw GradleException("Failed to delete ${jar.absolutePath}")
-            if (!tmp.renameTo(
-                    jar,
-                )
-            ) {
-                throw GradleException("Failed to replace ${jar.name} with MR-patched jar")
-            }
-        }
-    }
-
-    companion object {
-        private const val INITIAL_SEEN_CAPACITY = 8192
-    }
-}
-
-val composeJarsDir = layout.buildDirectory.dir("compose/jars")
-val runtimeCfg = configurations.getByName("runtimeClasspath")
-val appJarProvider = tasks.named<Jar>("jar").flatMap { it.archiveFile }
-val patchComposeJars =
-    tasks.register<PatchComposeJarsTask>("patchComposeJars") {
-        jarsDir.set(composeJarsDir)
-        mrSources.setFrom(runtimeCfg, appJarProvider)
-    }
-
-tasks.configureEach {
-    if (name.endsWith("UberJarForCurrentOS")) {
-        finalizedBy(patchComposeJars)
     }
 }
