@@ -110,8 +110,6 @@ val (major, minor, patch, qualifier) =
 
 val build = patch.ifEmpty { "0" }
 val numericWindowsVersion = listOf(major, minor, build).joinToString(".")
-val windowsVersion =
-    if (qualifier.isNotEmpty()) "$numericWindowsVersion-$qualifier" else numericWindowsVersion
 
 require(major.toInt() in 0..255) { "Windows MAJOR must be <=255" }
 require(minor.toInt() in 0..255) { "Windows MINOR must be <=255" }
