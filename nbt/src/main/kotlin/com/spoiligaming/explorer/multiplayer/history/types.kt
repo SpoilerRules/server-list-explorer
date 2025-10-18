@@ -88,6 +88,14 @@ data class MoveServerChange(
     override fun description() = "Moved '${server.name}' (${server.ip}) from position $fromIndex to $toIndex"
 }
 
+data class ReorderServersChange(
+    val oldOrder: List<MultiplayerServer>,
+    val newOrder: List<MultiplayerServer>,
+    override val timestamp: Instant = Instant.now(),
+) : ServerListChange() {
+    override fun description() = "Reordered server list"
+}
+
 data class SortChange(
     val oldServers: List<MultiplayerServer>,
     val newServers: List<MultiplayerServer>,
