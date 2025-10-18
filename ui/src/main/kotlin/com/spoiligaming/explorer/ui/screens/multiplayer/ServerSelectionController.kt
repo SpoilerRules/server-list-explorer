@@ -80,5 +80,10 @@ internal class ServerSelectionController(
         }
     }
 
+    fun indicesOf(entries: List<Uuid>) =
+        entries.mapIndexedNotNull { index, uuid ->
+            if (uuid in _selectedIds.value) index else null
+        }
+
     private fun Set<Uuid>.toggle(key: Uuid) = if (key in this) this - key else this + key
 }

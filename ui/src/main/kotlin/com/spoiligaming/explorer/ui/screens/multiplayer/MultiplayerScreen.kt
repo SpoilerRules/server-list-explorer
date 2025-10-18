@@ -100,6 +100,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.spoiligaming.explorer.multiplayer.MultiplayerServer
+import com.spoiligaming.explorer.multiplayer.history.ReorderServersChange
 import com.spoiligaming.explorer.multiplayer.history.ServerListHistoryService
 import com.spoiligaming.explorer.multiplayer.history.applyRedo
 import com.spoiligaming.explorer.multiplayer.history.applyUndo
@@ -152,6 +153,8 @@ import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.Collections
+import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.uuid.ExperimentalUuidApi
@@ -243,6 +246,18 @@ internal fun MultiplayerScreen(
     }
     var lastMove by remember { mutableStateOf<Pair<MultiplayerServer, Pair<Int, Int>>?>(null) }
     val lazyGridState = rememberLazyGridState()
+    var columnCount by remember { mutableStateOf(1) }
+    LaunchedEffect(lazyGridState) {
+        snapshotFlow {
+            lazyGridState.layoutInfo.visibleItemsInfo
+                .maxOfOrNull { it.column }
+                ?.plus(1)
+        }.collect { value ->
+            if (value != null && value > 0) {
+                columnCount = value
+            }
+        }
+    }
 
     var searchQuery by remember { mutableStateOf("") }
     var searchFilter by remember { mutableStateOf(SearchFilter.NameAndAddress) }
@@ -284,6 +299,102 @@ internal fun MultiplayerScreen(
                 lastMove = server to (oldIdx to newIdx)
             }
         }
+
+    fun handleKeyboardMove(direction: ServerEntryMoveDirection): Boolean {
+        if (selectedIds.isEmpty()) return false
+        if (searchQuery.isNotBlank()) return false
+
+        val effectiveColumnCount = columnCount.coerceAtLeast(1)
+        val selectedIndices =
+            controller.selection.indicesOf(pendingOrder.map { it.id })
+        if (selectedIndices.isEmpty()) return false
+        val selection = selectedIndices.map { it to pendingOrder[it] }
+
+        val offset =
+            when (direction) {
+                ServerEntryMoveDirection.Up -> -effectiveColumnCount
+                ServerEntryMoveDirection.Down -> effectiveColumnCount
+                ServerEntryMoveDirection.Left -> -1
+                ServerEntryMoveDirection.Right -> 1
+            }
+        if (offset == 0) return false
+
+        val lastIndex = pendingOrder.lastIndex
+        if (lastIndex == -1) return false
+
+        val isAllowed =
+            selection.all { (index, _) ->
+                val target = index + offset
+                when (direction) {
+                    ServerEntryMoveDirection.Left ->
+                        // ensure we don't move past the left edge (target >= 0) and not wrapping to the previous row
+                        target >= 0 && index % effectiveColumnCount != 0
+
+                    ServerEntryMoveDirection.Right ->
+                        /*
+                         Ensure we don't move past the right edge:
+                         - target <= lastIndex: stay within bounds
+                         - index % effectiveColumnCount != effectiveColumnCount - 1: not already at the last column
+                         - target / effectiveColumnCount == index / effectiveColumnCount: stay in the same row (no wrapping to next)
+                         */
+                        target <= lastIndex &&
+                            index % effectiveColumnCount != effectiveColumnCount - 1 &&
+                            target / effectiveColumnCount == index / effectiveColumnCount
+
+                    ServerEntryMoveDirection.Up ->
+                        // ensure we don't move above the first row
+                        index >= effectiveColumnCount
+
+                    ServerEntryMoveDirection.Down ->
+                        // ensure we don't move past the last row
+                        target <= lastIndex
+                }
+            }
+
+        if (!isAllowed) return false
+
+        val beforeOrder = pendingOrder.toList()
+        val workingOrder = pendingOrder.toMutableList()
+        val step = if (offset > 0) 1 else -1
+        val stepCount = abs(offset)
+        val orderedSelection =
+            if (offset > 0) {
+                selection.asReversed()
+            } else {
+                selection
+            }
+
+        for ((_, server) in orderedSelection) {
+            var currentIndex = workingOrder.indexOf(server)
+
+            repeat(stepCount) {
+                val nextIndex = currentIndex + step
+                if (nextIndex !in 0..workingOrder.lastIndex) {
+                    return false
+                }
+
+                Collections.swap(workingOrder, currentIndex, nextIndex)
+                currentIndex = nextIndex
+            }
+        }
+
+        val newOrder = workingOrder.toList()
+        pendingOrder = newOrder
+        lastMove = null
+
+        scope.launch {
+            repo.reorder(newOrder)
+            repo.commit()
+            historyService.recordChange(
+                ReorderServersChange(
+                    oldOrder = beforeOrder,
+                    newOrder = newOrder,
+                ),
+            )
+        }
+
+        return true
+    }
 
     val flashId = remember { mutableStateOf<Uuid?>(null) }
     val scrollTargetId = remember { mutableStateOf<Uuid?>(null) }
@@ -734,6 +845,20 @@ internal fun MultiplayerScreen(
                                 .onPreviewKeyEvent { e ->
                                     if (blockCount.value != 0) return@onPreviewKeyEvent false
 
+                                    if (e.type == KeyEventType.KeyDown) {
+                                        val handled =
+                                            when (e.key) {
+                                                Key.DirectionUp -> handleKeyboardMove(ServerEntryMoveDirection.Up)
+                                                Key.DirectionDown -> handleKeyboardMove(ServerEntryMoveDirection.Down)
+                                                Key.DirectionLeft -> handleKeyboardMove(ServerEntryMoveDirection.Left)
+                                                Key.DirectionRight -> handleKeyboardMove(ServerEntryMoveDirection.Right)
+                                                else -> false
+                                            }
+                                        if (handled) {
+                                            return@onPreviewKeyEvent true
+                                        }
+                                    }
+
                                     val isSelectionMod =
                                         if (hostOs == OS.MacOS) e.isMetaPressed else e.isCtrlPressed
 
@@ -891,6 +1016,9 @@ internal fun MultiplayerScreen(
                                                 )
                                             },
                                             onDelete = { controller.deleteSingle(serverEntry) },
+                                            onMoveRequest = { direction ->
+                                                handleKeyboardMove(direction)
+                                            },
                                         )
                                     }
                                 }

@@ -192,6 +192,17 @@ private suspend fun ServerListChange.applyTo(
                     }
                 }
 
+            is ReorderServersChange -> {
+                val listToApply =
+                    if (direction == Direction.UNDO) {
+                        oldOrder
+                    } else {
+                        newOrder
+                    }
+                repo.reorder(listToApply)
+                true
+            }
+
             is SortChange -> {
                 val listToApply = if (direction == Direction.UNDO) oldServers else newServers
                 repo.deleteAll()

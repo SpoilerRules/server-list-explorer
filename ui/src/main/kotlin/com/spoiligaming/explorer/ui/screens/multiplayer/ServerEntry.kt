@@ -98,9 +98,10 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
@@ -219,6 +220,7 @@ internal fun ServerEntry(
     onHighlightFinished: () -> Unit = {},
     onRefresh: () -> Unit,
     onDelete: () -> Unit,
+    onMoveRequest: (ServerEntryMoveDirection) -> Boolean = { false },
 ) {
     val amoledOn = LocalAmoledActive.current
     val mpSettings = LocalMultiplayerSettings.current
@@ -280,15 +282,18 @@ internal fun ServerEntry(
                             )
                         },
                     shape = CardDefaults.shape,
-                ).onKeyEvent {
-                    if (it.isShiftPressed && selected) {
-                        when (it.key) {
-                            Key.DirectionUp -> {
-                            }
-                        }
-                        true
+                ).onKeyEvent { e ->
+                    if (!selected || e.type != KeyEventType.KeyDown) {
+                        return@onKeyEvent false
                     }
-                    false
+
+                    when (e.key) {
+                        Key.DirectionUp -> onMoveRequest(ServerEntryMoveDirection.Up)
+                        Key.DirectionDown -> onMoveRequest(ServerEntryMoveDirection.Down)
+                        Key.DirectionLeft -> onMoveRequest(ServerEntryMoveDirection.Left)
+                        Key.DirectionRight -> onMoveRequest(ServerEntryMoveDirection.Right)
+                        else -> false
+                    }
                 },
         colors =
             CardDefaults.elevatedCardColors().copy(

@@ -148,6 +148,23 @@ class ServerListRepository(
             }
         }
 
+    suspend fun reorder(newOrder: List<MultiplayerServer>) =
+        mutate {
+            require(size == newOrder.size) {
+                "Cannot reorder servers: size mismatch (current=$size, new=${newOrder.size})"
+            }
+
+            val currentIds = this.map { it.id }.toSet()
+            val newIds = newOrder.map { it.id }.toSet()
+            require(currentIds == newIds) {
+                "Cannot reorder servers: entries do not match existing list"
+            }
+
+            clear()
+            addAll(newOrder)
+            logger.debug { "Reordered server list with ${newOrder.size} entries" }
+        }
+
     suspend fun updateIcon(
         index: Int,
         iconBase64: String,
