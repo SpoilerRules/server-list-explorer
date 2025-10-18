@@ -26,6 +26,8 @@ package com.spoiligaming.explorer.ui.screens.multiplayer
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -95,6 +97,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.Key
@@ -221,6 +224,7 @@ internal fun ServerEntry(
     onRefresh: () -> Unit,
     onDelete: () -> Unit,
     onMoveRequest: (ServerEntryMoveDirection) -> Boolean = { false },
+    blockedFeedback: BlockedMoveFeedback? = null,
 ) {
     val amoledOn = LocalAmoledActive.current
     val mpSettings = LocalMultiplayerSettings.current
@@ -267,11 +271,80 @@ internal fun ServerEntry(
         }
     }
 
+    val density = LocalDensity.current
+    val blockedOffsetX = remember { Animatable(0f) }
+    val blockedOffsetY = remember { Animatable(0f) }
+
+    LaunchedEffect(blockedFeedback?.token) {
+        if (blockedFeedback != null && blockedFeedback.targetIds.contains(data.id)) {
+            val travelPx = with(density) { 8.dp.toPx() }
+
+            blockedOffsetX.stop()
+            blockedOffsetY.stop()
+            blockedOffsetX.snapTo(0f)
+            blockedOffsetY.snapTo(0f)
+
+            val targetX =
+                when (blockedFeedback.direction) {
+                    ServerEntryMoveDirection.Left -> -travelPx
+                    ServerEntryMoveDirection.Right -> travelPx
+                    else -> 0f
+                }
+            val targetY =
+                when (blockedFeedback.direction) {
+                    ServerEntryMoveDirection.Up -> -travelPx
+                    ServerEntryMoveDirection.Down -> travelPx
+                    else -> 0f
+                }
+
+            if (targetX != 0f) {
+                blockedOffsetX.animateTo(
+                    targetValue = targetX,
+                    animationSpec =
+                        tween(
+                            durationMillis = 120,
+                            easing = LinearOutSlowInEasing,
+                        ),
+                )
+                blockedOffsetX.animateTo(
+                    targetValue = 0f,
+                    animationSpec =
+                        tween(
+                            durationMillis = 160,
+                            easing = FastOutSlowInEasing,
+                        ),
+                )
+            }
+
+            if (targetY != 0f) {
+                blockedOffsetY.animateTo(
+                    targetValue = targetY,
+                    animationSpec =
+                        tween(
+                            durationMillis = 120,
+                            easing = LinearOutSlowInEasing,
+                        ),
+                )
+                blockedOffsetY.animateTo(
+                    targetValue = 0f,
+                    animationSpec =
+                        tween(
+                            durationMillis = 160,
+                            easing = FastOutSlowInEasing,
+                        ),
+                )
+            }
+        }
+    }
+
     // FOR CONTRIBUTORS: make sure to edit ShimmerServerEntry.kt when you edit this
     ElevatedCard(
         modifier =
             modifier
-                .border(
+                .graphicsLayer {
+                    translationX = blockedOffsetX.value
+                    translationY = blockedOffsetY.value
+                }.border(
                     border =
                         if (selected || amoledOn) {
                             CardDefaults.outlinedCardBorder()

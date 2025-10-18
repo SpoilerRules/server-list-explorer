@@ -16,7 +16,12 @@
  * along with Server List Explorer.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.spoiligaming.explorer.ui.screens.multiplayer
+
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 internal enum class ServerEntryMoveDirection {
     Up,
@@ -24,3 +29,9 @@ internal enum class ServerEntryMoveDirection {
     Left,
     Right,
 }
+
+internal data class BlockedMoveFeedback(
+    val direction: ServerEntryMoveDirection,
+    val targetIds: Set<Uuid>,
+    val token: Long,
+)

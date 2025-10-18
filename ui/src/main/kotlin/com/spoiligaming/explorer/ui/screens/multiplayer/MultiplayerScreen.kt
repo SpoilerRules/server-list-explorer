@@ -300,15 +300,38 @@ internal fun MultiplayerScreen(
             }
         }
 
+    var blockedMoveFeedback by remember { mutableStateOf<BlockedMoveFeedback?>(null) }
+    var blockedMoveFeedbackToken by remember { mutableStateOf(0L) }
+
     fun handleKeyboardMove(direction: ServerEntryMoveDirection): Boolean {
         if (selectedIds.isEmpty()) return false
-        if (searchQuery.isNotBlank()) return false
 
-        val effectiveColumnCount = columnCount.coerceAtLeast(1)
         val selectedIndices =
             controller.selection.indicesOf(pendingOrder.map { it.id })
         if (selectedIndices.isEmpty()) return false
-        val selection = selectedIndices.map { it to pendingOrder[it] }
+        val selection =
+            selectedIndices.mapNotNull { index ->
+                pendingOrder.getOrNull(index)?.let { server -> index to server }
+            }
+        if (selection.isEmpty()) return false
+        val selectionIds = selection.map { (_, server) -> server.id }.toSet()
+
+        fun emitBlockedFeedback(): Boolean {
+            blockedMoveFeedbackToken += 1
+            blockedMoveFeedback =
+                BlockedMoveFeedback(
+                    direction = direction,
+                    targetIds = selectionIds,
+                    token = blockedMoveFeedbackToken,
+                )
+            return false
+        }
+
+        if (searchQuery.isNotBlank()) {
+            return emitBlockedFeedback()
+        }
+
+        val effectiveColumnCount = columnCount.coerceAtLeast(1)
 
         val offset =
             when (direction) {
@@ -351,7 +374,7 @@ internal fun MultiplayerScreen(
                 }
             }
 
-        if (!isAllowed) return false
+        if (!isAllowed) return emitBlockedFeedback()
 
         val beforeOrder = pendingOrder.toList()
         val workingOrder = pendingOrder.toMutableList()
@@ -370,7 +393,7 @@ internal fun MultiplayerScreen(
             repeat(stepCount) {
                 val nextIndex = currentIndex + step
                 if (nextIndex !in 0..workingOrder.lastIndex) {
-                    return false
+                    return emitBlockedFeedback()
                 }
 
                 Collections.swap(workingOrder, currentIndex, nextIndex)
@@ -381,6 +404,7 @@ internal fun MultiplayerScreen(
         val newOrder = workingOrder.toList()
         pendingOrder = newOrder
         lastMove = null
+        blockedMoveFeedback = null
 
         scope.launch {
             repo.reorder(newOrder)
@@ -1019,6 +1043,7 @@ internal fun MultiplayerScreen(
                                             onMoveRequest = { direction ->
                                                 handleKeyboardMove(direction)
                                             },
+                                            blockedFeedback = blockedMoveFeedback,
                                         )
                                     }
                                 }
