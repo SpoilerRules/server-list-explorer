@@ -96,10 +96,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.isShiftPressed
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
@@ -262,31 +258,29 @@ internal fun ServerEntry(
         }
     }
 
+    val outlinedBorder = CardDefaults.outlinedCardBorder()
+    val borderStroke =
+        when {
+            selected && amoledOn ->
+                BorderStroke(
+                    outlinedBorder.width,
+                    MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            selected || amoledOn -> outlinedBorder
+            else ->
+                BorderStroke(
+                    0.dp,
+                    Color.Transparent,
+                )
+        }
+
     // FOR CONTRIBUTORS: make sure to edit ShimmerServerEntry.kt when you edit this
     ElevatedCard(
         modifier =
-            modifier
-                .border(
-                    border =
-                        if (selected || amoledOn) {
-                            CardDefaults.outlinedCardBorder()
-                        } else {
-                            BorderStroke(
-                                0.dp,
-                                Color.Transparent,
-                            )
-                        },
-                    shape = CardDefaults.shape,
-                ).onKeyEvent {
-                    if (it.isShiftPressed && selected) {
-                        when (it.key) {
-                            Key.DirectionUp -> {
-                            }
-                        }
-                        true
-                    }
-                    false
-                },
+            modifier.border(
+                border = borderStroke,
+                shape = CardDefaults.shape,
+            ),
         colors =
             CardDefaults.elevatedCardColors().copy(
                 containerColor = bg,
