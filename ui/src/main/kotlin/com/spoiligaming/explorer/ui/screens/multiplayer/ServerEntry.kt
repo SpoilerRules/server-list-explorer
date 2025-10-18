@@ -337,6 +337,22 @@ internal fun ServerEntry(
         }
     }
 
+    val outlinedBorder = CardDefaults.outlinedCardBorder()
+    val borderStroke =
+        when {
+            selected && amoledOn ->
+                BorderStroke(
+                    outlinedBorder.width,
+                    MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            selected || amoledOn -> outlinedBorder
+            else ->
+                BorderStroke(
+                    0.dp,
+                    Color.Transparent,
+                )
+        }
+
     // FOR CONTRIBUTORS: make sure to edit ShimmerServerEntry.kt when you edit this
     ElevatedCard(
         modifier =
@@ -345,15 +361,7 @@ internal fun ServerEntry(
                     translationX = blockedOffsetX.value
                     translationY = blockedOffsetY.value
                 }.border(
-                    border =
-                        if (selected || amoledOn) {
-                            CardDefaults.outlinedCardBorder()
-                        } else {
-                            BorderStroke(
-                                0.dp,
-                                Color.Transparent,
-                            )
-                        },
+                    border = borderStroke,
                     shape = CardDefaults.shape,
                 ).onKeyEvent { e ->
                     if (!selected || e.type != KeyEventType.KeyDown) {
