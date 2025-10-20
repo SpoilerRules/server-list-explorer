@@ -39,8 +39,9 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
-import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.TooltipDefaults.rememberTooltipPositionProvider
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -185,7 +186,7 @@ internal fun AddServerDialog(
                                 style = MaterialTheme.typography.titleMedium,
                             )
                             TooltipBox(
-                                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                                positionProvider = rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
                                 tooltip = {
                                     PlainTooltip(
                                         modifier = Modifier.widthIn(min = TooltipMinWidth),
