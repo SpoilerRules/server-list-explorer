@@ -8,6 +8,7 @@ serialization = "1.9.0"
 # Build & tooling
 shadow = "9.2.2"
 ktlint = "13.1.0"
+proguard = "7.8.0"
 
 # UI & Compose ecosystem
 colorPicker = "0.7.0"
