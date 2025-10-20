@@ -29,7 +29,8 @@ import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.TooltipDefaults.rememberRichTooltipPositionProvider
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipDefaults.rememberTooltipPositionProvider
 import androidx.compose.material3.TooltipScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -52,17 +53,17 @@ internal fun FloatingDialogBuilder(
 ) {
     var anchorCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
 
+    val positionProvider = rememberTooltipPositionProvider(TooltipAnchorPosition.End)
+
     val realScope =
         remember {
-            runCatching {
-                val clazz = Class.forName(TooltipScopeImplClassName)
-                val ctor =
-                    clazz.declaredConstructors
-                        .first { it.parameterCount == TooltipCtorParamCount }
-                        .also { it.isAccessible = true }
-                @Suppress("UNCHECKED_CAST")
-                ctor.newInstance({ anchorCoords }) as TooltipScope
-            }.getOrNull()
+            val clazz = Class.forName(TooltipScopeImplClassName)
+            val ctor =
+                clazz.declaredConstructors
+                    .first { it.parameterCount == TooltipCtorParamCount }
+                    .apply { isAccessible = true }
+
+            ctor.newInstance({ anchorCoords }, positionProvider) as TooltipScope
         }
 
     val transitionState =
@@ -73,10 +74,10 @@ internal fun FloatingDialogBuilder(
         transitionState.targetState = visible
     }
 
-    if ((transitionState.currentState || transitionState.targetState) && realScope != null) {
+    if (transitionState.currentState || transitionState.targetState) {
         val transition = rememberTransition(transitionState, label = "floating dialog")
         Popup(
-            popupPositionProvider = rememberRichTooltipPositionProvider(),
+            popupPositionProvider = positionProvider,
             properties = PopupProperties(focusable = PopupIsFocusable),
             onDismissRequest = onDismissRequest,
         ) {
@@ -127,7 +128,7 @@ private const val DialogFadeInDurationMs = 150
 internal const val DialogFadeOutDurationMs = 75
 
 private const val TooltipScopeImplClassName = "androidx.compose.material3.TooltipScopeImpl"
-private const val TooltipCtorParamCount = 1
+private const val TooltipCtorParamCount = 2
 
 private const val PopupIsFocusable = true
 
