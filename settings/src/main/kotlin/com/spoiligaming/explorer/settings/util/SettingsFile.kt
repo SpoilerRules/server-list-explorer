@@ -80,6 +80,15 @@ internal class SettingsFile<T>(
         onComplete?.invoke()
     }
 
+    internal fun lastModifiedMillis(): Long? {
+        val file = settingsFile
+        return if (file.exists()) {
+            file.lastModified()
+        } else {
+            null
+        }
+    }
+
     private fun ensureDirExists(dir: File) {
         if (!dir.exists()) {
             dir.mkdirs().also { created ->

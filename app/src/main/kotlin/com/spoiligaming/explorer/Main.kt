@@ -25,7 +25,6 @@ fun main(args: Array<String>) {
     System.setProperty("log4j2.configurationFile", "log4j2-$env.xml")
 
     ArgsParser.parse(args)
-    ResourceInitializer()
 
     launchInterface()
 }
