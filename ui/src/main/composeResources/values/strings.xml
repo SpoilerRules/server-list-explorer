@@ -269,4 +269,6 @@
     <string name="setting_prefs_vsync_note">Changes will apply after you restart the app.</string>
     <string name="setting_prefs_fps_overlay">Show FPS Overlay</string>
     <string name="setting_prefs_fps_overlay_desc">Displays the current frames per second to help with debugging and benchmarking.</string>
+    <string name="setting_prefs_window_title_build_info">Show build info in window title</string>
+    <string name="setting_prefs_window_title_build_info_desc">Append the current app version and distribution to the window title.</string>
 </resources>

@@ -25,8 +25,28 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.shadow) apply false
+    alias(libs.plugins.buildConfig) apply true
     alias(libs.plugins.ktlint) apply true
 }
+
+val appVersionProvider =
+    providers
+        .environmentVariable("APP_VERSION")
+        .orElse(providers.gradleProperty("appVersion"))
+        .orElse("0.0.0-dev")
+
+val appDistributionProvider =
+    providers
+        .environmentVariable("APP_DISTRIBUTION")
+        .orElse(providers.gradleProperty("appDistribution"))
+        .orElse("unspecified")
+
+val appVersion = appVersionProvider.get()
+val appDistribution = appDistributionProvider.get()
+
+extra["appVersion"] = appVersion
+extra["appDistribution"] = appDistribution
+version = appVersion
 
 allprojects {
     repositories {
@@ -34,6 +54,20 @@ allprojects {
         google()
         maven("https://repo.azisaba.net/repository/maven-public/")
         maven("https://jitpack.io/")
+    }
+
+    plugins.withId("org.jetbrains.kotlin.jvm") {
+        apply(plugin = "com.github.gmazzo.buildconfig")
+
+        extensions.getByType<com.github.gmazzo.buildconfig.BuildConfigExtension>().apply {
+            useKotlinOutput {
+                internalVisibility = false
+            }
+            packageName("com.spoiligaming.explorer.build")
+
+            buildConfigField("VERSION", appVersion)
+            buildConfigField("DISTRIBUTION", appDistribution)
+        }
     }
 }
 

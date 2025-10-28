@@ -49,6 +49,8 @@ import server_list_explorer.ui.generated.resources.setting_prefs_undo_redo_note
 import server_list_explorer.ui.generated.resources.setting_prefs_vsync
 import server_list_explorer.ui.generated.resources.setting_prefs_vsync_desc
 import server_list_explorer.ui.generated.resources.setting_prefs_vsync_note
+import server_list_explorer.ui.generated.resources.setting_prefs_window_title_build_info
+import server_list_explorer.ui.generated.resources.setting_prefs_window_title_build_info_desc
 import server_list_explorer.ui.generated.resources.settings_section_preferences
 
 @Composable
@@ -163,6 +165,16 @@ internal fun PreferenceSettings() {
                     onCheckedChange = { newValue ->
                         preferenceSettingsManager.updateSettings {
                             it.copy(showFpsOverlay = newValue)
+                        }
+                    },
+                )
+                ItemSwitch(
+                    title = t(Res.string.setting_prefs_window_title_build_info),
+                    description = t(Res.string.setting_prefs_window_title_build_info_desc),
+                    isChecked = prefs.windowTitleShowBuildInfo,
+                    onCheckedChange = { newValue ->
+                        preferenceSettingsManager.updateSettings {
+                            it.copy(windowTitleShowBuildInfo = newValue)
                         }
                     },
                 )

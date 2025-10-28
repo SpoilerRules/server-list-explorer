@@ -7,6 +7,7 @@ serialization = "1.9.0"
 
 # Build & tooling
 shadow = "9.2.2"
+buildConfig = "5.7.0"
 ktlint = "13.1.0"
 proguard = "7.8.0"
 
@@ -78,4 +79,5 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 # Compose & build tooling
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }

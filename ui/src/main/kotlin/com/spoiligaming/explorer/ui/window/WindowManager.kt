@@ -31,6 +31,7 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.spoiligaming.explorer.build.BuildConfig
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalWindowState
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.ProvideAppSettings
@@ -40,6 +41,8 @@ import java.awt.Dimension
 
 internal object WindowManager {
     private const val WINDOW_TITLE = "Server List Explorer"
+    private const val BUILD_SUFFIX = " - ${BuildConfig.VERSION} (${BuildConfig.DISTRIBUTION})"
+    private const val WINDOW_TITLE_WITH_BUILD = WINDOW_TITLE + BUILD_SUFFIX
 
     private const val MIN_WIDTH_PX = 850
     private const val MIN_HEIGHT_PX = 500
@@ -87,10 +90,13 @@ internal object WindowManager {
                         ws.currentHeight.dp < ShortHeightThresold
                 }
 
+                val windowTitle =
+                    if (prefs.windowTitleShowBuildInfo) WINDOW_TITLE_WITH_BUILD else WINDOW_TITLE
+
                 Window(
                     onCloseRequest = ::exitApplication,
                     visible = true,
-                    title = WINDOW_TITLE,
+                    title = windowTitle,
                     state = windowState,
                 ) {
                     if (hostOs == OS.Windows) {

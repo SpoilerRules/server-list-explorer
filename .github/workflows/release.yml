@@ -31,19 +31,8 @@ jobs:
           if ([string]::IsNullOrEmpty($V)) { $V = $env:VERSION }
           if ([string]::IsNullOrEmpty($V)) { $V = '${{ secrets.VERSION }}' }
           "VERSION=$V" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
+          "APP_VERSION=$V" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
           "TAG=v$V" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
-
-      - name: Update project version
-        shell: powershell
-        run: |
-          # ensure gradle.properties contains the correct version
-          $file = 'gradle.properties'
-          $content = Get-Content $file -ErrorAction SilentlyContinue
-          if (-not ($content -match '^version=')) {
-             Add-Content $file "version=$($env:VERSION)"
-          } else {
-             $content -replace '^version=.*', "version=$($env:VERSION)" | Set-Content $file
-          }
 
       - name: Set up JDK 21
         uses: actions/setup-java@v5
@@ -62,54 +51,92 @@ jobs:
       - name: Generate ktlint baseline
         if: env.ACT != 'true'
         shell: powershell
-        run: .\gradlew.bat --no-configuration-cache ktlintGenerateBaseline
+        run: .\gradlew.bat ktlintGenerateBaseline
 
-      - name: Build all artifacts
+      - name: Prepare artifact staging directory
         shell: powershell
         run: |
-          .\gradlew.bat `
-            app:buildWithProjectModules `
-            app:shadowJar `
-            app:packageReleaseUberJarForCurrentOS `
-            app:createDistributable `
-            app:createReleaseDistributable `
-            app:packageMsi `
-            app:packageReleaseMsi `
-            app:packageExe `
-            app:packageReleaseExe `
+          New-Item -ItemType Directory -Force -Path app/out | Out-Null
+
+      - name: Build JAR distribution
+        shell: powershell
+        run: |
+          $env:APP_DISTRIBUTION = 'JAR'
+          .\gradlew.bat app:buildWithProjectModules
+          Copy-Item app/build/libs/ServerListExplorer.jar app/out/ServerListExplorer.jar -Force
+
+      - name: Build Fat JAR distribution
+        shell: powershell
+        run: |
+          $env:APP_DISTRIBUTION = 'Fat JAR'
+          .\gradlew.bat app:shadowJar
+          Copy-Item app/build/libs/ServerListExplorer-all.jar app/out/ServerListExplorer-all.jar -Force
+
+      - name: Build MSI installer (Fat JAR)
+        shell: powershell
+        run: |
+          $env:APP_DISTRIBUTION = 'MSI Installer (Fat JAR)'
+          .\gradlew.bat app:packageMsi
+          $msi = Get-ChildItem app/build/compose/binaries/main/msi/ServerListExplorer-*.msi | Select-Object -First 1
+          Copy-Item $msi.FullName ("app/out/ServerListExplorer_installer-$($env:VERSION).msi") -Force
+
+      - name: Build EXE installer (Fat JAR)
+        shell: powershell
+        run: |
+          $env:APP_DISTRIBUTION = 'EXE Installer (Fat JAR)'
+          .\gradlew.bat app:packageExe
+          $exe = Get-ChildItem app/build/compose/binaries/main/exe/ServerListExplorer-*.exe | Select-Object -First 1
+          Copy-Item $exe.FullName ("app/out/ServerListExplorer_installer-$($env:VERSION).exe") -Force
+
+      - name: Build Portable (Fat JAR)
+        shell: powershell
+        run: |
+          $env:APP_DISTRIBUTION = 'Portable (Fat JAR)'
+          .\gradlew.bat app:createDistributable
+          $portableDir = "app/build/compose/binaries/main/app/ServerListExplorer"
+          $portableZip = "app/out/ServerListExplorer_portable-$($env:VERSION).zip"
+          if (Test-Path $portableZip) { Remove-Item $portableZip -Force }
+          Compress-Archive -Path $portableDir -DestinationPath $portableZip -Force
+
+      - name: Build Minified Fat JAR distribution
+        shell: powershell
+        run: |
+          $env:APP_DISTRIBUTION = 'Minified Fat JAR'
+          .\gradlew.bat app:packageReleaseUberJarForCurrentOS
+          $releaseJar = Get-ChildItem app/build/compose/jars/ServerListExplorer-windows-x64-*-release.jar | Select-Object -First 1
+          Copy-Item $releaseJar.FullName app/out/ServerListExplorer-all-minified.jar -Force
+
+      - name: Build MSI installer (Minified Fat JAR)
+        shell: powershell
+        run: |
+          $env:APP_DISTRIBUTION = 'MSI Installer (Minified Fat JAR)'
+          .\gradlew.bat app:packageReleaseMsi
+          $msi = Get-ChildItem app/build/compose/binaries/main-release/msi/ServerListExplorer-*.msi | Select-Object -First 1
+          Copy-Item $msi.FullName ("app/out/ServerListExplorer-minified_installer-$($env:VERSION).msi") -Force
+
+      - name: Build EXE installer (Minified Fat JAR)
+        shell: powershell
+        run: |
+          $env:APP_DISTRIBUTION = 'EXE Installer (Minified Fat JAR)'
+          .\gradlew.bat app:packageReleaseExe
+          $exe = Get-ChildItem app/build/compose/binaries/main-release/exe/ServerListExplorer-*.exe | Select-Object -First 1
+          Copy-Item $exe.FullName ("app/out/ServerListExplorer-minified_installer-$($env:VERSION).exe") -Force
+
+      - name: Build Portable (Minified Fat JAR)
+        shell: powershell
+        run: |
+          $env:APP_DISTRIBUTION = 'Portable (Minified Fat JAR)'
+          .\gradlew.bat app:createReleaseDistributable
+          $portableDir = "app/build/compose/binaries/main-release/app/ServerListExplorer"
+          $portableZip = "app/out/ServerListExplorer-minified_portable-$($env:VERSION).zip"
+          if (Test-Path $portableZip) { Remove-Item $portableZip -Force }
+          Compress-Archive -Path $portableDir -DestinationPath $portableZip -Force
 
       - name: List Compose JARs
         shell: powershell
         run: |
           Write-Host "=== app/build/compose/jars ==="
           Get-ChildItem app/build/compose/jars
-
-      - name: Prepare extra artifacts
-        shell: powershell
-        run: |
-          Get-ChildItem -Path "app/build/compose/jars/ServerListExplorer-windows-x64-*-release.jar" `
-              | Copy-Item -Destination app/build/compose/binaries/ServerListExplorer-all-minified.jar -Force
-
-          Compress-Archive -Path app/build/compose/binaries/main-release/app/ServerListExplorer `
-             -DestinationPath app/build/ServerListExplorer-minified_portable-$($env:VERSION).zip -Force
-
-          Compress-Archive -Path app/build/compose/binaries/main/app/ServerListExplorer `
-             -DestinationPath app/build/ServerListExplorer_portable-$($env:VERSION).zip -Force
-
-          Rename-Item -Path (Get-ChildItem -Path "app/build/compose/jars/ServerListExplorer-windows-x64-*-release.jar").FullName `
-             -NewName "ServerListExplorer-all-minified.jar"
-
-          Rename-Item -Path (Get-ChildItem -Path "app/build/compose/binaries/main-release/msi/ServerListExplorer-*.msi").FullName `
-              -NewName "ServerListExplorer-minified_installer-$($env:VERSION).msi"
-
-          Rename-Item -Path (Get-ChildItem -Path "app/build/compose/binaries/main/msi/ServerListExplorer-*.msi").FullName `
-              -NewName "ServerListExplorer_installer-$($env:VERSION).msi"
-
-          Rename-Item -Path (Get-ChildItem -Path "app/build/compose/binaries/main-release/exe/ServerListExplorer-*.exe").FullName `
-              -NewName "ServerListExplorer-minified_installer-$($env:VERSION).exe"
-
-          Rename-Item -Path (Get-ChildItem -Path "app/build/compose/binaries/main/exe/ServerListExplorer-*.exe").FullName `
-              -NewName "ServerListExplorer_installer-$($env:VERSION).exe"
 
       - name: Create GitHub Release
         if: env.ACT != 'true'
@@ -122,15 +149,15 @@ jobs:
           draft: false
           prerelease: ${{ contains(env.TAG, '-beta') || contains(env.TAG, '-rc') || contains(env.TAG, '-alpha') }}
           files: |
-            app/build/libs/ServerListExplorer.jar
-            app/build/libs/ServerListExplorer-all.jar
-            app/build/compose/jars/ServerListExplorer-all-minified.jar
-            app/build/compose/binaries/main-release/msi/ServerListExplorer-minified_installer-${{ env.VERSION }}.msi
-            app/build/compose/binaries/main/msi/ServerListExplorer_installer-${{ env.VERSION }}.msi
-            app/build/compose/binaries/main-release/exe/ServerListExplorer-minified_installer-${{ env.VERSION }}.exe
-            app/build/compose/binaries/main/exe/ServerListExplorer_installer-${{ env.VERSION }}.exe
-            app/build/ServerListExplorer-minified_portable-${{ env.VERSION }}.zip
-            app/build/ServerListExplorer_portable-${{ env.VERSION }}.zip
+            app/out/ServerListExplorer.jar
+            app/out/ServerListExplorer-all.jar
+            app/out/ServerListExplorer-all-minified.jar
+            app/out/ServerListExplorer-minified_installer-${{ env.VERSION }}.msi
+            app/out/ServerListExplorer_installer-${{ env.VERSION }}.msi
+            app/out/ServerListExplorer-minified_installer-${{ env.VERSION }}.exe
+            app/out/ServerListExplorer_installer-${{ env.VERSION }}.exe
+            app/out/ServerListExplorer-minified_portable-${{ env.VERSION }}.zip
+            app/out/ServerListExplorer_portable-${{ env.VERSION }}.zip
 
       - name: Upload artifacts to workflow run
         if: env.ACT != 'true'
@@ -138,12 +165,12 @@ jobs:
         with:
           name: sle-${{ env.TAG }}
           path: |
-            app/build/libs/ServerListExplorer.jar
-            app/build/libs/ServerListExplorer-all.jar
-            app/build/compose/jars/ServerListExplorer-all-minified.jar
-            app/build/compose/binaries/main-release/msi/ServerListExplorer-minified_installer-${{ env.VERSION }}.msi
-            app/build/compose/binaries/main/msi/ServerListExplorer_installer-${{ env.VERSION }}.msi
-            app/build/compose/binaries/main-release/exe/ServerListExplorer-minified_installer-${{ env.VERSION }}.exe
-            app/build/compose/binaries/main/exe/ServerListExplorer_installer-${{ env.VERSION }}.exe
-            app/build/ServerListExplorer-minified_portable-${{ env.VERSION }}.zip
-            app/build/ServerListExplorer_portable-${{ env.VERSION }}.zip
+            app/out/ServerListExplorer.jar
+            app/out/ServerListExplorer-all.jar
+            app/out/ServerListExplorer-all-minified.jar
+            app/out/ServerListExplorer-minified_installer-${{ env.VERSION }}.msi
+            app/out/ServerListExplorer_installer-${{ env.VERSION }}.msi
+            app/out/ServerListExplorer-minified_installer-${{ env.VERSION }}.exe
+            app/out/ServerListExplorer_installer-${{ env.VERSION }}.exe
+            app/out/ServerListExplorer-minified_portable-${{ env.VERSION }}.zip
+            app/out/ServerListExplorer_portable-${{ env.VERSION }}.zip

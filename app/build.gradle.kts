@@ -99,6 +99,9 @@ val buildWithProjectModules by tasks.registering(Jar::class) {
     }
 }
 
+val appVersion: String by rootProject.extra
+version = appVersion
+
 val rawVersion = project.version.toString()
 val (major, minor, patch, qualifier) =
     Regex("""(\d+)\.(\d+)(?:\.(\d+))?(?:-([\w.\-]+))?""")
