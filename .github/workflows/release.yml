@@ -75,32 +75,36 @@ jobs:
       - name: Build MSI installer (Fat JAR)
         shell: powershell
         run: |
+          $env:ONLY_WINDOWS_X64 = 'true'
           $env:APP_DISTRIBUTION = 'MSI Installer (Fat JAR)'
           .\gradlew.bat app:packageMsi
           $msi = Get-ChildItem app/build/compose/binaries/main/msi/ServerListExplorer-*.msi | Select-Object -First 1
-          Copy-Item $msi.FullName ("app/out/ServerListExplorer_installer-$($env:VERSION).msi") -Force
+          Copy-Item $msi.FullName ("app/out/ServerListExplorer_$($env:VERSION)_x64.msi") -Force
 
       - name: Build EXE installer (Fat JAR)
         shell: powershell
         run: |
+          $env:ONLY_WINDOWS_X64 = 'true'
           $env:APP_DISTRIBUTION = 'EXE Installer (Fat JAR)'
           .\gradlew.bat app:packageExe
           $exe = Get-ChildItem app/build/compose/binaries/main/exe/ServerListExplorer-*.exe | Select-Object -First 1
-          Copy-Item $exe.FullName ("app/out/ServerListExplorer_installer-$($env:VERSION).exe") -Force
+          Copy-Item $exe.FullName ("app/out/ServerListExplorer_$($env:VERSION)_x64-setup.exe") -Force
 
       - name: Build Portable (Fat JAR)
         shell: powershell
         run: |
+          $env:ONLY_WINDOWS_X64 = 'true'
           $env:APP_DISTRIBUTION = 'Portable (Fat JAR)'
           .\gradlew.bat app:createDistributable
           $portableDir = "app/build/compose/binaries/main/app/ServerListExplorer"
-          $portableZip = "app/out/ServerListExplorer_portable-$($env:VERSION).zip"
+          $portableZip = "app/out/ServerListExplorer_$($env:VERSION)_windows-x64-portable.zip"
           if (Test-Path $portableZip) { Remove-Item $portableZip -Force }
           Compress-Archive -Path $portableDir -DestinationPath $portableZip -Force
 
       - name: Build Minified Fat JAR distribution
         shell: powershell
         run: |
+          $env:ONLY_WINDOWS_X64 = 'true'
           $env:APP_DISTRIBUTION = 'Minified Fat JAR'
           .\gradlew.bat app:packageReleaseUberJarForCurrentOS
           $releaseJar = Get-ChildItem app/build/compose/jars/ServerListExplorer-windows-x64-*-release.jar | Select-Object -First 1
@@ -109,26 +113,29 @@ jobs:
       - name: Build MSI installer (Minified Fat JAR)
         shell: powershell
         run: |
+          $env:ONLY_WINDOWS_X64 = 'true'
           $env:APP_DISTRIBUTION = 'MSI Installer (Minified Fat JAR)'
           .\gradlew.bat app:packageReleaseMsi
           $msi = Get-ChildItem app/build/compose/binaries/main-release/msi/ServerListExplorer-*.msi | Select-Object -First 1
-          Copy-Item $msi.FullName ("app/out/ServerListExplorer-minified_installer-$($env:VERSION).msi") -Force
+          Copy-Item $msi.FullName ("app/out/ServerListExplorer_$($env:VERSION)-minified_x64.msi") -Force
 
       - name: Build EXE installer (Minified Fat JAR)
         shell: powershell
         run: |
+          $env:ONLY_WINDOWS_X64 = 'true'
           $env:APP_DISTRIBUTION = 'EXE Installer (Minified Fat JAR)'
           .\gradlew.bat app:packageReleaseExe
           $exe = Get-ChildItem app/build/compose/binaries/main-release/exe/ServerListExplorer-*.exe | Select-Object -First 1
-          Copy-Item $exe.FullName ("app/out/ServerListExplorer-minified_installer-$($env:VERSION).exe") -Force
+          Copy-Item $exe.FullName ("app/out/ServerListExplorer_$($env:VERSION)-minified_x64-setup.exe") -Force
 
       - name: Build Portable (Minified Fat JAR)
         shell: powershell
         run: |
+          $env:ONLY_WINDOWS_X64 = 'true'
           $env:APP_DISTRIBUTION = 'Portable (Minified Fat JAR)'
           .\gradlew.bat app:createReleaseDistributable
           $portableDir = "app/build/compose/binaries/main-release/app/ServerListExplorer"
-          $portableZip = "app/out/ServerListExplorer-minified_portable-$($env:VERSION).zip"
+          $portableZip = "app/out/ServerListExplorer_$($env:VERSION)-minified_windows-x64-portable.zip"
           if (Test-Path $portableZip) { Remove-Item $portableZip -Force }
           Compress-Archive -Path $portableDir -DestinationPath $portableZip -Force
 
@@ -152,12 +159,12 @@ jobs:
             app/out/ServerListExplorer.jar
             app/out/ServerListExplorer-all.jar
             app/out/ServerListExplorer-all-minified.jar
-            app/out/ServerListExplorer-minified_installer-${{ env.VERSION }}.msi
-            app/out/ServerListExplorer_installer-${{ env.VERSION }}.msi
-            app/out/ServerListExplorer-minified_installer-${{ env.VERSION }}.exe
-            app/out/ServerListExplorer_installer-${{ env.VERSION }}.exe
-            app/out/ServerListExplorer-minified_portable-${{ env.VERSION }}.zip
-            app/out/ServerListExplorer_portable-${{ env.VERSION }}.zip
+            app/out/ServerListExplorer_${{ env.VERSION }}-minified_x64.msi
+            app/out/ServerListExplorer_${{ env.VERSION }}_x64.msi
+            app/out/ServerListExplorer_${{ env.VERSION }}-minified_x64-setup.exe
+            app/out/ServerListExplorer_${{ env.VERSION }}_x64-setup.exe
+            app/out/ServerListExplorer_${{ env.VERSION }}-minified_windows-x64-portable.zip
+            app/out/ServerListExplorer_${{ env.VERSION }}_windows-x64-portable.zip
 
       - name: Upload artifacts to workflow run
         if: env.ACT != 'true'
@@ -168,9 +175,9 @@ jobs:
             app/out/ServerListExplorer.jar
             app/out/ServerListExplorer-all.jar
             app/out/ServerListExplorer-all-minified.jar
-            app/out/ServerListExplorer-minified_installer-${{ env.VERSION }}.msi
-            app/out/ServerListExplorer_installer-${{ env.VERSION }}.msi
-            app/out/ServerListExplorer-minified_installer-${{ env.VERSION }}.exe
-            app/out/ServerListExplorer_installer-${{ env.VERSION }}.exe
-            app/out/ServerListExplorer-minified_portable-${{ env.VERSION }}.zip
-            app/out/ServerListExplorer_portable-${{ env.VERSION }}.zip
+            app/out/ServerListExplorer_${{ env.VERSION }}-minified_x64.msi
+            app/out/ServerListExplorer_${{ env.VERSION }}_x64.msi
+            app/out/ServerListExplorer_${{ env.VERSION }}-minified_x64-setup.exe
+            app/out/ServerListExplorer_${{ env.VERSION }}_x64-setup.exe
+            app/out/ServerListExplorer_${{ env.VERSION }}-minified_windows-x64-portable.zip
+            app/out/ServerListExplorer_${{ env.VERSION }}_windows-x64-portable.zip
