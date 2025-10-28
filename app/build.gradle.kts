@@ -35,14 +35,24 @@ dependencies {
     runtimeOnly(libs.log4j.slf4j2.impl)
 
     implementation(compose.runtime)
-    listOf(
-        compose.desktop.windows_x64,
-        compose.desktop.windows_arm64,
-        compose.desktop.linux_x64,
-        compose.desktop.linux_arm64,
-        compose.desktop.macos_x64,
-        compose.desktop.macos_arm64,
-    ).forEach { runtimeOnly(it) }
+
+    val onlyWinX64 = System.getenv("ONLY_WINDOWS_X64")?.toBoolean() == true
+    val targetRuntimes =
+        if (onlyWinX64) {
+            listOf(
+                compose.desktop.windows_x64,
+            )
+        } else {
+            listOf(
+                compose.desktop.windows_x64,
+                compose.desktop.windows_arm64,
+                compose.desktop.linux_x64,
+                compose.desktop.linux_arm64,
+                compose.desktop.macos_x64,
+                compose.desktop.macos_arm64,
+            )
+        }
+    targetRuntimes.forEach { runtimeOnly(it) }
 }
 
 val mainFunction = "com.spoiligaming.explorer.MainKt"
