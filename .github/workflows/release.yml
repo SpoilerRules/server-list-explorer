@@ -104,7 +104,6 @@ jobs:
       - name: Build Minified Fat JAR distribution
         shell: powershell
         run: |
-          $env:ONLY_WINDOWS_X64 = 'true'
           $env:APP_DISTRIBUTION = 'Minified Fat JAR'
           .\gradlew.bat app:packageReleaseUberJarForCurrentOS
           $releaseJar = Get-ChildItem app/build/compose/jars/ServerListExplorer-windows-x64-*-release.jar | Select-Object -First 1
