@@ -46,6 +46,8 @@ data class Preferences(
     val vsync: Boolean = true,
     @SerialName("show_fps_overlay")
     val showFpsOverlay: Boolean = false,
+    @SerialName("window_title_show_build_info")
+    val windowTitleShowBuildInfo: Boolean = false,
 ) {
     companion object {
         /**

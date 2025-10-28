@@ -94,10 +94,15 @@ val buildWithProjectModules by tasks.registering(Jar::class) {
         // ensure the subproject jar is built before this task
         dependsOn(jarProvider)
 
-        // include contents of that jar
-        from({ project.zipTree(jarProvider.flatMap { it.archiveFile }) })
+        // include contents of that jar, but drop the generated BuildConfig to avoid conflicts
+        from({ project.zipTree(jarProvider.flatMap { it.archiveFile }) }) {
+            exclude("com/spoiligaming/explorer/build/BuildConfig.class")
+        }
     }
 }
+
+val appVersion: String by rootProject.extra
+version = appVersion
 
 val rawVersion = project.version.toString()
 val (major, minor, patch, qualifier) =
