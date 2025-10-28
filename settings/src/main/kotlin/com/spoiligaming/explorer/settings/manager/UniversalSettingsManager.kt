@@ -49,6 +49,9 @@ class UniversalSettingsManager<T : Any>(
     @Volatile
     private var cachedSettings: T
 
+    @Volatile
+    private var lastLoadedTimestamp: Long? = null
+
     private val mutex = Mutex()
 
     init {
@@ -70,12 +73,20 @@ class UniversalSettingsManager<T : Any>(
 
         cachedSettings = initial
         _settingsFlow = MutableStateFlow(initial)
+        lastLoadedTimestamp = file.lastModifiedMillis()
 
         logger.debug { "Ready with settings from $fileName: $initial" }
     }
 
     override suspend fun loadSettings() =
         mutex.withLock {
+            val cachedTimestamp = lastLoadedTimestamp
+            val fileTimestamp = file.lastModifiedMillis()
+            if (cachedTimestamp != null && fileTimestamp != null && cachedTimestamp >= fileTimestamp) {
+                logger.debug { "Skipping reload for $fileName; cached settings are up to date." }
+                return@withLock cachedSettings
+            }
+
             logger.debug { "Loading $fileName." }
             val loaded =
                 runCatching { file.read() }
@@ -90,6 +101,7 @@ class UniversalSettingsManager<T : Any>(
                     }
             cachedSettings = loaded
             _settingsFlow.value = loaded
+            lastLoadedTimestamp = file.lastModifiedMillis()
             logger.debug { "Loaded settings from $fileName: $loaded" }
             loaded
         }
@@ -105,6 +117,7 @@ class UniversalSettingsManager<T : Any>(
                     .onSuccess {
                         cachedSettings = settings
                         _settingsFlow.value = settings
+                        lastLoadedTimestamp = file.lastModifiedMillis()
                         logger.debug { "Saved to $fileName: $settings" }
                         onComplete?.invoke()
                     }.onFailure { e ->
@@ -125,6 +138,7 @@ class UniversalSettingsManager<T : Any>(
                     .onSuccess {
                         cachedSettings = updated
                         _settingsFlow.value = updated
+                        lastLoadedTimestamp = file.lastModifiedMillis()
                         logger.debug { "Updated $fileName to $updated" }
                     }.onFailure { e ->
                         logger.error(e) { "Could not update $fileName." }
