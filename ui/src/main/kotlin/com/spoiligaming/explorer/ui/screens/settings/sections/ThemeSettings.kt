@@ -30,19 +30,36 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.spoiligaming.explorer.settings.manager.themeSettingsManager
 import com.spoiligaming.explorer.settings.model.ThemeMode
+import com.spoiligaming.explorer.settings.model.ThemePaletteStyle
 import com.spoiligaming.explorer.ui.extensions.toComposeColor
 import com.spoiligaming.explorer.ui.extensions.toHex
 import com.spoiligaming.explorer.ui.screens.settings.components.SettingsSection
 import com.spoiligaming.explorer.ui.t
+import com.spoiligaming.explorer.ui.theme.MAX_CONTRAST_LEVEL
+import com.spoiligaming.explorer.ui.theme.MIN_CONTRAST_LEVEL
 import com.spoiligaming.explorer.ui.widgets.DropdownOption
 import com.spoiligaming.explorer.ui.widgets.ItemColorPicker
 import com.spoiligaming.explorer.ui.widgets.ItemSelectableDropdownMenu
 import com.spoiligaming.explorer.ui.widgets.ItemSwitch
+import com.spoiligaming.explorer.ui.widgets.ItemValueSlider
 import server_list_explorer.ui.generated.resources.Res
+import server_list_explorer.ui.generated.resources.palette_style_content
+import server_list_explorer.ui.generated.resources.palette_style_expressive
+import server_list_explorer.ui.generated.resources.palette_style_fidelity
+import server_list_explorer.ui.generated.resources.palette_style_fruit_salad
+import server_list_explorer.ui.generated.resources.palette_style_monochrome
+import server_list_explorer.ui.generated.resources.palette_style_neutral
+import server_list_explorer.ui.generated.resources.palette_style_rainbow
+import server_list_explorer.ui.generated.resources.palette_style_tonal_spot
+import server_list_explorer.ui.generated.resources.palette_style_vibrant
 import server_list_explorer.ui.generated.resources.setting_theme_amoled_mode
 import server_list_explorer.ui.generated.resources.setting_theme_amoled_mode_desc
+import server_list_explorer.ui.generated.resources.setting_theme_contrast_level
+import server_list_explorer.ui.generated.resources.setting_theme_contrast_level_desc
 import server_list_explorer.ui.generated.resources.setting_theme_mode
 import server_list_explorer.ui.generated.resources.setting_theme_mode_desc
+import server_list_explorer.ui.generated.resources.setting_theme_palette_style
+import server_list_explorer.ui.generated.resources.setting_theme_palette_style_desc
 import server_list_explorer.ui.generated.resources.setting_theme_seed_color
 import server_list_explorer.ui.generated.resources.setting_theme_seed_color_desc
 import server_list_explorer.ui.generated.resources.setting_theme_use_system_accent
@@ -76,6 +93,25 @@ internal fun ThemeSettings() {
                     onConfirm = { newColor ->
                         themeSettingsManager.updateSettings {
                             it.copy(seedColor = "#" + newColor.toHex())
+                        }
+                    },
+                )
+                PaletteStyleDropdown(
+                    currentStyle = themeSettings.paletteStyle,
+                    onStyleSelected = { newStyle ->
+                        themeSettingsManager.updateSettings { current ->
+                            current.copy(paletteStyle = newStyle)
+                        }
+                    },
+                )
+                ItemValueSlider(
+                    title = t(Res.string.setting_theme_contrast_level),
+                    description = t(Res.string.setting_theme_contrast_level_desc),
+                    value = themeSettings.contrastLevel,
+                    valueRange = MIN_CONTRAST_LEVEL.toFloat()..MAX_CONTRAST_LEVEL.toFloat(),
+                    onValueChange = { newValue ->
+                        themeSettingsManager.updateSettings { current ->
+                            current.copy(contrastLevel = newValue.coerceIn(MIN_CONTRAST_LEVEL, MAX_CONTRAST_LEVEL))
                         }
                     },
                 )
@@ -142,5 +178,45 @@ private fun ThemeModeDropdown(
         options = options,
     ) { selected ->
         displayNameToMode[selected.text]?.let(onModeSelected)
+    }
+}
+
+@Composable
+private fun PaletteStyleDropdown(
+    currentStyle: ThemePaletteStyle,
+    onStyleSelected: (ThemePaletteStyle) -> Unit,
+) {
+    val styleToDisplayName =
+        ThemePaletteStyle.entries.associateWith { style ->
+            when (style) {
+                ThemePaletteStyle.TonalSpot -> t(Res.string.palette_style_tonal_spot)
+                ThemePaletteStyle.Neutral -> t(Res.string.palette_style_neutral)
+                ThemePaletteStyle.Vibrant -> t(Res.string.palette_style_vibrant)
+                ThemePaletteStyle.Expressive -> t(Res.string.palette_style_expressive)
+                ThemePaletteStyle.Rainbow -> t(Res.string.palette_style_rainbow)
+                ThemePaletteStyle.FruitSalad -> t(Res.string.palette_style_fruit_salad)
+                ThemePaletteStyle.Monochrome -> t(Res.string.palette_style_monochrome)
+                ThemePaletteStyle.Fidelity -> t(Res.string.palette_style_fidelity)
+                ThemePaletteStyle.Content -> t(Res.string.palette_style_content)
+            }
+        }
+    val displayNameToStyle = styleToDisplayName.entries.associate { (k, v) -> v to k }
+
+    val options =
+        styleToDisplayName.map { (_, displayName) ->
+            DropdownOption(
+                text = displayName,
+            )
+        }
+
+    val selectedOption = options.first { it.text == styleToDisplayName[currentStyle] }
+
+    ItemSelectableDropdownMenu(
+        title = t(Res.string.setting_theme_palette_style),
+        description = t(Res.string.setting_theme_palette_style_desc),
+        selectedOption = selectedOption,
+        options = options,
+    ) { selected ->
+        displayNameToStyle[selected.text]?.let(onStyleSelected)
     }
 }

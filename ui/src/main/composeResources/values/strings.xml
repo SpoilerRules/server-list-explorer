@@ -227,6 +227,19 @@
     <string name="setting_theme_amoled_mode_desc">Enable pure-black backgrounds on OLED screens when dark mode is active.</string>
     <string name="setting_theme_use_system_accent">Use system accent color</string>
     <string name="setting_theme_use_system_accent_desc">When enabled, Server List Explorer will adopt your Windows accent color as the seed color. Toggle on to keep your Server List Explorer in sync with your OS accent.</string>
+    <string name="setting_theme_palette_style">Palette style</string>
+    <string name="setting_theme_palette_style_desc">Select how colors are generated from your seed color.</string>
+    <string name="palette_style_tonal_spot">Tonal spot</string>
+    <string name="palette_style_neutral">Neutral</string>
+    <string name="palette_style_vibrant">Vibrant</string>
+    <string name="palette_style_expressive">Expressive</string>
+    <string name="palette_style_rainbow">Rainbow</string>
+    <string name="palette_style_fruit_salad">Fruit salad</string>
+    <string name="palette_style_monochrome">Monochrome</string>
+    <string name="palette_style_fidelity">Fidelity</string>
+    <string name="palette_style_content">Content</string>
+    <string name="setting_theme_contrast_level">Contrast level</string>
+    <string name="setting_theme_contrast_level_desc">Increase or decrease the contrast of the theme for better visibility.</string>
 
     <!-- Settings: Multiplayer Server List -->
     <string name="setting_mp_entry_scale">Server entry scale</string>
