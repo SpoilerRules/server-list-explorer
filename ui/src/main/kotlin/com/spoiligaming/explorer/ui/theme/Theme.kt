@@ -44,30 +44,43 @@ import com.spoiligaming.explorer.ui.util.rememberSystemAccentColor
 internal val LocalDarkTheme = staticCompositionLocalOf { false }
 internal var isDarkTheme by mutableStateOf(false)
     private set
-internal var isSystemDarkTheme by mutableStateOf(OsThemeDetector.getDetector().isDark)
+internal var isSystemDarkTheme by mutableStateOf(false)
     private set
+private val osThemeDetector by lazy { OsThemeDetector.getDetector() }
 
 @Composable
 private fun rememberThemeState(): Pair<State<Boolean>, Boolean> {
     val themeSettings by themeSettingsManager.settingsFlow.collectAsState()
     val themeMode = themeSettings.themeMode
 
-    val osDetector = remember { OsThemeDetector.getDetector() }
-    var systemDark by remember { mutableStateOf(osDetector.isDark) }
-
-    DisposableEffect(themeMode) {
-        val listener: (Boolean) -> Unit = { nowIsDark ->
-            systemDark = nowIsDark
-            isSystemDarkTheme = nowIsDark
+    val systemDetector =
+        remember(themeMode) {
+            if (themeMode == ThemeMode.System) osThemeDetector else null
         }
 
-        if (themeMode == ThemeMode.System) {
-            osDetector.registerListener(listener)
-        }
+    if (systemDetector == null && isSystemDarkTheme) {
+        isSystemDarkTheme = false
+    }
 
-        onDispose {
-            if (themeMode == ThemeMode.System) {
-                osDetector.removeListener(listener)
+    var systemDark by remember(themeMode) { mutableStateOf(systemDetector?.isDark ?: false) }
+
+    DisposableEffect(systemDetector) {
+        if (systemDetector == null) {
+            onDispose {}
+        } else {
+            val listener: (Boolean) -> Unit = { nowIsDark ->
+                systemDark = nowIsDark
+                isSystemDarkTheme = nowIsDark
+            }
+
+            val currentState = systemDetector.isDark
+            systemDark = currentState
+            isSystemDarkTheme = currentState
+
+            systemDetector.registerListener(listener)
+
+            onDispose {
+                systemDetector.removeListener(listener)
             }
         }
     }
