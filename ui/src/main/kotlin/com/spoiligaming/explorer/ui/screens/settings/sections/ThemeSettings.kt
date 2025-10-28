@@ -42,6 +42,8 @@ import com.spoiligaming.explorer.ui.widgets.ItemColorPicker
 import com.spoiligaming.explorer.ui.widgets.ItemSelectableDropdownMenu
 import com.spoiligaming.explorer.ui.widgets.ItemSwitch
 import com.spoiligaming.explorer.ui.widgets.ItemValueSlider
+import org.jetbrains.skiko.OS
+import org.jetbrains.skiko.hostOs
 import server_list_explorer.ui.generated.resources.Res
 import server_list_explorer.ui.generated.resources.palette_style_content
 import server_list_explorer.ui.generated.resources.palette_style_expressive
@@ -125,16 +127,18 @@ internal fun ThemeSettings() {
                         }
                     },
                 )
-                ItemSwitch(
-                    title = t(Res.string.setting_theme_use_system_accent),
-                    description = t(Res.string.setting_theme_use_system_accent_desc),
-                    isChecked = themeSettings.useSystemAccentColor,
-                    onCheckedChange = { newValue ->
-                        themeSettingsManager.updateSettings { current ->
-                            current.copy(useSystemAccentColor = newValue)
-                        }
-                    },
-                )
+                if (hostOs == OS.Windows) {
+                    ItemSwitch(
+                        title = t(Res.string.setting_theme_use_system_accent),
+                        description = t(Res.string.setting_theme_use_system_accent_desc),
+                        isChecked = themeSettings.useSystemAccentColor,
+                        onCheckedChange = { newValue ->
+                            themeSettingsManager.updateSettings { current ->
+                                current.copy(useSystemAccentColor = newValue)
+                            }
+                        },
+                    )
+                }
             },
     )
 }
