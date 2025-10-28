@@ -34,11 +34,28 @@ enum class ThemeMode {
 }
 
 @Serializable
+enum class ThemePaletteStyle {
+    TonalSpot,
+    Neutral,
+    Vibrant,
+    Expressive,
+    Rainbow,
+    FruitSalad,
+    Monochrome,
+    Fidelity,
+    Content,
+}
+
+@Serializable
 data class ThemeSettings(
     @SerialName("theme_mode")
     val themeMode: ThemeMode = ThemeMode.System,
     @SerialName("seed_color")
     val seedColor: String = DEFAULT_SEED_COLOR,
+    @SerialName("palette_style")
+    val paletteStyle: ThemePaletteStyle = ThemePaletteStyle.TonalSpot,
+    @SerialName("contrast_level")
+    val contrastLevel: Double = DEFAULT_CONTRAST_LEVEL,
     @SerialName("use_system_accent_color")
     val useSystemAccentColor: Boolean = false,
     @SerialName("amoled_mode")
@@ -46,5 +63,6 @@ data class ThemeSettings(
 ) {
     companion object {
         const val DEFAULT_SEED_COLOR = "#4B4376"
+        const val DEFAULT_CONTRAST_LEVEL = 0.0
     }
 }

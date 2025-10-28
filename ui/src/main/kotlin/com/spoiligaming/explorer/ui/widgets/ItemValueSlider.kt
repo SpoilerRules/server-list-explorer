@@ -55,6 +55,7 @@ internal inline fun <reified T : Number> ItemValueSlider(
 ) {
     val isInt = T::class == Int::class
     val isLong = T::class == Long::class
+    val isDouble = T::class == Double::class
 
     val clamped = value.toFloat().coerceIn(valueRange)
     val autoSteps =
@@ -81,6 +82,7 @@ internal inline fun <reified T : Number> ItemValueSlider(
                     when {
                         isInt -> coerced.roundToInt() as T
                         isLong -> coerced.roundToInt().toLong() as T
+                        isDouble -> coerced.toDouble() as T
                         else -> coerced as T
                     }
                 if (final != currentValue) currentOnChange(final)
@@ -101,6 +103,7 @@ internal inline fun <reified T : Number> ItemValueSlider(
                         when {
                             isInt -> localValue.roundToInt().toString()
                             isLong -> localValue.roundToInt().toLong().toString()
+                            isDouble -> String.format(DOUBLE_FORMAT, localValue.toDouble())
                             else -> String.format(FLOAT_FORMAT, localValue)
                         },
                     style = MaterialTheme.typography.bodyMedium,
@@ -121,4 +124,6 @@ private const val SLIDER_WIDTH_RATIO = 0.25f
 private const val SLIDER_DEBOUNCE_MS = 300L
 private const val STEP_OFFSET = 1
 private val SliderSpacing = 8.dp
+
 private const val FLOAT_FORMAT = "%.1f"
+private const val DOUBLE_FORMAT = "%.2f"

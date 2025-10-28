@@ -37,6 +37,7 @@ import com.materialkolor.dynamiccolor.ColorSpec
 import com.materialkolor.rememberDynamicMaterialThemeState
 import com.spoiligaming.explorer.settings.manager.themeSettingsManager
 import com.spoiligaming.explorer.settings.model.ThemeMode
+import com.spoiligaming.explorer.settings.model.ThemePaletteStyle
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalThemeSettings
 import com.spoiligaming.explorer.ui.extensions.toComposeColor
 import com.spoiligaming.explorer.ui.util.rememberSystemAccentColor
@@ -46,7 +47,9 @@ internal var isDarkTheme by mutableStateOf(false)
     private set
 internal var isSystemDarkTheme by mutableStateOf(false)
     private set
-private val osThemeDetector by lazy { OsThemeDetector.getDetector() }
+
+internal const val MIN_CONTRAST_LEVEL = 0.0
+internal const val MAX_CONTRAST_LEVEL = 1.0
 
 @Composable
 private fun rememberThemeState(): Pair<State<Boolean>, Boolean> {
@@ -130,13 +133,20 @@ internal fun AppTheme(content: @Composable () -> Unit) {
             }
         }
 
+    val paletteStyle = remember(themeSettings.paletteStyle) { themeSettings.paletteStyle.toMaterialPaletteStyle() }
+    val contrastLevel =
+        remember(themeSettings.contrastLevel) {
+            themeSettings.contrastLevel.coerceIn(MIN_CONTRAST_LEVEL, MAX_CONTRAST_LEVEL)
+        }
+
     val dynamicThemeState =
         rememberDynamicMaterialThemeState(
-            isAmoled = themeSettings.amoledMode,
-            isDark = currentAppDarkTheme,
-            style = PaletteStyle.TonalSpot,
-            specVersion = ColorSpec.SpecVersion.SPEC_2025,
             seedColor = chosenSeedColor,
+            isDark = currentAppDarkTheme,
+            isAmoled = themeSettings.amoledMode,
+            style = paletteStyle,
+            contrastLevel = contrastLevel,
+            specVersion = ColorSpec.SpecVersion.SPEC_2025,
         )
 
     CompositionLocalProvider(LocalDarkTheme provides currentAppDarkTheme) {
@@ -147,3 +157,18 @@ internal fun AppTheme(content: @Composable () -> Unit) {
         )
     }
 }
+
+private fun ThemePaletteStyle.toMaterialPaletteStyle() =
+    when (this) {
+        ThemePaletteStyle.TonalSpot -> PaletteStyle.TonalSpot
+        ThemePaletteStyle.Neutral -> PaletteStyle.Neutral
+        ThemePaletteStyle.Vibrant -> PaletteStyle.Vibrant
+        ThemePaletteStyle.Expressive -> PaletteStyle.Expressive
+        ThemePaletteStyle.Rainbow -> PaletteStyle.Rainbow
+        ThemePaletteStyle.FruitSalad -> PaletteStyle.FruitSalad
+        ThemePaletteStyle.Monochrome -> PaletteStyle.Monochrome
+        ThemePaletteStyle.Fidelity -> PaletteStyle.Fidelity
+        ThemePaletteStyle.Content -> PaletteStyle.Content
+    }
+
+private val osThemeDetector by lazy { OsThemeDetector.getDetector() }
