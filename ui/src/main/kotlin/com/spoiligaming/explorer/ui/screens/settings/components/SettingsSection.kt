@@ -19,19 +19,19 @@
 package com.spoiligaming.explorer.ui.screens.settings.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -44,34 +44,58 @@ internal fun SettingsSection(
         color = MaterialTheme.colorScheme.onBackground,
         style = MaterialTheme.typography.titleLarge,
     )
-    Box(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .background(
-                    MaterialTheme.colorScheme.surfaceColorAtElevation(BoxElevation),
-                    shape = CardDefaults.outlinedShape,
-                ).border(CardDefaults.outlinedCardBorder(), shape = CardDefaults.outlinedShape),
-    ) {
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(InnerPadding),
-            verticalArrangement = Arrangement.spacedBy(InnerArrangement),
-        ) {
-            settings.forEachIndexed { index, setting ->
-                setting()
 
-                if (index != settings.lastIndex) {
-                    HorizontalDivider()
+    Column(modifier = Modifier.fillMaxWidth()) {
+        val containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(SectionContainerElevation)
+        val dividerColor = MaterialTheme.colorScheme.background
+
+        settings.forEachIndexed { index, setting ->
+            val shape =
+                when {
+                    settings.size == 1 -> SectionSingleShape
+                    index == 0 -> SectionTopShape
+                    index == settings.lastIndex -> SectionBottomShape
+                    else -> RectangleShape
                 }
+
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = containerColor,
+                tonalElevation = SectionContainerElevation,
+                shape = shape,
+            ) {
+                setting()
+            }
+
+            if (index != settings.lastIndex) {
+                Spacer(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(SectionDividerSpacing)
+                            .background(dividerColor),
+                )
             }
         }
     }
 }
 
 private val OuterArrangement = 8.dp
-private val BoxElevation = 2.dp
-private val InnerPadding = 16.dp
-private val InnerArrangement = 12.dp
+private val SectionContainerElevation = 8.dp
+private val SectionCornerRadius = 16.dp
+private val SectionDividerSpacing = 4.dp
+private val SectionSingleShape = RoundedCornerShape(SectionCornerRadius)
+private val SectionTopShape =
+    RoundedCornerShape(
+        topStart = SectionCornerRadius,
+        topEnd = SectionCornerRadius,
+        bottomStart = 0.dp,
+        bottomEnd = 0.dp,
+    )
+private val SectionBottomShape =
+    RoundedCornerShape(
+        topStart = 0.dp,
+        topEnd = 0.dp,
+        bottomStart = SectionCornerRadius,
+        bottomEnd = SectionCornerRadius,
+    )

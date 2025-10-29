@@ -37,6 +37,8 @@ import server_list_explorer.ui.generated.resources.setting_prefs_highlight_delay
 import server_list_explorer.ui.generated.resources.setting_prefs_language
 import server_list_explorer.ui.generated.resources.setting_prefs_scroll_after_add
 import server_list_explorer.ui.generated.resources.setting_prefs_scroll_after_add_desc
+import server_list_explorer.ui.generated.resources.setting_prefs_settings_scrollbar_always_visible
+import server_list_explorer.ui.generated.resources.setting_prefs_settings_scrollbar_always_visible_desc
 import server_list_explorer.ui.generated.resources.setting_prefs_snackbar_at_top
 import server_list_explorer.ui.generated.resources.setting_prefs_snackbar_at_top_desc
 import server_list_explorer.ui.generated.resources.setting_prefs_undo_history_size
@@ -60,124 +62,158 @@ internal fun PreferenceSettings() {
     SettingsSection(
         header = t(Res.string.settings_section_preferences),
         settings =
-            listOf {
-                ItemLanguagePickerDropdownMenu(
-                    title = t(Res.string.setting_prefs_language),
-                    selectedLocale = prefs.locale,
-                    onLocaleSelected = { locale ->
-                        preferenceSettingsManager.updateSettings {
-                            it.copy(locale = locale)
-                        }
-                    },
-                )
-                ItemSwitch(
-                    title = t(Res.string.setting_prefs_snackbar_at_top),
-                    description = t(Res.string.setting_prefs_snackbar_at_top_desc),
-                    isChecked = prefs.snackbarAtTop,
-                    onCheckedChange = { newValue ->
-                        preferenceSettingsManager.updateSettings {
-                            it.copy(snackbarAtTop = newValue)
-                        }
-                    },
-                )
-                ItemValueSlider(
-                    title = t(Res.string.setting_prefs_undo_history_size),
-                    description = t(Res.string.setting_prefs_undo_history_size_desc),
-                    value = prefs.maxUndoHistorySize,
-                    valueRange = 0f..1000f,
-                    onValueChange = { newSize ->
-                        preferenceSettingsManager.updateSettings {
-                            it.copy(maxUndoHistorySize = newSize)
-                        }
-                    },
-                )
-                ItemValueSlider(
-                    title = t(Res.string.setting_prefs_undo_redo_delay),
-                    description = t(Res.string.setting_prefs_undo_redo_delay_desc),
-                    note = t(Res.string.setting_prefs_undo_redo_note),
-                    value = prefs.undoRedoRepeatInitialDelayMillis,
-                    valueRange = 100f..1000f,
-                    onValueChange = { newDelay ->
-                        preferenceSettingsManager.updateSettings {
-                            it.copy(undoRedoRepeatInitialDelayMillis = newDelay)
-                        }
-                    },
-                )
-                ItemValueSlider(
-                    title = t(Res.string.setting_prefs_undo_redo_interval),
-                    description = t(Res.string.setting_prefs_undo_redo_interval_desc),
-                    note = t(Res.string.setting_prefs_undo_redo_note),
-                    value = prefs.undoRedoRepeatIntervalMillis,
-                    valueRange = 20f..300f,
-                    onValueChange = { newInterval ->
-                        preferenceSettingsManager.updateSettings {
-                            it.copy(undoRedoRepeatIntervalMillis = newInterval)
-                        }
-                    },
-                )
-                ItemSwitch(
-                    title = t(Res.string.setting_prefs_scroll_after_add),
-                    description = t(Res.string.setting_prefs_scroll_after_add_desc),
-                    isChecked = prefs.scrollAfterAdd,
-                    onCheckedChange = { newValue ->
-                        preferenceSettingsManager.updateSettings {
-                            it.copy(scrollAfterAdd = newValue)
-                        }
-                    },
-                )
-                ItemSwitch(
-                    title = t(Res.string.setting_prefs_highlight_after_scroll),
-                    description = t(Res.string.setting_prefs_highlight_after_scroll_desc),
-                    isChecked = prefs.highlightAfterScroll,
-                    onCheckedChange = { newValue ->
-                        preferenceSettingsManager.updateSettings {
-                            it.copy(highlightAfterScroll = newValue)
-                        }
-                    },
-                )
-                ItemValueSlider(
-                    title = t(Res.string.setting_prefs_highlight_delay),
-                    description = t(Res.string.setting_prefs_highlight_delay_desc),
-                    note = t(Res.string.setting_prefs_highlight_delay_note),
-                    value = prefs.highlightAfterScrollDelayMillis,
-                    valueRange = 0f..1000f,
-                    onValueChange = { newMs ->
-                        preferenceSettingsManager.updateSettings {
-                            it.copy(highlightAfterScrollDelayMillis = newMs)
-                        }
-                    },
-                )
-                ItemSwitch(
-                    title = t(Res.string.setting_prefs_vsync),
-                    description = t(Res.string.setting_prefs_vsync_desc),
-                    note = t(Res.string.setting_prefs_vsync_note),
-                    isChecked = prefs.vsync,
-                    onCheckedChange = { newValue ->
-                        preferenceSettingsManager.updateSettings {
-                            it.copy(vsync = newValue)
-                        }
-                    },
-                )
-                ItemSwitch(
-                    title = t(Res.string.setting_prefs_fps_overlay),
-                    description = t(Res.string.setting_prefs_fps_overlay_desc),
-                    isChecked = prefs.showFpsOverlay,
-                    onCheckedChange = { newValue ->
-                        preferenceSettingsManager.updateSettings {
-                            it.copy(showFpsOverlay = newValue)
-                        }
-                    },
-                )
-                ItemSwitch(
-                    title = t(Res.string.setting_prefs_window_title_build_info),
-                    description = t(Res.string.setting_prefs_window_title_build_info_desc),
-                    isChecked = prefs.windowTitleShowBuildInfo,
-                    onCheckedChange = { newValue ->
-                        preferenceSettingsManager.updateSettings {
-                            it.copy(windowTitleShowBuildInfo = newValue)
-                        }
-                    },
-                )
+            buildList {
+                add {
+                    ItemLanguagePickerDropdownMenu(
+                        title = t(Res.string.setting_prefs_language),
+                        selectedLocale = prefs.locale,
+                        onLocaleSelected = { locale ->
+                            preferenceSettingsManager.updateSettings {
+                                it.copy(locale = locale)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemSwitch(
+                        title = t(Res.string.setting_prefs_snackbar_at_top),
+                        description = t(Res.string.setting_prefs_snackbar_at_top_desc),
+                        isChecked = prefs.snackbarAtTop,
+                        onCheckedChange = { newValue ->
+                            preferenceSettingsManager.updateSettings {
+                                it.copy(snackbarAtTop = newValue)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemSwitch(
+                        title = t(Res.string.setting_prefs_settings_scrollbar_always_visible),
+                        description = t(Res.string.setting_prefs_settings_scrollbar_always_visible_desc),
+                        isChecked = prefs.settingsScrollbarAlwaysVisible,
+                        onCheckedChange = { newValue ->
+                            preferenceSettingsManager.updateSettings {
+                                it.copy(settingsScrollbarAlwaysVisible = newValue)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemValueSlider(
+                        title = t(Res.string.setting_prefs_undo_history_size),
+                        description = t(Res.string.setting_prefs_undo_history_size_desc),
+                        value = prefs.maxUndoHistorySize,
+                        valueRange = 0f..1000f,
+                        onValueChange = { newSize ->
+                            preferenceSettingsManager.updateSettings {
+                                it.copy(maxUndoHistorySize = newSize)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemValueSlider(
+                        title = t(Res.string.setting_prefs_undo_redo_delay),
+                        description = t(Res.string.setting_prefs_undo_redo_delay_desc),
+                        note = t(Res.string.setting_prefs_undo_redo_note),
+                        value = prefs.undoRedoRepeatInitialDelayMillis,
+                        valueRange = 100f..1000f,
+                        onValueChange = { newDelay ->
+                            preferenceSettingsManager.updateSettings {
+                                it.copy(undoRedoRepeatInitialDelayMillis = newDelay)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemValueSlider(
+                        title = t(Res.string.setting_prefs_undo_redo_interval),
+                        description = t(Res.string.setting_prefs_undo_redo_interval_desc),
+                        note = t(Res.string.setting_prefs_undo_redo_note),
+                        value = prefs.undoRedoRepeatIntervalMillis,
+                        valueRange = 20f..300f,
+                        onValueChange = { newInterval ->
+                            preferenceSettingsManager.updateSettings {
+                                it.copy(undoRedoRepeatIntervalMillis = newInterval)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemSwitch(
+                        title = t(Res.string.setting_prefs_scroll_after_add),
+                        description = t(Res.string.setting_prefs_scroll_after_add_desc),
+                        isChecked = prefs.scrollAfterAdd,
+                        onCheckedChange = { newValue ->
+                            preferenceSettingsManager.updateSettings {
+                                it.copy(scrollAfterAdd = newValue)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemSwitch(
+                        title = t(Res.string.setting_prefs_highlight_after_scroll),
+                        description = t(Res.string.setting_prefs_highlight_after_scroll_desc),
+                        isChecked = prefs.highlightAfterScroll,
+                        onCheckedChange = { newValue ->
+                            preferenceSettingsManager.updateSettings {
+                                it.copy(highlightAfterScroll = newValue)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemValueSlider(
+                        title = t(Res.string.setting_prefs_highlight_delay),
+                        description = t(Res.string.setting_prefs_highlight_delay_desc),
+                        note = t(Res.string.setting_prefs_highlight_delay_note),
+                        value = prefs.highlightAfterScrollDelayMillis,
+                        valueRange = 0f..1000f,
+                        onValueChange = { newMs ->
+                            preferenceSettingsManager.updateSettings {
+                                it.copy(highlightAfterScrollDelayMillis = newMs)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemSwitch(
+                        title = t(Res.string.setting_prefs_vsync),
+                        description = t(Res.string.setting_prefs_vsync_desc),
+                        note = t(Res.string.setting_prefs_vsync_note),
+                        isChecked = prefs.vsync,
+                        onCheckedChange = { newValue ->
+                            preferenceSettingsManager.updateSettings {
+                                it.copy(vsync = newValue)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemSwitch(
+                        title = t(Res.string.setting_prefs_fps_overlay),
+                        description = t(Res.string.setting_prefs_fps_overlay_desc),
+                        isChecked = prefs.showFpsOverlay,
+                        onCheckedChange = { newValue ->
+                            preferenceSettingsManager.updateSettings {
+                                it.copy(showFpsOverlay = newValue)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemSwitch(
+                        title = t(Res.string.setting_prefs_window_title_build_info),
+                        description = t(Res.string.setting_prefs_window_title_build_info_desc),
+                        isChecked = prefs.windowTitleShowBuildInfo,
+                        onCheckedChange = { newValue ->
+                            preferenceSettingsManager.updateSettings {
+                                it.copy(windowTitleShowBuildInfo = newValue)
+                            }
+                        },
+                    )
+                }
             },
     )
 }

@@ -78,66 +78,80 @@ internal fun ThemeSettings() {
     SettingsSection(
         header = t(Res.string.settings_section_theme),
         settings =
-            listOf {
-                ThemeModeDropdown(
-                    currentMode = themeSettings.themeMode,
-                    onModeSelected = { newMode ->
-                        themeSettingsManager.updateSettings {
-                            it.copy(themeMode = newMode)
-                        }
-                    },
-                )
-                ItemColorPicker(
-                    title = t(Res.string.setting_theme_seed_color),
-                    description = t(Res.string.setting_theme_seed_color_desc),
-                    currentColor = themeSettings.seedColor.toComposeColor(),
-                    restoreButton = true,
-                    onConfirm = { newColor ->
-                        themeSettingsManager.updateSettings {
-                            it.copy(seedColor = "#" + newColor.toHex())
-                        }
-                    },
-                )
-                PaletteStyleDropdown(
-                    currentStyle = themeSettings.paletteStyle,
-                    onStyleSelected = { newStyle ->
-                        themeSettingsManager.updateSettings { current ->
-                            current.copy(paletteStyle = newStyle)
-                        }
-                    },
-                )
-                ItemValueSlider(
-                    title = t(Res.string.setting_theme_contrast_level),
-                    description = t(Res.string.setting_theme_contrast_level_desc),
-                    value = themeSettings.contrastLevel,
-                    valueRange = MIN_CONTRAST_LEVEL.toFloat()..MAX_CONTRAST_LEVEL.toFloat(),
-                    onValueChange = { newValue ->
-                        themeSettingsManager.updateSettings { current ->
-                            current.copy(contrastLevel = newValue.coerceIn(MIN_CONTRAST_LEVEL, MAX_CONTRAST_LEVEL))
-                        }
-                    },
-                )
-                ItemSwitch(
-                    title = t(Res.string.setting_theme_amoled_mode),
-                    description = t(Res.string.setting_theme_amoled_mode_desc),
-                    isChecked = themeSettings.amoledMode,
-                    onCheckedChange = { newValue ->
-                        themeSettingsManager.updateSettings { current ->
-                            current.copy(amoledMode = newValue)
-                        }
-                    },
-                )
-                if (hostOs == OS.Windows) {
-                    ItemSwitch(
-                        title = t(Res.string.setting_theme_use_system_accent),
-                        description = t(Res.string.setting_theme_use_system_accent_desc),
-                        isChecked = themeSettings.useSystemAccentColor,
-                        onCheckedChange = { newValue ->
-                            themeSettingsManager.updateSettings { current ->
-                                current.copy(useSystemAccentColor = newValue)
+            buildList {
+                add {
+                    ThemeModeDropdown(
+                        currentMode = themeSettings.themeMode,
+                        onModeSelected = { newMode ->
+                            themeSettingsManager.updateSettings {
+                                it.copy(themeMode = newMode)
                             }
                         },
                     )
+                }
+                add {
+                    ItemColorPicker(
+                        title = t(Res.string.setting_theme_seed_color),
+                        description = t(Res.string.setting_theme_seed_color_desc),
+                        currentColor = themeSettings.seedColor.toComposeColor(),
+                        restoreButton = true,
+                        onConfirm = { newColor ->
+                            themeSettingsManager.updateSettings {
+                                it.copy(seedColor = "#" + newColor.toHex())
+                            }
+                        },
+                    )
+                }
+                add {
+                    PaletteStyleDropdown(
+                        currentStyle = themeSettings.paletteStyle,
+                        onStyleSelected = { newStyle ->
+                            themeSettingsManager.updateSettings { current ->
+                                current.copy(paletteStyle = newStyle)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemValueSlider(
+                        title = t(Res.string.setting_theme_contrast_level),
+                        description = t(Res.string.setting_theme_contrast_level_desc),
+                        value = themeSettings.contrastLevel,
+                        valueRange = MIN_CONTRAST_LEVEL.toFloat()..MAX_CONTRAST_LEVEL.toFloat(),
+                        onValueChange = { newValue ->
+                            themeSettingsManager.updateSettings { current ->
+                                current.copy(
+                                    contrastLevel = newValue.coerceIn(MIN_CONTRAST_LEVEL, MAX_CONTRAST_LEVEL),
+                                )
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemSwitch(
+                        title = t(Res.string.setting_theme_amoled_mode),
+                        description = t(Res.string.setting_theme_amoled_mode_desc),
+                        isChecked = themeSettings.amoledMode,
+                        onCheckedChange = { newValue ->
+                            themeSettingsManager.updateSettings { current ->
+                                current.copy(amoledMode = newValue)
+                            }
+                        },
+                    )
+                }
+                if (hostOs == OS.Windows) {
+                    add {
+                        ItemSwitch(
+                            title = t(Res.string.setting_theme_use_system_accent),
+                            description = t(Res.string.setting_theme_use_system_accent_desc),
+                            isChecked = themeSettings.useSystemAccentColor,
+                            onCheckedChange = { newValue ->
+                                themeSettingsManager.updateSettings { current ->
+                                    current.copy(useSystemAccentColor = newValue)
+                                }
+                            },
+                        )
+                    }
                 }
             },
     )

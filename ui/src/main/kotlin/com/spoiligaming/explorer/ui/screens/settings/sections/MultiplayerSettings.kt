@@ -61,70 +61,81 @@ internal fun MultiplayerSettings() {
     SettingsSection(
         header = t(Res.string.settings_section_multiplayer),
         settings =
-            listOf {
-                /* ItemSwitch(
-                       title = "Cache server status results",
-                       description = "Save responses from MCUtils to load your list faster and use less data when checking server status.",
-                       isChecked = mpSettings.enableServerQueryCache,
-                       onCheckedChange = { newValue ->
-                           multiplayerSettingsManager.updateSettings {
-                               it.copy(enableServerQueryCache = newValue)
-                           }
-                       },
-                   )*/
-                ItemValueSlider(
-                    title = t(Res.string.setting_mp_entry_scale),
-                    description = t(Res.string.setting_mp_entry_scale_desc),
-                    value = mpSettings.serverEntryScale,
-                    valueRange = 1f..4f,
-                    onValueChange = { newScale ->
-                        multiplayerSettingsManager.updateSettings {
-                            it.copy(serverEntryScale = newScale)
-                        }
-                    },
-                )
-                ActionBarOrientationDropdown(
-                    current = mpSettings.actionBarOrientation,
-                    onSelected = { newOrientation ->
-                        multiplayerSettingsManager.updateSettings {
-                            it.copy(actionBarOrientation = newOrientation)
-                        }
-                    },
-                )
-                ItemValueSlider(
-                    title = t(Res.string.setting_mp_drag_shake_intensity),
-                    description = t(Res.string.setting_mp_drag_shake_intensity_desc),
-                    value = mpSettings.dragShakeIntensityDegrees,
-                    valueRange = 0f..10f,
-                    onValueChange = { newValue ->
-                        multiplayerSettingsManager.updateSettings {
-                            it.copy(dragShakeIntensityDegrees = newValue)
-                        }
-                    },
-                )
-                ItemValueSlider(
-                    title = t(Res.string.setting_mp_connection_timeout),
-                    description = t(Res.string.setting_mp_connection_timeout_desc),
-                    value = mpSettings.connectTimeoutMillis / 1000L,
-                    valueRange = 1f..600f,
-                    onValueChange = { newValueInSeconds ->
-                        multiplayerSettingsManager.updateSettings {
-                            it.copy(connectTimeoutMillis = newValueInSeconds * 1000)
-                        }
-                    },
-                )
-
-                ItemValueSlider(
-                    title = t(Res.string.setting_mp_socket_timeout),
-                    description = t(Res.string.setting_mp_socket_timeout_desc),
-                    value = mpSettings.socketTimeoutMillis / 1000L,
-                    valueRange = 1f..60f,
-                    onValueChange = { newValueInSeconds ->
-                        multiplayerSettingsManager.updateSettings {
-                            it.copy(socketTimeoutMillis = newValueInSeconds * 1000)
-                        }
-                    },
-                )
+            buildList {
+                /*add {
+                    ItemSwitch(
+                        title = "Cache server status results",
+                        description = "Save responses from MCUtils to load your list faster and use less data when checking server status.",
+                        isChecked = mpSettings.enableServerQueryCache,
+                        onCheckedChange = { newValue ->
+                            multiplayerSettingsManager.updateSettings {
+                                it.copy(enableServerQueryCache = newValue)
+                            }
+                        },
+                    )
+                }*/
+                add {
+                    ItemValueSlider(
+                        title = t(Res.string.setting_mp_entry_scale),
+                        description = t(Res.string.setting_mp_entry_scale_desc),
+                        value = mpSettings.serverEntryScale,
+                        valueRange = 1f..4f,
+                        onValueChange = { newScale ->
+                            multiplayerSettingsManager.updateSettings {
+                                it.copy(serverEntryScale = newScale)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ActionBarOrientationDropdown(
+                        current = mpSettings.actionBarOrientation,
+                        onSelected = { newOrientation ->
+                            multiplayerSettingsManager.updateSettings {
+                                it.copy(actionBarOrientation = newOrientation)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemValueSlider(
+                        title = t(Res.string.setting_mp_drag_shake_intensity),
+                        description = t(Res.string.setting_mp_drag_shake_intensity_desc),
+                        value = mpSettings.dragShakeIntensityDegrees,
+                        valueRange = 0f..10f,
+                        onValueChange = { newValue ->
+                            multiplayerSettingsManager.updateSettings {
+                                it.copy(dragShakeIntensityDegrees = newValue)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemValueSlider(
+                        title = t(Res.string.setting_mp_connection_timeout),
+                        description = t(Res.string.setting_mp_connection_timeout_desc),
+                        value = mpSettings.connectTimeoutMillis / 1000L,
+                        valueRange = 1f..600f,
+                        onValueChange = { newValueInSeconds ->
+                            multiplayerSettingsManager.updateSettings {
+                                it.copy(connectTimeoutMillis = newValueInSeconds * 1000)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemValueSlider(
+                        title = t(Res.string.setting_mp_socket_timeout),
+                        description = t(Res.string.setting_mp_socket_timeout_desc),
+                        value = mpSettings.socketTimeoutMillis / 1000L,
+                        valueRange = 1f..60f,
+                        onValueChange = { newValueInSeconds ->
+                            multiplayerSettingsManager.updateSettings {
+                                it.copy(socketTimeoutMillis = newValueInSeconds * 1000)
+                            }
+                        },
+                    )
+                }
             },
     )
 }

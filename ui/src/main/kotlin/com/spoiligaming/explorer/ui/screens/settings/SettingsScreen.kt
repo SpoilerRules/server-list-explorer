@@ -61,6 +61,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
 import com.spoiligaming.explorer.ui.screens.settings.sections.MultiplayerSettings
 import com.spoiligaming.explorer.ui.screens.settings.sections.PreferenceSettings
 import com.spoiligaming.explorer.ui.screens.settings.sections.ThemeSettings
@@ -82,6 +83,7 @@ import kotlin.math.absoluteValue
 
 @Composable
 internal fun SettingsScreen() {
+    val prefs = LocalPrefs.current
     val sections =
         remember {
             mutableListOf<Pair<@Composable () -> String, @Composable () -> Unit>>().apply {
@@ -190,7 +192,10 @@ internal fun SettingsScreen() {
 
         Spacer(modifier = Modifier.width(MainRowSpacerWidth))
 
-        AppVerticalScrollbar(adapter = scrollbarAdapter)
+        AppVerticalScrollbar(
+            adapter = scrollbarAdapter,
+            alwaysVisible = prefs.settingsScrollbarAlwaysVisible,
+        )
 
         Spacer(modifier = Modifier.width(animatedSpacerWidth))
 
