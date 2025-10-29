@@ -279,19 +279,17 @@ private fun rememberSettingsScrollbarAdapter(
                 get() = viewportHeightPx.toDouble()
 
             override suspend fun scrollTo(scrollOffset: Double) {
-                scope.launch {
-                    // compute the desired scroll position, clamped within valid bounds
-                    val maxScroll = (totalContentHeightPx - viewportHeightPx).coerceAtLeast(0f)
-                    val targetScroll = scrollOffset.coerceIn(0.0, maxScroll.toDouble()).toFloat()
+                // compute the desired scroll position, clamped within valid bounds
+                val maxScroll = (totalContentHeightPx - viewportHeightPx).coerceAtLeast(0f)
+                val targetScroll = scrollOffset.coerceIn(0.0, maxScroll.toDouble()).toFloat()
 
-                    // calculate the difference between the desired and current scroll positions
-                    val delta = targetScroll - scrollOffsetPx
+                // calculate the difference between the desired and current scroll positions
+                val delta = targetScroll - scrollOffsetPx
 
-                    // only scroll if the difference is large enough to be meaningful
-                    // this avoids tiny, jittery corrections caused by floating-point precision errors
-                    if (delta.absoluteValue > SCROLL_DELTA_THRESHOLD) {
-                        listState.scrollBy(delta)
-                    }
+                // only scroll if the difference is large enough to be meaningful
+                // this avoids tiny, jittery corrections caused by floating-point precision errors
+                if (delta.absoluteValue > SCROLL_DELTA_THRESHOLD) {
+                    listState.scrollBy(delta)
                 }
             }
         }
