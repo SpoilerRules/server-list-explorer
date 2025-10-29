@@ -216,7 +216,6 @@ private fun rememberSettingsScrollbarAdapter(
     itemHeights: Map<Int, Int>,
     viewportHeightPx: Int,
 ): ScrollbarAdapter {
-    val scope = rememberCoroutineScope()
     val spacingPx = with(LocalDensity.current) { LazyColumnArrangement.toPx() }
 
     // average measured item height used as a stable fallback when an individual section height is missing
