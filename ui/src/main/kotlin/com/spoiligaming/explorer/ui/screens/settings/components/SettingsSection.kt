@@ -81,7 +81,7 @@ internal fun SettingsSection(
 }
 
 private val OuterArrangement = 8.dp
-private val SectionContainerElevation = 2.dp
+private val SectionContainerElevation = 8.dp
 private val SectionCornerRadius = 16.dp
 private val SectionDividerSpacing = 4.dp
 private val SectionSingleShape = RoundedCornerShape(SectionCornerRadius)
