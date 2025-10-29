@@ -22,8 +22,8 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,17 +38,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.v2.ScrollbarAdapter
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -83,6 +82,7 @@ import kotlin.math.absoluteValue
 
 @Composable
 internal fun SettingsScreen() {
+    val density = LocalDensity.current
     val prefs = LocalPrefs.current
     val sections =
         remember {
@@ -131,27 +131,13 @@ internal fun SettingsScreen() {
             ),
     )
 
-    val listState = rememberLazyListState()
-    val itemHeights = remember { mutableStateMapOf<Int, Int>() }
+    val spacingPx = with(density) { SectionSpacing.toPx() }
 
+    val sectionHeights = remember { mutableStateListOf<Int>() }
+    var totalContentHeight by remember { mutableStateOf(0) }
     var viewportHeightPx by remember { mutableStateOf(0) }
 
-    val averageItemHeightPx =
-        remember(itemHeights.values, viewportHeightPx) {
-            if (itemHeights.isNotEmpty()) {
-                itemHeights.values.average().toFloat()
-            } else {
-                viewportHeightPx.toFloat().coerceAtLeast(1f)
-            }
-        }
-
-    val scrollbarAdapter =
-        rememberSettingsScrollbarAdapter(
-            listState = listState,
-            sectionCount = sections.size,
-            itemHeights = itemHeights,
-            viewportHeightPx = viewportHeightPx,
-        )
+    val scrollState = rememberScrollState()
 
     Row(
         modifier =
@@ -168,23 +154,31 @@ internal fun SettingsScreen() {
                     .fillMaxSize()
                     .onSizeChanged { viewportHeightPx = it.height },
         ) {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(LazyColumnArrangement),
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(SectionSpacing),
             ) {
                 sections.forEachIndexed { index, (_, contentComposable) ->
-                    item(key = "content_$index") {
-                        Box(
-                            Modifier.onSizeChanged { size ->
-                                val h = size.height
-                                if (itemHeights[index] != h) {
-                                    itemHeights[index] = h
+                    Box(
+                        modifier =
+                            Modifier.onSizeChanged { newSize ->
+                                val h = newSize.height
+
+                                // ensure list has space for this index, filling gaps with zeros
+                                if (sectionHeights.size <= index) {
+                                    sectionHeights += List(index - sectionHeights.size + 1) { 0 }
                                 }
+
+                                sectionHeights[index] = h
+
+                                val gapCount = (sections.size - 1).coerceAtLeast(0)
+                                totalContentHeight = sectionHeights.sum() + spacingPx.toInt() * gapCount
                             },
-                        ) {
-                            contentComposable()
-                        }
+                    ) {
+                        contentComposable()
                     }
                 }
             }
@@ -193,7 +187,12 @@ internal fun SettingsScreen() {
         Spacer(modifier = Modifier.width(MainRowSpacerWidth))
 
         AppVerticalScrollbar(
-            adapter = scrollbarAdapter,
+            adapter =
+                rememberScrollbarAdapter(
+                    scrollState = scrollState,
+                    viewportHeightPx = viewportHeightPx,
+                    totalContentHeight = totalContentHeight,
+                ),
             alwaysVisible = prefs.settingsScrollbarAlwaysVisible,
         )
 
@@ -201,137 +200,90 @@ internal fun SettingsScreen() {
 
         SectionNavigator(
             sectionTitles = sections.map { it.first },
-            listState = listState,
-            itemHeights = itemHeights,
-            averageItemHeightPx = averageItemHeightPx,
+            scrollState = scrollState,
+            sectionHeights = sectionHeights,
+            totalContentHeight = totalContentHeight,
+            viewportHeightPx = viewportHeightPx,
             modifier = Modifier.width(IntrinsicSize.Max).fillMaxHeight(),
         )
     }
 }
 
 @Composable
-private fun rememberSettingsScrollbarAdapter(
-    listState: LazyListState,
-    sectionCount: Int,
-    itemHeights: Map<Int, Int>,
+private fun rememberScrollbarAdapter(
+    scrollState: ScrollState,
     viewportHeightPx: Int,
-): ScrollbarAdapter {
-    val scope = rememberCoroutineScope()
-    val spacingPx = with(LocalDensity.current) { LazyColumnArrangement.toPx() }
-
-    // average measured item height used as a stable fallback when an individual section height is missing
-    val averageItemHeightPx =
-        remember(itemHeights.values, viewportHeightPx) {
-            if (itemHeights.isNotEmpty()) {
-                itemHeights.values.average().toFloat()
-            } else {
-                viewportHeightPx.toFloat().coerceAtLeast(1f)
-            }
-        }
-
-    // compute total content height as the sum of all section heights plus the total spacing between sections
-    val totalContentHeightPx =
-        remember(
-            sectionCount,
-            itemHeights.values,
-            averageItemHeightPx,
-            listState.layoutInfo,
-        ) {
-            val items =
-                (0 until sectionCount)
-                    .sumOf { idx ->
-                        itemHeights[idx]?.toDouble()
-                            ?: averageItemHeightPx.toDouble()
-                    }.toFloat()
-            val spacings = spacingPx * (sectionCount - 1).coerceAtLeast(0)
-            items + spacings
-        }
-
-    // derive the absolute scroll offset in pixels by summing the heights and spacings of all fully scrolled past sections
-    // and adding the intra-item scroll offset provided by the LazyListState
-    val scrollOffsetPx by remember(
-        listState.firstVisibleItemIndex,
-        listState.firstVisibleItemScrollOffset,
-        itemHeights.values,
-        averageItemHeightPx,
-    ) {
-        derivedStateOf {
-            val beforeHeights =
-                (0 until listState.firstVisibleItemIndex)
-                    .sumOf { idx ->
-                        itemHeights[idx]?.toDouble()
-                            ?: averageItemHeightPx.toDouble()
-                    }.toFloat()
-            val beforeSpacings = listState.firstVisibleItemIndex * spacingPx
-            beforeHeights + beforeSpacings + listState.firstVisibleItemScrollOffset
-        }
-    }
-
-    return remember(scrollOffsetPx, totalContentHeightPx, viewportHeightPx) {
+    totalContentHeight: Int,
+): ScrollbarAdapter =
+    remember(scrollState, viewportHeightPx, totalContentHeight) {
         object : ScrollbarAdapter {
             override val scrollOffset
-                get() = scrollOffsetPx.toDouble()
+                get() = scrollState.value.toDouble()
 
             override val contentSize
-                get() = totalContentHeightPx.toDouble()
+                get() = totalContentHeight.toDouble().coerceAtLeast(viewportHeightPx.toDouble())
 
             override val viewportSize
                 get() = viewportHeightPx.toDouble()
 
             override suspend fun scrollTo(scrollOffset: Double) {
-                scope.launch {
-                    // compute the desired scroll position, clamped within valid bounds
-                    val maxScroll = (totalContentHeightPx - viewportHeightPx).coerceAtLeast(0f)
-                    val targetScroll = scrollOffset.coerceIn(0.0, maxScroll.toDouble()).toFloat()
+                // compute the desired scroll position, clamped within valid bounds
+                val maxScroll = (totalContentHeight - viewportHeightPx).coerceAtLeast(0)
+                val targetScroll = scrollOffset.coerceIn(0.0, maxScroll.toDouble()).toFloat()
 
-                    // calculate the difference between the desired and current scroll positions
-                    val delta = targetScroll - scrollOffsetPx
+                // calculate the difference between the desired and current scroll positions
+                val currentScroll = scrollState.value.toFloat()
+                val delta = targetScroll - currentScroll
 
-                    // only scroll if the difference is large enough to be meaningful
-                    // this avoids tiny, jittery corrections caused by floating-point precision errors
-                    if (delta.absoluteValue > SCROLL_DELTA_THRESHOLD) {
-                        listState.scrollBy(delta)
-                    }
+                // only scroll if the difference is large enough to be meaningful
+                // this avoids tiny, jittery corrections caused by floating-point precision errors
+                if (delta.absoluteValue > SCROLL_DELTA_THRESHOLD) {
+                    scrollState.scrollBy(delta)
                 }
             }
         }
     }
-}
 
 @Composable
 private fun SectionNavigator(
     sectionTitles: List<@Composable () -> String>,
-    listState: LazyListState,
-    itemHeights: Map<Int, Int>,
-    averageItemHeightPx: Float,
+    scrollState: ScrollState,
+    sectionHeights: List<Int>,
+    totalContentHeight: Int,
+    viewportHeightPx: Int,
     modifier: Modifier = Modifier,
 ) {
+    val density = LocalDensity.current
     val scope = rememberCoroutineScope()
-    val spacingPx = with(LocalDensity.current) { LazyColumnArrangement.toPx() }
+    val spacingPx = with(density) { SectionSpacing.toPx() }
 
-    val currentSectionIndex by remember {
+    val currentSectionIndex by remember(scrollState.value, sectionHeights, viewportHeightPx) {
         derivedStateOf {
-            val layoutInfo = listState.layoutInfo
-            val viewportStart = layoutInfo.viewportStartOffset
-            val viewportEnd = layoutInfo.viewportEndOffset
-            // choose a symmetric anchor inside the viewport. center is a good default
-            val anchor = viewportStart + (viewportEnd - viewportStart) / 2
+            if (sectionHeights.isEmpty() || viewportHeightPx <= 0) return@derivedStateOf 0
 
-            val visible = layoutInfo.visibleItemsInfo
-            // pick the visible item whose center is closest to the anchor
-            val best =
-                visible.minByOrNull {
-                    val center = it.offset + it.size / 2
-                    abs(center - anchor)
+            val anchor = scrollState.value + viewportHeightPx / 2
+
+            val gap = with(density) { SectionSpacing.toPx() }.toInt()
+
+            var offset = 0
+            val centers =
+                sectionHeights.map { height ->
+                    val center = offset + height / 2
+                    offset += height + gap
+                    center
                 }
 
-            (best?.index ?: listState.firstVisibleItemIndex)
-                .coerceIn(0, sectionTitles.size - 1)
+            centers
+                .withIndex()
+                .minByOrNull { (_, center) -> abs(center - anchor) }
+                ?.index
+                ?.coerceIn(0, sectionTitles.lastIndex)
+                ?: 0
         }
     }
 
     val baseOffsetDp =
-        with(LocalDensity.current) {
+        with(density) {
             (SectionButtonHeight.toPx() + NavigatorBaseOffset.toPx()).toDp()
         }
 
@@ -361,7 +313,7 @@ private fun SectionNavigator(
                     ),
         )
 
-        // "thumb" that moves as firstVisibleItemIndex changes
+        // "thumb" that moves as current section changes
         Box(
             modifier =
                 Modifier
@@ -389,34 +341,27 @@ private fun SectionNavigator(
                             MaterialTheme.colorScheme.onSurfaceVariant
                         }
 
-                    val onClickAction: () -> Unit =
-                        remember(index) {
-                            {
-                                scope.launch {
-                                    val currentScrollOffset =
-                                        listState.firstVisibleItemScrollOffset +
-                                            (0 until listState.firstVisibleItemIndex).sumOf { i ->
-                                                (itemHeights[i]?.toDouble() ?: averageItemHeightPx.toDouble()) +
-                                                    spacingPx
-                                            }
+                    val onClickAction: () -> Unit = {
+                        scope.launch {
+                            if (sectionHeights.isEmpty()) return@launch
 
-                                    val targetOffset =
-                                        (0 until index).sumOf { i ->
-                                            (itemHeights[i]?.toDouble() ?: averageItemHeightPx.toDouble()) + spacingPx
-                                        }
+                            val spacing = spacingPx.toInt()
+                            val gaps = (index - 1).coerceAtLeast(0)
+                            val target = sectionHeights.take(index).sum() + spacing * gaps
 
-                                    val scrollAmount = (targetOffset - currentScrollOffset).toFloat()
-                                    listState.animateScrollBy(
-                                        value = scrollAmount,
-                                        animationSpec =
-                                            tween(
-                                                durationMillis = ANIMATION_DURATION_MILLIS,
-                                                easing = LinearOutSlowInEasing,
-                                            ),
-                                    )
-                                }
-                            }
+                            val maxScroll = (totalContentHeight - viewportHeightPx).coerceAtLeast(0)
+                            val clamped = target.coerceIn(0, maxScroll)
+
+                            scrollState.animateScrollTo(
+                                clamped,
+                                animationSpec =
+                                    tween(
+                                        durationMillis = ANIMATION_DURATION_MILLIS,
+                                        easing = LinearOutSlowInEasing,
+                                    ),
+                            )
                         }
+                    }
 
                     SlickTextButton(
                         contentColor = textColor,
@@ -447,7 +392,7 @@ private const val COMPACT_WINDOW_WIDTH_FRACTION = 0.75f
 private const val EXPANDED_WINDOW_WIDTH_FRACTION = 0.6f
 private const val SCROLL_DELTA_THRESHOLD = 0.5f
 
-private val LazyColumnArrangement = 24.dp
+private val SectionSpacing = 24.dp
 private val ColumnArrangement = 8.dp
 private val MainRowSpacerWidth = 4.dp
 private val MainPaddingCompact = 0.dp
