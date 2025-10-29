@@ -263,6 +263,8 @@
     <string name="setting_prefs_language">Language</string>
     <string name="setting_prefs_snackbar_at_top">Show snackbar at top</string>
     <string name="setting_prefs_snackbar_at_top_desc">Display snackbar notifications at the top of the screen instead of the bottom.</string>
+    <string name="setting_prefs_settings_scrollbar_always_visible">Always show settings scrollbar</string>
+    <string name="setting_prefs_settings_scrollbar_always_visible_desc">Keep the settings scrollbar visible at all times. When off, it appears when you hover over it.</string>
     <string name="setting_prefs_undo_history_size">Undo history size</string>
     <string name="setting_prefs_undo_history_size_desc">The maximum number of changes that can be undone. Higher values allow you to undo more steps but require more memory.</string>
     <string name="setting_prefs_undo_redo_delay">Undo/Redo shortcut repeat delay (ms)</string>

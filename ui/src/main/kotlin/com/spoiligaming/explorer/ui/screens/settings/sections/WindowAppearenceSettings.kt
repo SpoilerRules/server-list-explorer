@@ -72,57 +72,67 @@ internal fun WindowAppearenceSettings() {
     SettingsSection(
         header = t(Res.string.settings_section_window_appearance),
         settings =
-            listOf {
-                TitleBarColorModeDropdown(
-                    currentMode = windowAppearence.titleBarColorMode,
-                    onModeSelected = { newMode ->
-                        windowAppearanceSettingsManager.updateSettings {
-                            it.copy(titleBarColorMode = newMode)
-                        }
-                    },
-                )
-                ItemColorPicker(
-                    t(Res.string.setting_window_title_bar_color),
-                    t(Res.string.setting_window_title_bar_color_desc),
-                    t(Res.string.setting_window_title_bar_color_note),
-                    currentColor = windowAppearence.customTitleBarColor.toComposeColor(),
-                    restoreButton = false,
-                    onConfirm = { newColor ->
-                        windowAppearanceSettingsManager.updateSettings {
-                            it.copy(customTitleBarColor = "#" + newColor.toHex())
-                        }
-                    },
-                )
-                ItemSwitch(
-                    title = t(Res.string.setting_window_custom_border_color),
-                    description = t(Res.string.setting_window_custom_border_color_desc),
-                    isChecked = windowAppearence.useCustomBorderColor,
-                    onCheckedChange = { newValue ->
-                        windowAppearanceSettingsManager.updateSettings {
-                            it.copy(useCustomBorderColor = newValue)
-                        }
-                    },
-                )
-                ItemColorPicker(
-                    title = t(Res.string.setting_window_border_color),
-                    description = t(Res.string.setting_window_border_color_desc),
-                    note = t(Res.string.setting_window_border_color_note),
-                    currentColor = windowAppearence.customBorderColor.toComposeColor(),
-                    restoreButton = false,
-                    onConfirm = { newColor ->
-                        windowAppearanceSettingsManager.updateSettings {
-                            it.copy(customBorderColor = "#" + newColor.toHex())
-                        }
-                    },
-                )
-                CornerPreferenceDropdown(
-                    currentMode = windowAppearence.windowCornerPreference,
-                    onModeSelected = { newMode ->
-                        windowAppearanceSettingsManager.updateSettings {
-                            it.copy(windowCornerPreference = newMode)
-                        }
-                    },
-                )
+            buildList {
+                add {
+                    TitleBarColorModeDropdown(
+                        currentMode = windowAppearence.titleBarColorMode,
+                        onModeSelected = { newMode ->
+                            windowAppearanceSettingsManager.updateSettings {
+                                it.copy(titleBarColorMode = newMode)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemColorPicker(
+                        t(Res.string.setting_window_title_bar_color),
+                        t(Res.string.setting_window_title_bar_color_desc),
+                        t(Res.string.setting_window_title_bar_color_note),
+                        currentColor = windowAppearence.customTitleBarColor.toComposeColor(),
+                        restoreButton = false,
+                        onConfirm = { newColor ->
+                            windowAppearanceSettingsManager.updateSettings {
+                                it.copy(customTitleBarColor = "#" + newColor.toHex())
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemSwitch(
+                        title = t(Res.string.setting_window_custom_border_color),
+                        description = t(Res.string.setting_window_custom_border_color_desc),
+                        isChecked = windowAppearence.useCustomBorderColor,
+                        onCheckedChange = { newValue ->
+                            windowAppearanceSettingsManager.updateSettings {
+                                it.copy(useCustomBorderColor = newValue)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemColorPicker(
+                        title = t(Res.string.setting_window_border_color),
+                        description = t(Res.string.setting_window_border_color_desc),
+                        note = t(Res.string.setting_window_border_color_note),
+                        currentColor = windowAppearence.customBorderColor.toComposeColor(),
+                        restoreButton = false,
+                        onConfirm = { newColor ->
+                            windowAppearanceSettingsManager.updateSettings {
+                                it.copy(customBorderColor = "#" + newColor.toHex())
+                            }
+                        },
+                    )
+                }
+                add {
+                    CornerPreferenceDropdown(
+                        currentMode = windowAppearence.windowCornerPreference,
+                        onModeSelected = { newMode ->
+                            windowAppearanceSettingsManager.updateSettings {
+                                it.copy(windowCornerPreference = newMode)
+                            }
+                        },
+                    )
+                }
             },
     )
 }

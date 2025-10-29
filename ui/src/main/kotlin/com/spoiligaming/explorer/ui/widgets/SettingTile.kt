@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemColors
@@ -34,7 +33,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -70,7 +68,7 @@ internal fun SettingTile(
                 Row(horizontalArrangement = Arrangement.spacedBy(ConflictReasonSpacing)) {
                     Icon(
                         Icons.Filled.Warning,
-                        contentDescription = "",
+                        contentDescription = null,
                         modifier = Modifier.size(WarningIconSize),
                         tint = MaterialTheme.colorScheme.error,
                     )
@@ -102,8 +100,7 @@ internal fun SettingTile(
         }
     },
     trailingContent = trailingContent,
-    modifier =
-        modifier.fillMaxWidth().clip(CardDefaults.shape),
+    modifier = modifier.fillMaxWidth(),
     colors = colors,
 )
 
@@ -119,8 +116,7 @@ internal fun FlexibleSettingTile(
     ListItem(
         headlineContent = { Text(text = title) },
         supportingContent = supportingContent,
-        modifier =
-            modifier.fillMaxWidth().clip(CardDefaults.shape),
+        modifier = modifier.fillMaxWidth(),
         colors = colors,
     )
 } else {
@@ -128,10 +124,7 @@ internal fun FlexibleSettingTile(
         headlineContent = { Text(text = title) },
         supportingContent = supportingContent,
         trailingContent = trailingContent,
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .clip(CardDefaults.shape),
+        modifier = modifier.fillMaxWidth(),
         colors = colors,
     )
 }
