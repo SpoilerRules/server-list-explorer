@@ -162,7 +162,7 @@ compose.desktop.application {
         )
 
     nativeDistributions {
-        packageName = "ServerListExplorer"
+        packageName = "Server List Explorer"
 
         windows {
             packageVersion = numericWindowsVersion
