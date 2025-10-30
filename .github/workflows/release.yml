@@ -53,7 +53,7 @@ jobs:
           java-version: 21
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4.4.3
+        uses: gradle/actions/setup-gradle@v5.0.0
         with:
           gradle-version: wrapper
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
@@ -66,7 +66,17 @@ jobs:
 
       - name: Build all artifacts
         shell: powershell
-        run: .\gradlew.bat app:shadowJar app:buildWithProjectModules app:packageReleaseUberJarForCurrentOS app:packageReleaseMsi app:packageMsi app:createReleaseDistributable app:createDistributable
+        run: |
+          .\gradlew.bat `
+            app:buildWithProjectModules `
+            app:shadowJar `
+            app:packageReleaseUberJarForCurrentOS `
+            app:createDistributable `
+            app:createReleaseDistributable `
+            app:packageMsi `
+            app:packageReleaseMsi `
+            app:packageExe `
+            app:packageReleaseExe `
 
       - name: List Compose JARs
         shell: powershell
@@ -77,12 +87,6 @@ jobs:
       - name: Prepare extra artifacts
         shell: powershell
         run: |
-          Rename-Item -Path (Get-ChildItem -Path "app/build/compose/jars/ServerListExplorer-windows-x64-*-release.jar").FullName `
-             -NewName "ServerListExplorer-all-minified.jar"
-
-          Rename-Item -Path (Get-ChildItem -Path "app/build/compose/binaries/main-release/msi/ServerListExplorer-*.msi").FullName `
-              -NewName "ServerListExplorer-minified-$($env:VERSION).msi"
-
           Get-ChildItem -Path "app/build/compose/jars/ServerListExplorer-windows-x64-*-release.jar" `
               | Copy-Item -Destination app/build/compose/binaries/ServerListExplorer-all-minified.jar -Force
 
@@ -91,6 +95,21 @@ jobs:
 
           Compress-Archive -Path app/build/compose/binaries/main/app/ServerListExplorer `
              -DestinationPath app/build/ServerListExplorer_portable-$($env:VERSION).zip -Force
+
+          Rename-Item -Path (Get-ChildItem -Path "app/build/compose/jars/ServerListExplorer-windows-x64-*-release.jar").FullName `
+             -NewName "ServerListExplorer-all-minified.jar"
+
+          Rename-Item -Path (Get-ChildItem -Path "app/build/compose/binaries/main-release/msi/ServerListExplorer-*.msi").FullName `
+              -NewName "ServerListExplorer-minified_installer-$($env:VERSION).msi"
+
+          Rename-Item -Path (Get-ChildItem -Path "app/build/compose/binaries/main/msi/ServerListExplorer-*.msi").FullName `
+              -NewName "ServerListExplorer_installer-$($env:VERSION).msi"
+
+          Rename-Item -Path (Get-ChildItem -Path "app/build/compose/binaries/main-release/exe/ServerListExplorer-*.exe").FullName `
+              -NewName "ServerListExplorer-minified_installer-$($env:VERSION).exe"
+
+          Rename-Item -Path (Get-ChildItem -Path "app/build/compose/binaries/main/exe/ServerListExplorer-*.exe").FullName `
+              -NewName "ServerListExplorer_installer-$($env:VERSION).exe"
 
       - name: Create GitHub Release
         if: env.ACT != 'true'
@@ -106,21 +125,25 @@ jobs:
             app/build/libs/ServerListExplorer.jar
             app/build/libs/ServerListExplorer-all.jar
             app/build/compose/jars/ServerListExplorer-all-minified.jar
-            app/build/compose/binaries/main-release/msi/ServerListExplorer-${{ env.VERSION }}.msi
-            app/build/compose/binaries/main/msi/ServerListExplorer-${{ env.VERSION }}.msi
+            app/build/compose/binaries/main-release/msi/ServerListExplorer-minified_installer-${{ env.VERSION }}.msi
+            app/build/compose/binaries/main/msi/ServerListExplorer_installer-${{ env.VERSION }}.msi
+            app/build/compose/binaries/main-release/exe/ServerListExplorer-minified_installer-${{ env.VERSION }}.exe
+            app/build/compose/binaries/main/exe/ServerListExplorer_installer-${{ env.VERSION }}.exe
             app/build/ServerListExplorer-minified_portable-${{ env.VERSION }}.zip
             app/build/ServerListExplorer_portable-${{ env.VERSION }}.zip
 
       - name: Upload artifacts to workflow run
         if: env.ACT != 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: sle-${{ env.TAG }}
           path: |
             app/build/libs/ServerListExplorer.jar
             app/build/libs/ServerListExplorer-all.jar
             app/build/compose/jars/ServerListExplorer-all-minified.jar
-            app/build/compose/binaries/main-release/msi/ServerListExplorer-${{ env.VERSION }}.msi
-            app/build/compose/binaries/main-release/msi/ServerListExplorer-${{ env.VERSION }}.msi
+            app/build/compose/binaries/main-release/msi/ServerListExplorer-minified_installer-${{ env.VERSION }}.msi
+            app/build/compose/binaries/main/msi/ServerListExplorer_installer-${{ env.VERSION }}.msi
+            app/build/compose/binaries/main-release/exe/ServerListExplorer-minified_installer-${{ env.VERSION }}.exe
+            app/build/compose/binaries/main/exe/ServerListExplorer_installer-${{ env.VERSION }}.exe
             app/build/ServerListExplorer-minified_portable-${{ env.VERSION }}.zip
             app/build/ServerListExplorer_portable-${{ env.VERSION }}.zip

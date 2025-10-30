@@ -16,6 +16,7 @@
  * along with Server List Explorer.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import java.io.FileOutputStream
 import java.time.Year
 import java.util.jar.JarEntry
@@ -155,13 +156,20 @@ compose.desktop.application {
         )
 
     nativeDistributions {
-        packageName = "ServerListExplorer"
+        packageName = "Server List Explorer"
 
         windows {
             packageVersion = numericWindowsVersion
             msiPackageVersion = numericWindowsVersion
-            exePackageVersion = windowsVersion
+            exePackageVersion = numericWindowsVersion
+
             console = false
+
+            shortcut = true
+            menu = true
+            perUserInstall = true
+            dirChooser = true
+            upgradeUuid = "4bd4c2a2-2567-4c63-9abf-aa5adab76c4c"
         }
 
         description = "Minecraft server list explorer"
@@ -170,7 +178,8 @@ compose.desktop.application {
         licenseFile.set(rootProject.file("LICENSE"))
 
         targetFormats(
-            org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi,
+            TargetFormat.Msi,
+            TargetFormat.Exe,
         )
 
         modules("java.management", "java.naming", "jdk.unsupported")
