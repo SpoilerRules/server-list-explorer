@@ -177,6 +177,8 @@ compose.desktop.application {
     }
 
     buildTypes.release.proguard {
+        version = libs.versions.proguard
+
         optimize.set(false)
         obfuscate.set(false)
         configurationFiles.from(
