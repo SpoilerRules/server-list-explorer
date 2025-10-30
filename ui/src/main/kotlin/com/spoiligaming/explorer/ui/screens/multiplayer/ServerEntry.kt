@@ -827,95 +827,97 @@ private fun OnlineServerDataRow(
                             }
 
                             add {
-                                AssistChip(
-                                    onClick = { showDescription = true },
-                                    label = { Text(t(Res.string.description_label)) },
-                                    modifier = Modifier.height(32.dp).pointerHoverIcon(PointerIcon.Hand),
-                                    enabled = true,
-                                    leadingIcon = {
-                                        Icon(
-                                            imageVector = Icons.AutoMirrored.Default.Subject,
-                                            contentDescription = t(Res.string.description_label),
-                                            modifier = Modifier.size(18.dp),
-                                        )
-                                        val copyWithColorCodesText = t(Res.string.copy_with_color_codes)
-                                        FloatingDialogBuilder(
-                                            visible = showDescription,
-                                            onDismissRequest = { showDescription = false },
-                                        ) {
-                                            RichTooltip(
-                                                title = { Text(t(Res.string.server_description_title)) },
-                                                text = {
-                                                    ContextMenuDataProvider(
-                                                        items = {
-                                                            buildList {
-                                                                if (descAllSelected && serverData.isNotEmpty()) {
-                                                                    add(
-                                                                        ContextMenuItem(copyWithColorCodesText) {
-                                                                            ClipboardUtils.copy(serverData)
-                                                                        },
-                                                                    )
-                                                                }
+                                val copyWithColorCodesText = t(Res.string.copy_with_color_codes)
+                                Box {
+                                    AssistChip(
+                                        onClick = { showDescription = true },
+                                        label = { Text(t(Res.string.description_label)) },
+                                        modifier = Modifier.height(32.dp).pointerHoverIcon(PointerIcon.Hand),
+                                        enabled = true,
+                                        leadingIcon = {
+                                            Icon(
+                                                imageVector = Icons.AutoMirrored.Default.Subject,
+                                                contentDescription = t(Res.string.description_label),
+                                                modifier = Modifier.size(18.dp),
+                                            )
+                                        },
+                                    )
+                                    FloatingDialogBuilder(
+                                        visible = showDescription,
+                                        onDismissRequest = { showDescription = false },
+                                    ) {
+                                        RichTooltip(
+                                            title = { Text(t(Res.string.server_description_title)) },
+                                            text = {
+                                                ContextMenuDataProvider(
+                                                    items = {
+                                                        buildList {
+                                                            if (descAllSelected && serverData.isNotEmpty()) {
+                                                                add(
+                                                                    ContextMenuItem(copyWithColorCodesText) {
+                                                                        ClipboardUtils.copy(serverData)
+                                                                    },
+                                                                )
                                                             }
-                                                        },
-                                                    ) {
-                                                        Card(modifier = Modifier.padding(top = 12.dp)) {
-                                                            Box(
-                                                                Modifier
-                                                                    .fillMaxWidth()
-                                                                    .padding(MotdInnerPadding),
-                                                            ) {
-                                                                val focusRequester = remember { FocusRequester() }
+                                                        }
+                                                    },
+                                                ) {
+                                                    Card(modifier = Modifier.padding(top = 12.dp)) {
+                                                        Box(
+                                                            Modifier
+                                                                .fillMaxWidth()
+                                                                .padding(MotdInnerPadding),
+                                                        ) {
+                                                            val focusRequester = remember { FocusRequester() }
 
-                                                                LaunchedEffect(Unit) {
-                                                                    focusRequester.requestFocus()
-                                                                }
+                                                            LaunchedEffect(Unit) {
+                                                                focusRequester.requestFocus()
+                                                            }
 
-                                                                HackedSelectionContainer(
-                                                                    modifier =
-                                                                        Modifier
-                                                                            .focusRequester(focusRequester)
-                                                                            .focusable()
-                                                                            .pointerInput(Unit) {
-                                                                                awaitPointerEventScope {
-                                                                                    while (true) {
-                                                                                        val event = awaitPointerEvent()
-                                                                                        if (event.type ==
-                                                                                            PointerEventType.Press
-                                                                                        ) {
-                                                                                            event.changes.forEach {
-                                                                                                it.consume()
-                                                                                            }
+                                                            HackedSelectionContainer(
+                                                                modifier =
+                                                                    Modifier
+                                                                        .focusRequester(focusRequester)
+                                                                        .focusable()
+                                                                        .pointerInput(Unit) {
+                                                                            awaitPointerEventScope {
+                                                                                while (true) {
+                                                                                    val event = awaitPointerEvent()
+                                                                                    if (event.type ==
+                                                                                        PointerEventType.Press
+                                                                                    ) {
+                                                                                        event.changes.forEach {
+                                                                                            it.consume()
                                                                                         }
                                                                                     }
                                                                                 }
-                                                                            },
-                                                                    onSelectedChange = { descIsSelecting = it },
-                                                                    onAllSelectedChange = { descAllSelected = it },
-                                                                ) {
-                                                                    Text(
-                                                                        text =
-                                                                            serverData.toMinecraftAnnotatedString(
-                                                                                descriptionObfuscationSeed,
-                                                                            ),
-                                                                        style = MaterialTheme.typography.bodyMedium,
-                                                                        lineHeight = MotdLineHeight,
-                                                                    )
-                                                                }
+                                                                            }
+                                                                        },
+                                                                onSelectedChange = { descIsSelecting = it },
+                                                                onAllSelectedChange = { descAllSelected = it },
+                                                            ) {
+                                                                Text(
+                                                                    text =
+                                                                        serverData.toMinecraftAnnotatedString(
+                                                                            descriptionObfuscationSeed,
+                                                                        ),
+                                                                    style = MaterialTheme.typography.bodyMedium,
+                                                                    lineHeight = MotdLineHeight,
+                                                                )
                                                             }
                                                         }
                                                     }
-                                                },
-                                                action = {
-                                                    TextButton(
-                                                        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                                                        onClick = { showDescription = false },
-                                                    ) { Text(t(Res.string.ok_label)) }
-                                                },
-                                            )
-                                        }
-                                    },
-                                )
+                                                }
+                                            },
+                                            action = {
+                                                TextButton(
+                                                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                                                    onClick = { showDescription = false },
+                                                ) { Text(t(Res.string.ok_label)) }
+                                            },
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
