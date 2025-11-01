@@ -33,7 +33,7 @@ themeDetector = "3.9.1"
 
 # Minecraft
 nbt = "6.1"
-mcUtils = "1.6.0"
+mcUtils = "1.7.2"
 
 [libraries]
 # Core language/runtime
