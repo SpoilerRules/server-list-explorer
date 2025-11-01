@@ -29,7 +29,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.network.sockets.SocketTimeoutException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import tech.aliorpse.mcutils.modules.server.JavaServer
+import tech.aliorpse.mcutils.modules.server.status.JavaServer
 import tech.aliorpse.mcutils.utils.hostPortOf
 import java.io.EOFException
 import java.net.ConnectException

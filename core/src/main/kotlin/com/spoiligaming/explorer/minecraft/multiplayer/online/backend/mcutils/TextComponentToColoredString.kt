@@ -18,8 +18,8 @@
 
 package com.spoiligaming.explorer.minecraft.multiplayer.online.backend.mcutils
 
-import tech.aliorpse.mcutils.model.server.TextComponent
-import tech.aliorpse.mcutils.model.server.TextStyle
+import tech.aliorpse.mcutils.model.server.status.TextComponent
+import tech.aliorpse.mcutils.model.server.status.TextStyle
 
 internal fun TextComponent.toSectionString(): String {
     fun estimate(node: TextComponent): Int = node.text.length + node.extra.sumOf { estimate(it) }
