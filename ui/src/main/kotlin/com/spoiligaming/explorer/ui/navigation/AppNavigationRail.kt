@@ -113,7 +113,7 @@ internal fun AppNavigationRail(
         targetValue = targetRailWidth,
         animationSpec =
             tween(
-                durationMillis = RailWidthAnimDurationMs,
+                durationMillis = RAIL_WIDTH_ANIMATION_DURATION_MS,
                 easing = FastOutSlowInEasing,
             ),
     )
@@ -137,13 +137,13 @@ internal fun AppNavigationRail(
                     enter =
                         fadeIn(animationSpec = HeaderFadeSpec) +
                             slideInVertically(
-                                initialOffsetY = { -it / SlideOffsetDivider },
+                                initialOffsetY = { -it / SLIDE_ANIMATION_OFFSET_DIVIDER },
                                 animationSpec = HeaderSlideSpec,
                             ),
                     exit =
                         fadeOut(animationSpec = HeaderFadeSpec) +
                             slideOutVertically(
-                                targetOffsetY = { -it / SlideOffsetDivider },
+                                targetOffsetY = { -it / SLIDE_ANIMATION_OFFSET_DIVIDER },
                                 animationSpec = HeaderSlideSpec,
                             ),
                 ) {
@@ -224,7 +224,7 @@ internal fun AppNavigationRail(
                     }
                 }
 
-                Spacer(Modifier.weight(SpacerExpandWeight))
+                Spacer(Modifier.weight(SPACER_EXPAND_WEIGHT))
 
                 Box(
                     modifier =
@@ -481,10 +481,10 @@ private fun getNavigationRailItems() =
 private val RailCollapsedWidth = 96.dp
 private val RailExpandedMinWidth = 220.dp
 private val RailExpandedMaxWidth = 360.dp
-private const val RailWidthAnimDurationMs = 120
+private const val RAIL_WIDTH_ANIMATION_DURATION_MS = 120
 
-private const val HeaderAnimDurationMs = 200
-private const val SlideOffsetDivider = 2
+private const val HEADER_ANIMATION_DURATION_MS = 200
+private const val SLIDE_ANIMATION_OFFSET_DIVIDER = 2
 
 private val ItemsSpacing = 4.dp
 private val DividerPaddingExpandedHorizontal = 28.dp
@@ -499,14 +499,14 @@ private val BottomSpacerHeight = 12.dp
 private val IconSize = 24.dp
 private val ToggleButtonSize = 56.dp
 private val ToggleIconBoxSize = 24.dp
-private const val ToggleAnimDurationMs = 250
+private const val TOGGLE_ANIMATION_DURATION_MS = 250
 
 private val DividerThicknessThin = 0.5.dp
-private const val SpacerExpandWeight = 1f
+private const val SPACER_EXPAND_WEIGHT = 1f
 
 private val HeaderFadeSpec: FiniteAnimationSpec<Float> =
-    tween(durationMillis = HeaderAnimDurationMs, easing = LinearOutSlowInEasing)
+    tween(durationMillis = HEADER_ANIMATION_DURATION_MS, easing = LinearOutSlowInEasing)
 private val HeaderSlideSpec: FiniteAnimationSpec<IntOffset> =
-    tween(durationMillis = HeaderAnimDurationMs, easing = LinearOutSlowInEasing)
+    tween(durationMillis = HEADER_ANIMATION_DURATION_MS, easing = LinearOutSlowInEasing)
 private val ToggleSlideSpec: FiniteAnimationSpec<IntOffset> =
-    tween(durationMillis = ToggleAnimDurationMs, easing = FastOutLinearInEasing)
+    tween(durationMillis = TOGGLE_ANIMATION_DURATION_MS, easing = FastOutLinearInEasing)
