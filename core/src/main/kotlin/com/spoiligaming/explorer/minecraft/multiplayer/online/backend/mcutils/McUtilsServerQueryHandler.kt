@@ -34,6 +34,7 @@ import tech.aliorpse.mcutils.utils.hostPortOf
 import java.io.EOFException
 import java.net.ConnectException
 import java.net.InetAddress
+import java.net.SocketException
 import java.net.UnknownHostException
 import kotlin.time.Clock
 import kotlin.time.Duration
@@ -137,6 +138,14 @@ internal class McUtilsServerQueryHandler(
                             OfflineServerData
                         }
 
+                        is SocketException -> {
+                            logger.info {
+                                "Socket error while connecting to $serverAddress: ${e.message} " +
+                                    "(resolved IP: $resolvedIp, host: ${hostPortOf(serverAddress)})"
+                            }
+                            OfflineServerData
+                        }
+
                         is EOFException -> {
                             logger.info {
                                 "Server $serverAddress closed the connection unexpectedly " +
@@ -147,7 +156,7 @@ internal class McUtilsServerQueryHandler(
 
                         else -> {
                             logger.error(e) {
-                                "Unexpected exception while fetching data for $serverAddress" +
+                                "Unexpected exception while fetching data for $serverAddress " +
                                     "(resolved IP: $resolvedIp, host: ${hostPortOf(serverAddress)})"
                             }
                             throw e
