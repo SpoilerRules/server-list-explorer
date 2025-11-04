@@ -47,6 +47,7 @@
     <string name="add_server_button_add">Add</string>
 
     <string name="dialog_cancel_button">Cancel</string>
+    <string name="dialog_close_button">Close</string>
     <string name="dialog_save_button">Save</string>
 
     <string name="cd_dialog_icon">Icon for %1$s dialog</string>
@@ -147,7 +148,7 @@
 
     <string name="description_label">Description</string>
     <string name="server_description_title">Server description</string>
-    <string name="ok_label">OK</string>
+    <string name="dialog_reload_server_list_button">Reload server list</string>
     <string name="info_blocked_by_mojang">Blocked by Mojang</string>
     <string name="info_secure_chat_enforced">Secure chat</string>
     <string name="protocol_format">Protocol %1$s</string>

@@ -175,6 +175,7 @@ import server_list_explorer.ui.generated.resources.context_copy_icon_png
 import server_list_explorer.ui.generated.resources.context_revert_default_icon
 import server_list_explorer.ui.generated.resources.copy_with_color_codes
 import server_list_explorer.ui.generated.resources.description_label
+import server_list_explorer.ui.generated.resources.dialog_close_button
 import server_list_explorer.ui.generated.resources.error_copy_icon_base64_failed
 import server_list_explorer.ui.generated.resources.error_copy_icon_png_failed
 import server_list_explorer.ui.generated.resources.error_revert_icon_failed
@@ -189,7 +190,6 @@ import server_list_explorer.ui.generated.resources.menu_delete
 import server_list_explorer.ui.generated.resources.menu_hidden
 import server_list_explorer.ui.generated.resources.menu_refresh
 import server_list_explorer.ui.generated.resources.menu_server_resource_packs
-import server_list_explorer.ui.generated.resources.ok_label
 import server_list_explorer.ui.generated.resources.ping_unknown
 import server_list_explorer.ui.generated.resources.protocol_format
 import server_list_explorer.ui.generated.resources.rate_limited_message
@@ -1019,7 +1019,7 @@ private fun OnlineServerDataRow(
                                             TextButton(
                                                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                                                 onClick = { showDescription = false },
-                                            ) { Text(t(Res.string.ok_label)) }
+                                            ) { Text(t(Res.string.dialog_close_button)) }
                                         },
                                     )
                                 }
