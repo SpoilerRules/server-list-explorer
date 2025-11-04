@@ -48,7 +48,7 @@ data class Preferences(
     val showFpsOverlay: Boolean = false,
     @SerialName("window_title_show_build_info")
     val windowTitleShowBuildInfo: Boolean = false,
-    @SerialName("settings_scrollbar_always_visible")
+    @SerialName("scrollbar_always_visible")
     val settingsScrollbarAlwaysVisible: Boolean = false,
 ) {
     companion object {
