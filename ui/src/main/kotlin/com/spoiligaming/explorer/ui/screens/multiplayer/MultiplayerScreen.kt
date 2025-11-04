@@ -134,11 +134,11 @@ import server_list_explorer.ui.generated.resources.cd_undo
 import server_list_explorer.ui.generated.resources.delete_all_support_text
 import server_list_explorer.ui.generated.resources.delete_all_title_question
 import server_list_explorer.ui.generated.resources.dialog_cancel_button
+import server_list_explorer.ui.generated.resources.dialog_reload_server_list_button
 import server_list_explorer.ui.generated.resources.dialog_support_text_external_change
 import server_list_explorer.ui.generated.resources.dialog_title_external_change
 import server_list_explorer.ui.generated.resources.no_search_matches_message
 import server_list_explorer.ui.generated.resources.no_search_results_for
-import server_list_explorer.ui.generated.resources.ok_label
 import server_list_explorer.ui.generated.resources.query_method_mc_srv_stat
 import server_list_explorer.ui.generated.resources.query_method_mc_utils
 import server_list_explorer.ui.generated.resources.query_method_save_and_refresh_all_entries
@@ -196,7 +196,7 @@ internal fun MultiplayerScreen(
         val dialogTitleExternalChangeText = t(Res.string.dialog_title_external_change)
         val dialogSupportTextExternalChangeText =
             t(Res.string.dialog_support_text_external_change, conflictPath.toString())
-        val okLabelText = t(Res.string.ok_label)
+        val dialogReloadServerListButtonText = t(Res.string.dialog_reload_server_list_button)
 
         ExpressiveDialog(
             onDismissRequest = { /* no-op: require acknowledgment */ },
@@ -210,7 +210,7 @@ internal fun MultiplayerScreen(
             title(dialogTitleExternalChangeText)
             supportText(dialogSupportTextExternalChangeText)
             accept(
-                okLabelText.prominent onClick {
+                dialogReloadServerListButtonText.prominent onClick {
                     scope.launch {
                         Files.deleteIfExists(repo.createTempServerListFile())
                         repo.load()
