@@ -19,6 +19,7 @@
 @file:OptIn(
     ExperimentalUuidApi::class,
     ExperimentalMaterial3Api::class,
+    ExperimentalComposeUiApi::class,
 )
 
 package com.spoiligaming.explorer.ui.screens.multiplayer
@@ -81,6 +82,8 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipDefaults.rememberTooltipPositionProvider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -91,6 +94,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
@@ -951,6 +955,7 @@ private fun OnlineServerDataRow(
                                 FloatingDialogBuilder(
                                     visible = showDescription,
                                     onDismissRequest = { showDescription = false },
+                                    positionProvider = rememberTooltipPositionProvider(TooltipAnchorPosition.Left),
                                 ) {
                                     RichTooltip(
                                         title = { Text(t(Res.string.server_description_title)) },

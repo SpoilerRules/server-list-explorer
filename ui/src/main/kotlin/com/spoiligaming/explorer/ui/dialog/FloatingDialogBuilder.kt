@@ -43,17 +43,19 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 
 @Composable
 internal fun FloatingDialogBuilder(
     visible: Boolean,
     onDismissRequest: () -> Unit,
+    positionProvider: PopupPositionProvider = rememberTooltipPositionProvider(
+        TooltipAnchorPosition.End
+    ),
     content: @Composable TooltipScope.() -> Unit,
 ) {
     var anchorCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
-
-    val positionProvider = rememberTooltipPositionProvider(TooltipAnchorPosition.End)
 
     val realScope =
         remember {
