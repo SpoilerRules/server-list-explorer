@@ -109,10 +109,8 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
@@ -140,6 +138,7 @@ import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalMultiplaye
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
 import com.spoiligaming.explorer.ui.dialog.FloatingDialogBuilder
 import com.spoiligaming.explorer.ui.extensions.safeAsImageBitmapOrNull
+import com.spoiligaming.explorer.ui.extensions.stopClickPropagation
 import com.spoiligaming.explorer.ui.extensions.toGroupedString
 import com.spoiligaming.explorer.ui.extensions.toPngBase64
 import com.spoiligaming.explorer.ui.extensions.toPngInputStream
@@ -795,18 +794,7 @@ private fun MotdCard(
                         },
                     ) {
                         HackedSelectionContainer(
-                            modifier =
-                                Modifier
-                                    .pointerInput(Unit) {
-                                        awaitPointerEventScope {
-                                            while (true) {
-                                                val event = awaitPointerEvent()
-                                                if (event.type == PointerEventType.Press) {
-                                                    event.changes.forEach { it.consume() }
-                                                }
-                                            }
-                                        }
-                                    },
+                            modifier = Modifier.stopClickPropagation(),
                             onSelectedChange = { isSelecting = it },
                             onAllSelectedChange = { allSelected = it },
                         ) {
@@ -822,17 +810,7 @@ private fun MotdCard(
 
                 is OnlineServerDataResourceResult.Error ->
                     SelectionContainer(
-                        modifier =
-                            Modifier.pointerInput(Unit) {
-                                awaitPointerEventScope {
-                                    while (true) {
-                                        val event = awaitPointerEvent()
-                                        if (event.type == PointerEventType.Press) {
-                                            event.changes.forEach { it.consume() }
-                                        }
-                                    }
-                                }
-                            },
+                        modifier = Modifier.stopClickPropagation(),
                     ) {
                         Text(
                             text = t(Res.string.server_unreachable),
@@ -843,17 +821,7 @@ private fun MotdCard(
 
                 is OnlineServerDataResourceResult.RateLimited ->
                     SelectionContainer(
-                        modifier =
-                            Modifier.pointerInput(Unit) {
-                                awaitPointerEventScope {
-                                    while (true) {
-                                        val event = awaitPointerEvent()
-                                        if (event.type == PointerEventType.Press) {
-                                            event.changes.forEach { it.consume() }
-                                        }
-                                    }
-                                }
-                            },
+                        modifier = Modifier.stopClickPropagation(),
                     ) {
                         Text(
                             text = t(Res.string.rate_limited_message),
@@ -990,20 +958,7 @@ private fun OnlineServerDataRow(
                                                                 Modifier
                                                                     .focusRequester(focusRequester)
                                                                     .focusable()
-                                                                    .pointerInput(Unit) {
-                                                                        awaitPointerEventScope {
-                                                                            while (true) {
-                                                                                val event = awaitPointerEvent()
-                                                                                if (event.type ==
-                                                                                    PointerEventType.Press
-                                                                                ) {
-                                                                                    event.changes.forEach {
-                                                                                        it.consume()
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    },
+                                                                    .stopClickPropagation(),
                                                             onSelectedChange = { descIsSelecting = it },
                                                             onAllSelectedChange = { descAllSelected = it },
                                                         ) {
@@ -1145,17 +1100,7 @@ private fun InfoChip(
                 modifier = Modifier.size(18.dp),
             )
             SelectionContainer(
-                modifier =
-                    Modifier.pointerInput(Unit) {
-                        awaitPointerEventScope {
-                            while (true) {
-                                val event = awaitPointerEvent()
-                                if (event.type == PointerEventType.Press) {
-                                    event.changes.forEach { it.consume() }
-                                }
-                            }
-                        }
-                    },
+                modifier = Modifier.stopClickPropagation(),
             ) {
                 when (label) {
                     is String ->

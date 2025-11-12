@@ -106,3 +106,15 @@ internal fun Modifier.blockIntrinsics() =
             ) = 0
         },
     )
+
+internal fun Modifier.stopClickPropagation() =
+    pointerInput(Unit) {
+        awaitPointerEventScope {
+            while (true) {
+                val event = awaitPointerEvent()
+                if (event.type == PointerEventType.Press) {
+                    event.changes.forEach { it.consume() }
+                }
+            }
+        }
+    }
