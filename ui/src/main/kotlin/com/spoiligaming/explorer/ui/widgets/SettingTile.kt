@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
@@ -72,30 +73,38 @@ internal fun SettingTile(
                         modifier = Modifier.size(WarningIconSize),
                         tint = MaterialTheme.colorScheme.error,
                     )
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
+                    SelectionContainer {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
                 }
             }
-            Text(text = title, style = MaterialTheme.typography.bodyLarge)
+            SelectionContainer {
+                Text(text = title, style = MaterialTheme.typography.bodyLarge)
+            }
         }
     },
     supportingContent = {
         Column(verticalArrangement = Arrangement.spacedBy(DescriptionNoteSpacing)) {
             description?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                SelectionContainer {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
             note?.let {
-                Text(
-                    text = "Note: $it",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = NOTE_ALPHA),
-                )
+                SelectionContainer {
+                    Text(
+                        text = "Note: $it",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = NOTE_ALPHA),
+                    )
+                }
             }
         }
     },
