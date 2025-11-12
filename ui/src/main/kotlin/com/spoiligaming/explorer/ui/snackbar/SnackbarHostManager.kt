@@ -18,7 +18,6 @@
 
 package com.spoiligaming.explorer.ui.snackbar
 
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -26,18 +25,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun BoxScope.SnackbarHostManager(modifier: Modifier = Modifier) {
+internal fun SnackbarHostManager(modifier: Modifier = Modifier) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val eventsFlow = SnackbarController.events
-
-    val prefs = LocalPrefs.current
 
     LaunchedEffect(eventsFlow, snackbarHostState) {
         scope.launch {
@@ -60,13 +55,6 @@ internal fun BoxScope.SnackbarHostManager(modifier: Modifier = Modifier) {
 
     SnackbarHost(
         hostState = snackbarHostState,
-        modifier =
-            modifier.align(
-                if (prefs.snackbarAtTop) {
-                    Alignment.TopCenter
-                } else {
-                    Alignment.BottomCenter
-                },
-            ),
+        modifier = modifier,
     )
 }

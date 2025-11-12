@@ -42,6 +42,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -143,7 +144,9 @@ private fun SetupWizardScreen() {
 
 @Composable
 private fun MainAppScreen() {
+    val prefs = LocalPrefs.current
     val navController = rememberNavController()
+
     Row(modifier = Modifier.fillMaxSize()) {
         AppNavigationRail(navController) {
             themeSettingsManager.updateSettings {
@@ -172,14 +175,20 @@ private fun MainAppScreen() {
                 DEFAULT_CONTENT_PADDING
             }
 
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValue),
-        ) {
-            NavGraph(navController = navController)
-            SnackbarHostManager()
+        Box {
+            Box(modifier = Modifier.fillMaxSize().padding(paddingValue)) {
+                NavGraph(navController = navController)
+            }
+            SnackbarHostManager(
+                modifier =
+                    Modifier.align(
+                        if (prefs.snackbarAtTop) {
+                            Alignment.TopCenter
+                        } else {
+                            Alignment.BottomCenter
+                        },
+                    ),
+            )
         }
     }
 }
