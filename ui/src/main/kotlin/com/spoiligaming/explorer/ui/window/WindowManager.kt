@@ -48,8 +48,8 @@ internal object WindowManager {
     private const val MIN_HEIGHT_PX = 500
     private val MIN_WINDOW_SIZE = Dimension(MIN_WIDTH_PX, MIN_HEIGHT_PX)
 
-    private val CompactWidthThresold = 1000.dp
-    private val ShortHeightThresold = 640.dp
+    private val CompactWidthThreshold = 1000.dp
+    private val ShortHeightThreshold = 640.dp
 
     private const val SKIKO_VSYNC_PROPERTY = "skiko.vsync.enabled"
 
@@ -84,10 +84,10 @@ internal object WindowManager {
                 SideEffect {
                     isWindowCompact =
                         !ws.isWindowMaximized &&
-                        ws.currentWidth.dp < CompactWidthThresold
+                        ws.currentWidth.dp < CompactWidthThreshold
                     isWindowShort =
                         !ws.isWindowMaximized &&
-                        ws.currentHeight.dp < ShortHeightThresold
+                        ws.currentHeight.dp < ShortHeightThreshold
                 }
 
                 val windowTitle =
