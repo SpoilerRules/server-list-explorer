@@ -41,7 +41,7 @@ import java.awt.Dimension
 
 internal object WindowManager {
     private const val WINDOW_TITLE = "Server List Explorer"
-    private const val BUILD_SUFFIX = " - ${BuildConfig.VERSION} (${BuildConfig.DISTRIBUTION})"
+    private const val BUILD_SUFFIX = " ${BuildConfig.VERSION} - ${BuildConfig.DISTRIBUTION}"
     private const val WINDOW_TITLE_WITH_BUILD = WINDOW_TITLE + BUILD_SUFFIX
 
     private const val MIN_WIDTH_PX = 850
