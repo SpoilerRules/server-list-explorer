@@ -42,7 +42,7 @@ jobs:
           java-version: 21
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4.4.3
+        uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: wrapper
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
@@ -146,7 +146,7 @@ jobs:
 
       - name: Create GitHub Release
         if: env.ACT != 'true'
-        uses: softprops/action-gh-release@v2.3.2
+        uses: softprops/action-gh-release@v2.4.2
         with:
           tag_name: ${{ env.TAG }}
           name: "Server List Explorer ${{ env.TAG }}"
@@ -167,7 +167,7 @@ jobs:
 
       - name: Upload artifacts to workflow run
         if: env.ACT != 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: sle-${{ env.TAG }}
           path: |
