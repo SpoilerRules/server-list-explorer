@@ -101,6 +101,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -342,18 +343,17 @@ internal fun ServerEntry(
 
     val outlinedBorder = CardDefaults.outlinedCardBorder()
     val borderStroke =
-        when {
-            selected && amoledOn ->
-                BorderStroke(
-                    outlinedBorder.width,
-                    MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            selected || amoledOn -> outlinedBorder
-            else ->
-                BorderStroke(
-                    0.dp,
-                    Color.Transparent,
-                )
+        if (selected) {
+            val brush =
+                if (amoledOn) {
+                    SolidColor(MaterialTheme.colorScheme.onSurfaceVariant)
+                } else {
+                    outlinedBorder.brush
+                }
+
+            BorderStroke(outlinedBorder.width, brush)
+        } else {
+            BorderStroke(0.dp, Color.Transparent)
         }
 
     // FOR CONTRIBUTORS: make sure to edit ShimmerServerEntry.kt when you edit this
