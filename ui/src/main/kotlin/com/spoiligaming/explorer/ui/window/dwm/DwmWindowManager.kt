@@ -138,8 +138,8 @@ internal class DwmWindowStyler private constructor(
         onSuccess = { hr ->
             if (hr.succeeded()) true else hr.also { logHResult(attribute, it) }.let { false }
         },
-        onFailure = { t ->
-            logger.error(t) { "DwmSetWindowAttribute($attribute) threw" }
+        onFailure = { e ->
+            logger.error(e) { "DwmSetWindowAttribute($attribute) threw" }
             false
         },
     )
@@ -158,7 +158,7 @@ internal class DwmWindowStyler private constructor(
                 (color.blue * 255).toInt() and 0xFF,
             )
         return if (hr.succeeded()) {
-            logger.debug { "DWM attribute $attribute <- $hex" }
+            logger.debug { "DWM attribute $attribute set to color $hex" }
             true
         } else {
             logHResult(attribute, hr)

@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Server List Explorer.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 @file:OptIn(ExperimentalUuidApi::class)
 
 package com.spoiligaming.explorer.multiplayer.repository
