@@ -30,7 +30,6 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.engine.cio.endpoint
 import io.ktor.client.plugins.HttpTimeout
 import kotlinx.coroutines.flow.flow
-import kotlin.time.Duration.Companion.seconds
 
 class OnlineServerDataFacade(
     private val serverAddress: String,
@@ -76,10 +75,6 @@ class OnlineServerDataFacade(
                 }
         }
 
-    private companion object {
-        private const val REQUEST_TIMEOUT_BUFFER_MILLIS = 30_000L
-    }
-
     private fun buildQueryHandler(method: ServerQueryMethod) =
         when (method) {
             ServerQueryMethod.McSrvStat ->
@@ -107,11 +102,17 @@ class OnlineServerDataFacade(
                     serverAddress = serverAddress,
                     connectionTimeoutMillis = connectTimeoutMillis.toInt(),
                     socketTimeoutMillis = socketTimeoutMillis.toInt(),
-                    // caching intentionally disabled pending user feedback
-                    cacheDelay = 0.seconds,
-                    skipCache = true,
+                    socketAttempts = DEFAULT_SOCKET_ATTEMPTS,
+                    eofAttempts = DEFAULT_EOF_ATTEMPTS,
                 )
         }
+
+    companion object {
+        private const val REQUEST_TIMEOUT_BUFFER_MILLIS = 30_000L
+
+        private const val DEFAULT_SOCKET_ATTEMPTS = 3
+        private const val DEFAULT_EOF_ATTEMPTS = 3
+    }
 }
 
 private val logger = KotlinLogging.logger {}

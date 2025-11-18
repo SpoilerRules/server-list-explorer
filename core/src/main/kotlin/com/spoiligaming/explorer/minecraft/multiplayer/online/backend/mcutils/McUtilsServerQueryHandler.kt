@@ -16,17 +16,15 @@
  * along with Server List Explorer.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-@file:OptIn(ExperimentalTime::class)
-
 package com.spoiligaming.explorer.minecraft.multiplayer.online.backend.mcutils
 
 import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.IServerData
 import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.IServerQueryHandler
 import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.McUtilsOnlineServerData
 import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.OfflineServerData
-import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.OnlineServerData
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.network.sockets.SocketTimeoutException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import tech.aliorpse.mcutils.modules.server.status.JavaServer
@@ -36,52 +34,64 @@ import java.net.ConnectException
 import java.net.InetAddress
 import java.net.SocketException
 import java.net.UnknownHostException
-import kotlin.time.Clock
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 internal class McUtilsServerQueryHandler(
     private val serverAddress: String,
-    private val cacheDelay: Duration,
     private val connectionTimeoutMillis: Int,
     private val socketTimeoutMillis: Int,
-    private val skipCache: Boolean,
+    private val socketAttempts: Int,
+    private val eofAttempts: Int,
 ) : IServerQueryHandler {
-    private var cache: Cache? = null
+    init {
+        require(socketAttempts >= 1) { "socketAttempts must be >= 1 (was $socketAttempts)" }
+        require(eofAttempts >= 1) { "eofAttempts must be >= 1 (was $eofAttempts)" }
+    }
 
     override suspend fun getServerData(): IServerData =
         withContext(Dispatchers.IO) {
-            val now = Clock.System.now()
-
             val resolvedIp =
-                try {
-                    resolveToIp(serverAddress)
-                } catch (_: UnknownHostException) {
-                    logger.debug {
-                        "Returning (from resolveToIp exception handler) for $serverAddress: OfflineServerData"
-                    }
-                    return@withContext OfflineServerData
+                resolveIpOrNull(serverAddress)
+                    ?: return@withContext OfflineServerData
+
+            val hostPort = hostPortOf(serverAddress)
+
+            try {
+                logger.info {
+                    "Fetching data via mcutils for server $serverAddress " +
+                        "(resolved IP: $resolvedIp, host: $hostPort)."
                 }
 
-            if (
-                !skipCache &&
-                cache?.serverIp == resolvedIp &&
-                cache!!.timestamp + cacheDelay > now
-            ) {
-                logger.info { "Cache hit for server IP $resolvedIp - returning cached data." }
-                return@withContext cache!!.serverData
-            }
-
-            return@withContext runCatching {
-                logger.info { "Fetching data via mcutils for server $serverAddress." }
-
                 val status =
-                    JavaServer.getStatus(
-                        hostPort = hostPortOf(serverAddress),
-                        connectionTimeout = connectionTimeoutMillis,
-                        readTimeout = socketTimeoutMillis,
-                    )
+                    retry(
+                        retryPolicy<SocketException>(
+                            maxAttempts = socketAttempts,
+                        ) { attempt, maxAttempts, cause ->
+                            logRetry(
+                                cause = cause,
+                                resolvedIp = resolvedIp,
+                                hostPort = hostPort,
+                                attempt = attempt,
+                                maxAttempts = maxAttempts,
+                            )
+                        },
+                        retryPolicy<EOFException>(
+                            maxAttempts = eofAttempts,
+                        ) { attempt, maxAttempts, cause ->
+                            logRetry(
+                                cause = cause,
+                                resolvedIp = resolvedIp,
+                                hostPort = hostPort,
+                                attempt = attempt,
+                                maxAttempts = maxAttempts,
+                            )
+                        },
+                    ) {
+                        JavaServer.getStatus(
+                            hostPort = hostPort,
+                            connectionTimeout = connectionTimeoutMillis,
+                            readTimeout = socketTimeoutMillis,
+                        )
+                    }
 
                 val motd = status.description.toSectionString()
                 val versionInfo = status.version.name
@@ -97,87 +107,110 @@ internal class McUtilsServerQueryHandler(
                         ?.joinToString("\n")
                 val enforcesSecureChat = status.enforcesSecureChat
 
-                val serverData =
-                    McUtilsOnlineServerData(
-                        motd = motd,
-                        onlinePlayers = onlinePlayers,
-                        maxPlayers = maxPlayers,
-                        versionInfo = versionInfo,
-                        ping = ping,
-                        icon = icon,
-                        protocolVersion = protocol,
-                        ip = resolvedIp,
-                        info = info,
-                        secureChatEnforced = enforcesSecureChat,
-                    )
-
-                if (!skipCache) {
-                    cache = Cache(serverIp = resolvedIp, serverData = serverData, timestamp = now)
-                    logger.info { "Successfully fetched and cached data for server $serverAddress." }
-                } else {
-                    logger.info { "Successfully fetched data for server $serverAddress (cache skipped)." }
-                }
-
-                serverData
-            }.getOrElse { e ->
-                val result =
-                    when (e) {
-                        is SocketTimeoutException -> {
-                            logger.info {
-                                "Connection to server $serverAddress timed out " +
-                                    "(resolved IP: $resolvedIp, host: ${hostPortOf(serverAddress)})"
-                            }
-                            OfflineServerData
-                        }
-
-                        is ConnectException -> {
-                            logger.info {
-                                "Connection to server $serverAddress was refused " +
-                                    "(resolved IP: $resolvedIp, host: ${hostPortOf(serverAddress)})"
-                            }
-                            OfflineServerData
-                        }
-
-                        is SocketException -> {
-                            logger.info {
-                                "Socket error while connecting to $serverAddress: ${e.message} " +
-                                    "(resolved IP: $resolvedIp, host: ${hostPortOf(serverAddress)})"
-                            }
-                            OfflineServerData
-                        }
-
-                        is EOFException -> {
-                            logger.info {
-                                "Server $serverAddress closed the connection unexpectedly " +
-                                    "(resolved IP: $resolvedIp, host: ${hostPortOf(serverAddress)})"
-                            }
-                            OfflineServerData
-                        }
-
-                        else -> {
-                            logger.error(e) {
-                                "Unexpected exception while fetching data for $serverAddress " +
-                                    "(resolved IP: $resolvedIp, host: ${hostPortOf(serverAddress)})"
-                            }
-                            throw e
-                        }
+                McUtilsOnlineServerData(
+                    motd = motd,
+                    onlinePlayers = onlinePlayers,
+                    maxPlayers = maxPlayers,
+                    versionInfo = versionInfo,
+                    ping = ping,
+                    icon = icon,
+                    protocolVersion = protocol,
+                    ip = resolvedIp,
+                    info = info,
+                    secureChatEnforced = enforcesSecureChat,
+                ).also {
+                    logger.info {
+                        "Successfully fetched data for server $serverAddress " +
+                            "(resolved IP: $resolvedIp, host: $hostPort)."
                     }
-
-                logger.debug { "Returning fallback result for $serverAddress due to ${e::class.simpleName}: $result" }
-                result
+                }
+            } catch (e: Throwable) {
+                if (e is CancellationException) throw e
+                handleException(e, resolvedIp, hostPort)
             }
         }
 
-    private suspend fun resolveToIp(host: String) =
-        withContext(Dispatchers.IO) {
-            InetAddress.getByName(host).hostAddress
+    private fun resolveIpOrNull(host: String): String? =
+        try {
+            resolveToIp(host)
+        } catch (_: UnknownHostException) {
+            logger.debug {
+                "Returning (from resolveToIp exception handler) for $serverAddress: OfflineServerData"
+            }
+            null
         }
-}
 
-private data class Cache(
-    val serverIp: String,
-    val serverData: OnlineServerData,
-    val timestamp: Instant,
-)
+    private fun resolveToIp(host: String): String = InetAddress.getByName(host).hostAddress
+
+    @Suppress("NOTHING_TO_INLINE")
+    private inline fun <reified E : Throwable> logRetry(
+        cause: E,
+        resolvedIp: String,
+        hostPort: Any?,
+        attempt: Int,
+        maxAttempts: Int,
+    ) {
+        val name = E::class.simpleName
+        logger.info(cause) {
+            "JavaServer.getStatus failed with $name for $serverAddress " +
+                "(resolved IP: $resolvedIp, host: $hostPort, attempt ${attempt + 1} of $maxAttempts). Retrying..."
+        }
+    }
+
+    private fun handleException(
+        e: Throwable,
+        resolvedIp: String,
+        hostPort: Any?,
+    ): IServerData {
+        val result =
+            when (e) {
+                is SocketTimeoutException -> {
+                    logger.info {
+                        "Connection to server $serverAddress timed out " +
+                            "(resolved IP: $resolvedIp, host: $hostPort)"
+                    }
+                    OfflineServerData
+                }
+
+                is ConnectException -> {
+                    logger.info {
+                        "Connection to server $serverAddress was refused " +
+                            "(resolved IP: $resolvedIp, host: $hostPort)"
+                    }
+                    OfflineServerData
+                }
+
+                is SocketException -> {
+                    logger.info {
+                        "Socket error while connecting to $serverAddress: ${e.message} " +
+                            "(resolved IP: $resolvedIp, host: $hostPort)"
+                    }
+                    OfflineServerData
+                }
+
+                is EOFException -> {
+                    logger.info {
+                        "Server $serverAddress closed the connection unexpectedly " +
+                            "(resolved IP: $resolvedIp, host: $hostPort)"
+                    }
+                    OfflineServerData
+                }
+
+                else -> {
+                    logger.error(e) {
+                        "Unexpected exception while fetching data for $serverAddress " +
+                            "(resolved IP: $resolvedIp, host: $hostPort)"
+                    }
+                    throw e
+                }
+            }
+
+        logger.debug {
+            "Returning fallback result for $serverAddress due to ${e::class.simpleName}: $result"
+        }
+
+        return result
+    }
+}
 
 private val logger = KotlinLogging.logger {}
