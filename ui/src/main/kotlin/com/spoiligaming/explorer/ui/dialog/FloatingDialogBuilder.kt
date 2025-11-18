@@ -50,9 +50,10 @@ import androidx.compose.ui.window.PopupProperties
 internal fun FloatingDialogBuilder(
     visible: Boolean,
     onDismissRequest: () -> Unit,
-    positionProvider: PopupPositionProvider = rememberTooltipPositionProvider(
-        TooltipAnchorPosition.End
-    ),
+    positionProvider: PopupPositionProvider =
+        rememberTooltipPositionProvider(
+            TooltipAnchorPosition.End,
+        ),
     content: @Composable TooltipScope.() -> Unit,
 ) {
     var anchorCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
