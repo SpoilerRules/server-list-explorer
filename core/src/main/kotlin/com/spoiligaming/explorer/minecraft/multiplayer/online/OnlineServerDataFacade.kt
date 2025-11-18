@@ -110,7 +110,7 @@ class OnlineServerDataFacade(
     companion object {
         private const val REQUEST_TIMEOUT_BUFFER_MILLIS = 30_000L
 
-        private const val DEFAULT_SOCKET_ATTEMPTS = 3
+        private const val DEFAULT_SOCKET_ATTEMPTS = 5
         private const val DEFAULT_EOF_ATTEMPTS = 3
     }
 }
