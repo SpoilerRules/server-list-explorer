@@ -83,7 +83,8 @@ internal fun TextComponent.toSectionString(): String {
     return out.toString()
 }
 
-private fun colorCodeFor(c: String): String {
+@Suppress("NOTHING_TO_INLINE")
+private inline fun colorCodeFor(c: String): String {
     if (c.isEmpty()) return ""
 
     if (c[0] == HEX_PREFIX) {
@@ -119,7 +120,8 @@ private object StyleBits {
     const val STRIKETHROUGH = 1 shl 3
     const val OBFUSCATED = 1 shl 4
 
-    fun encode(set: Set<TextStyle>): Int {
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun encode(set: Set<TextStyle>): Int {
         var b = 0
         if (TextStyle.BOLD in set) b = b or BOLD
         if (TextStyle.ITALIC in set) b = b or ITALIC
@@ -129,7 +131,8 @@ private object StyleBits {
         return b
     }
 
-    fun append(
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun append(
         bits: Int,
         dest: StringBuilder,
     ) {
