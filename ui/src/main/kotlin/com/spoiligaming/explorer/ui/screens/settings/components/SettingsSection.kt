@@ -24,14 +24,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -49,13 +47,26 @@ internal fun SettingsSection(
         val containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(SectionContainerElevation)
         val dividerColor = MaterialTheme.colorScheme.background
 
+        val sectionOuterShape = MaterialTheme.shapes.large
+        val sectionInnerShape = MaterialTheme.shapes.extraSmall
+        val sectionTopShape =
+            sectionInnerShape.copy(
+                topStart = sectionOuterShape.topStart,
+                topEnd = sectionOuterShape.topEnd,
+            )
+        val sectionBottomShape =
+            sectionInnerShape.copy(
+                bottomStart = sectionOuterShape.bottomStart,
+                bottomEnd = sectionOuterShape.bottomEnd,
+            )
+
         settings.forEachIndexed { index, setting ->
             val shape =
                 when {
-                    settings.size == 1 -> SectionSingleShape
-                    index == 0 -> SectionTopShape
-                    index == settings.lastIndex -> SectionBottomShape
-                    else -> RectangleShape
+                    settings.size == 1 -> sectionOuterShape
+                    index == 0 -> sectionTopShape
+                    index == settings.lastIndex -> sectionBottomShape
+                    else -> sectionInnerShape
                 }
 
             Surface(
@@ -82,20 +93,4 @@ internal fun SettingsSection(
 
 private val OuterArrangement = 8.dp
 private val SectionContainerElevation = 8.dp
-private val SectionCornerRadius = 16.dp
 private val SectionDividerSpacing = 4.dp
-private val SectionSingleShape = RoundedCornerShape(SectionCornerRadius)
-private val SectionTopShape =
-    RoundedCornerShape(
-        topStart = SectionCornerRadius,
-        topEnd = SectionCornerRadius,
-        bottomStart = 0.dp,
-        bottomEnd = 0.dp,
-    )
-private val SectionBottomShape =
-    RoundedCornerShape(
-        topStart = 0.dp,
-        topEnd = 0.dp,
-        bottomStart = SectionCornerRadius,
-        bottomEnd = SectionCornerRadius,
-    )
