@@ -115,18 +115,63 @@ val appVersion: String by rootProject.extra
 version = appVersion
 
 val rawVersion = project.version.toString()
-val (major, minor, patch, qualifier) =
+
+val versionMatch =
     Regex("""(\d+)\.(\d+)(?:\.(\d+))?(?:-([\w.\-]+))?""")
         .matchEntire(rawVersion)
-        ?.destructured
         ?: error("Version \"$rawVersion\" is not valid SemVer")
 
-val build = patch.ifEmpty { "0" }
-val numericWindowsVersion = listOf(major, minor, build).joinToString(".")
+val (majorStr, minorStr, patchStr, qualifier) = versionMatch.destructured
 
-require(major.toInt() in 0..255) { "Windows MAJOR must be <=255" }
-require(minor.toInt() in 0..255) { "Windows MINOR must be <=255" }
-require(build.toInt() in 0..65535) { "Windows BUILD must be <=65535" }
+val major = majorStr.toInt()
+val minor = minorStr.toInt()
+val patch = patchStr.ifEmpty { "0" }.toInt()
+
+require(major in 0..255) { "Windows MAJOR must be <=255 (got $major)" }
+require(minor in 0..255) { "Windows MINOR must be <=255 (got $minor)" }
+require(patch in 0..654) {
+    "Windows PATCH must be between 0 and 654 for version mapping (got $patch)"
+}
+
+val preReleaseMatch =
+    if (qualifier.isNotEmpty()) {
+        Regex("""(dev|alpha|beta|rc)(?:\.(\d+))?""").matchEntire(qualifier)
+            ?: error(
+                "Unsupported pre-release identifier \"$qualifier\". " +
+                    "Expected dev[.N], alpha.N, beta.N, or rc.N.",
+            )
+    } else {
+        null
+    }
+
+val windowsBuild =
+    if (preReleaseMatch == null) {
+        patch * 100 + 99
+    } else {
+        val (stage, numStr) = preReleaseMatch.destructured
+        val num = numStr.ifEmpty { "0" }.toInt()
+
+        require(num in 0..98) {
+            "Pre-release number must be between 0 and 98 (got $num)"
+        }
+
+        val stageCode =
+            when (stage) {
+                "dev" -> 0
+                "alpha" -> 1
+                "beta" -> 2
+                "rc" -> 3
+                else -> error("Unexpected stage \"$stage\"")
+            }
+
+        patch * 100 + stageCode * 10 + num
+    }
+
+require(windowsBuild in 0..65535) {
+    "Windows BUILD must be <=65535 (got $windowsBuild)"
+}
+
+val numericWindowsVersion = "$major.$minor.$windowsBuild"
 
 val startYear = 2025
 val copyrightYears =
