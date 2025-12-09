@@ -15,8 +15,9 @@
                            charset="UTF-8"/>
         </Console>
 
-        <RollingFile name="File" fileName="logs/serverlistexplorer-dev.log"
-                     filePattern="logs/sle-dev-%d{yyyy-MM-dd}-%i.zip"
+        <RollingFile name="File"
+                     fileName="${sys:app.logs.dir}/serverlistexplorer-dev.log"
+                     filePattern="${sys:app.logs.dir}/sle-dev-%d{yyyy-MM-dd}-%i.zip"
                      append="true">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t/%threadId/%p] %c %l PID=%pid - %msg%ex%n"
                            charset="UTF-8"/>

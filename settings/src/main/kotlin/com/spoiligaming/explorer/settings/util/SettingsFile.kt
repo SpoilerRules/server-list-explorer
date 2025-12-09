@@ -24,69 +24,69 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import java.io.File
-import java.nio.file.Paths
 
 internal class SettingsFile<T>(
     private val fileName: String,
     private val serializer: KSerializer<T>,
     private val defaultValueProvider: () -> T,
 ) {
-    private val settingsDir = Paths.get("config").toFile()
-    private val settingsFile by lazy { settingsDir.resolve(fileName) }
-
     private val json =
         Json {
             prettyPrint = true
             encodeDefaults = true
+            ignoreUnknownKeys = true
         }
+
+    private val settingsFile
+        get() = SettingsStorage.settingsDir.resolve(fileName)
+
+    val lastModifiedMillis
+        get() = settingsFile.takeIf { it.exists() }?.lastModified()
 
     suspend fun read() =
         withContext(Dispatchers.IO) {
-            logger.debug { "Attempting to read settings from: ${settingsFile.absolutePath}" }
+            val dir = SettingsStorage.settingsDir
+            val file = settingsFile
 
-            if (!settingsFile.exists()) {
-                ensureDirExists(settingsDir)
+            logger.debug { "Attempting to read settings from: ${file.absolutePath}" }
+
+            if (!file.exists()) {
+                ensureDirExists(dir)
+
                 val defaultObj = defaultValueProvider()
-                settingsFile.writeText(json.encodeToString(serializer, defaultObj))
+                file.writeText(json.encodeToString(serializer, defaultObj))
+
                 logger.info { "Created new settings file with default: $defaultObj" }
                 return@withContext defaultObj
             }
 
             val raw =
-                settingsFile.readText().also {
+                file.readText().also {
                     logger.debug { "Read raw JSON: ${it.take(100).replace("\n", "\\n")}..." }
                 }
 
-            if (raw.isBlank()) {
-                throw IllegalStateException(
-                    "SettingsFile.read(): existing file is empty: ${settingsFile.absolutePath}",
-                )
+            check(raw.isNotBlank()) {
+                "SettingsFile.read(): existing file is empty: ${file.absolutePath}"
             }
 
             val loaded = json.decodeFromString(serializer, raw)
             logger.info { "Loaded settings from disk: $loaded" }
-            return@withContext loaded
+            loaded
         }
 
     suspend fun write(
         data: T,
         onComplete: (() -> Unit)? = null,
     ) = withContext(Dispatchers.IO) {
-        ensureDirExists(settingsDir)
+        val dir = SettingsStorage.settingsDir
+        val file = settingsFile
+
+        ensureDirExists(dir)
 
         val serialized = json.encodeToString(serializer, data)
-        settingsFile.writeText(serialized)
+        file.writeText(serialized)
         logger.debug { "Saved settings to disk: $data" }
         onComplete?.invoke()
-    }
-
-    internal fun lastModifiedMillis(): Long? {
-        val file = settingsFile
-        return if (file.exists()) {
-            file.lastModified()
-        } else {
-            null
-        }
     }
 
     private fun ensureDirExists(dir: File) {

@@ -8,8 +8,9 @@
                monitorInterval="30">
 
     <Appenders>
-        <RollingFile name="File" fileName="logs/sle-latest.log"
-                     filePattern="logs/sle-%d{yyyy-MM-dd}-%i.zip"
+        <RollingFile name="File"
+                     fileName="${sys:app.logs.dir}/sle-latest.log"
+                     filePattern="${sys:app.logs.dir}/sle-%d{yyyy-MM-dd}-%i.zip"
                      append="true">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t/%threadId/%p] %c %l PID=%pid - %msg%ex%n"
                            charset="UTF-8"/>
