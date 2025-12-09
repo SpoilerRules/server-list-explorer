@@ -16,8 +16,10 @@
  * along with Server List Explorer.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import com.github.gmazzo.buildconfig.BuildConfigExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 plugins {
     alias(libs.plugins.kotlin.jvm) apply true
@@ -29,24 +31,74 @@ plugins {
     alias(libs.plugins.ktlint) apply true
 }
 
-val appVersionProvider =
+val appVersionProvider: Provider<String> =
     providers
         .environmentVariable("APP_VERSION")
         .orElse(providers.gradleProperty("appVersion"))
         .orElse("0.0.0-dev")
 
-val appDistributionProvider =
+val appDistributionProvider: Provider<String> =
     providers
         .environmentVariable("APP_DISTRIBUTION")
         .orElse(providers.gradleProperty("appDistribution"))
-        .orElse("unspecified")
+        .orElse(
+            provider {
+                val requestedTasks = gradle.startParameter.taskNames.flatMap { it.split(":") }
+
+                when {
+                    "packageReleaseMsi" in requestedTasks -> "MSI Installer (Minified Fat JAR)"
+                    "packageReleaseExe" in requestedTasks -> "EXE Installer (Minified Fat JAR)"
+                    "createReleaseDistributable" in requestedTasks -> "Portable (Minified Fat JAR)"
+                    "packageReleaseUberJarForCurrentOS" in requestedTasks -> "Minified Fat JAR"
+                    "packageMsi" in requestedTasks -> "MSI Installer (Fat JAR)"
+                    "packageExe" in requestedTasks -> "EXE Installer (Fat JAR)"
+                    "createDistributable" in requestedTasks -> "Portable (Fat JAR)"
+                    "shadowJar" in requestedTasks -> "Fat JAR"
+                    "buildWithProjectModules" in requestedTasks -> "JAR"
+                    else -> "unspecified"
+                }
+            },
+        )
+
+val onlyWindowsX64Provider: Provider<Boolean> =
+    providers
+        .environmentVariable("ONLY_WINDOWS_X64")
+        .map { it.toBoolean() }
+        .orElse(providers.gradleProperty("onlyWindowsX64").map { it.toBoolean() })
+        .orElse(
+            provider {
+                val requestedTasks = gradle.startParameter.taskNames.flatMap { it.split(":") }
+                requestedTasks.any { task ->
+                    task in
+                        listOf(
+                            "packageMsi",
+                            "packageExe",
+                            "createDistributable",
+                            "packageReleaseMsi",
+                            "packageReleaseExe",
+                            "createReleaseDistributable",
+                        )
+                }
+            },
+        )
 
 val appVersion = appVersionProvider.get()
 val appDistribution = appDistributionProvider.get()
+val onlyWindowsX64 = onlyWindowsX64Provider.get()
 
 extra["appVersion"] = appVersion
 extra["appDistribution"] = appDistribution
+extra["onlyWindowsX64"] = onlyWindowsX64
 version = appVersion
+
+gradle.taskGraph.whenReady {
+    if (appDistribution != "unspecified") {
+        logger.lifecycle("Building distribution: $appDistribution")
+    }
+    if (onlyWindowsX64) {
+        logger.lifecycle("Building for Windows x64 only (optimization enabled)")
+    }
+}
 
 allprojects {
     repositories {
@@ -59,7 +111,7 @@ allprojects {
     plugins.withId("org.jetbrains.kotlin.jvm") {
         apply(plugin = "com.github.gmazzo.buildconfig")
 
-        extensions.getByType<com.github.gmazzo.buildconfig.BuildConfigExtension>().apply {
+        extensions.getByType<BuildConfigExtension>().apply {
             useKotlinOutput {
                 internalVisibility = false
             }
@@ -108,7 +160,7 @@ subprojects {
         }
     }
 
-    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    configure<KtlintExtension> {
         debug.set(false)
         verbose.set(false)
         android.set(false)
