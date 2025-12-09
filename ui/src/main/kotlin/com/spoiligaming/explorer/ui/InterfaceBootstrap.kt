@@ -62,8 +62,6 @@ import com.spoiligaming.explorer.ui.theme.isDarkTheme
 import com.spoiligaming.explorer.ui.theme.isSystemDarkTheme
 import com.spoiligaming.explorer.ui.window.WindowManager
 import com.spoiligaming.explorer.util.FirstRunManager
-import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 fun launchInterface() {
