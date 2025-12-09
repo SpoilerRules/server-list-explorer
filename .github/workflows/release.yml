@@ -61,17 +61,15 @@ jobs:
       - name: Build all distributions
         shell: powershell
         run: |
-          .\gradlew.bat `
-            app:buildWithProjectModules `
-            app:shadowJar `
-            app:packageMsi `
-            app:packageExe `
-            app:createDistributable `
-            app:packageReleaseUberJarForCurrentOS `
-            app:packageReleaseMsi `
-            app:packageReleaseExe `
-            app:createReleaseDistributable `
-            --parallel
+          .\gradlew.bat app:buildWithProjectModules
+          .\gradlew.bat app:shadowJar
+          .\gradlew.bat app:createDistributable
+          .\gradlew.bat app:packageMsi
+          .\gradlew.bat app:packageExe
+          .\gradlew.bat app:packageReleaseUberJarForCurrentOS
+          .\gradlew.bat app:createReleaseDistributable
+          .\gradlew.bat app:packageReleaseMsi
+          .\gradlew.bat app:packageReleaseExe
 
       - name: Copy artifacts to staging directory
         shell: powershell
