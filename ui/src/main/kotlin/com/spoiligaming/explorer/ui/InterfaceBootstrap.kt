@@ -61,7 +61,9 @@ import com.spoiligaming.explorer.ui.theme.AppTheme
 import com.spoiligaming.explorer.ui.theme.isDarkTheme
 import com.spoiligaming.explorer.ui.theme.isSystemDarkTheme
 import com.spoiligaming.explorer.ui.window.WindowManager
-import com.spoiligaming.explorer.util.FirstRunChecker
+import com.spoiligaming.explorer.util.FirstRunManager
+import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 fun launchInterface() {
@@ -70,7 +72,7 @@ fun launchInterface() {
 
 @Composable
 private fun AppContainer() {
-    val isFirstRun by FirstRunChecker.isFirstRun.collectAsState()
+    val isFirstRun by FirstRunManager.isFirstRun.collectAsState()
     val prefs = LocalPrefs.current
 
     val contextMenuRepresentation =
@@ -135,7 +137,7 @@ private fun SetupWizardScreen() {
     val scope = rememberCoroutineScope()
     SetupWizard(
         onFinished = {
-            scope.launch { FirstRunChecker.markFirstRunDone() }
+            scope.launch { FirstRunManager.markFirstRunDone() }
         },
         intOffsetAnimationSpec = offsetAnimationSpec,
         floatAnimationSpec = floatAnimationSpec,
