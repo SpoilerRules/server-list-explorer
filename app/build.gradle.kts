@@ -36,9 +36,9 @@ dependencies {
 
     implementation(compose.runtime)
 
-    val onlyWinX64 = System.getenv("ONLY_WINDOWS_X64")?.toBoolean() == true
+    val onlyWindowsX64: Boolean by rootProject.extra
     val targetRuntimes =
-        if (onlyWinX64) {
+        if (onlyWindowsX64) {
             listOf(
                 compose.desktop.windows_x64,
             )
