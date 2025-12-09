@@ -23,6 +23,7 @@ import com.spoiligaming.explorer.ui.launchInterface
 fun main(args: Array<String>) {
     val env = if (System.getProperty("env") == "dev") "dev" else "prod"
     System.setProperty("log4j2.configurationFile", "log4j2-$env.xml")
+    System.setProperty("app.logs.dir", LogStorage.logsDir.absolutePath)
 
     ArgsParser.parse(args)
 
