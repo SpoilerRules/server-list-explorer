@@ -14,8 +14,13 @@ on:
         required: true
 
 jobs:
-  release:
-    runs-on: windows-latest
+  build-jars:
+    name: Build & Publish JARs
+    runs-on: ubuntu-latest
+
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
 
     steps:
       - name: Check out code
@@ -24,15 +29,35 @@ jobs:
           fetch-depth: 0
 
       - name: Determine version & tag
-        shell: powershell
+        id: meta
+        shell: bash
         run: |
-          # use dispatched input, env var, or secret
-          $V = '${{ github.event.inputs.version }}'
-          if ([string]::IsNullOrEmpty($V)) { $V = $env:VERSION }
-          if ([string]::IsNullOrEmpty($V)) { $V = '${{ secrets.VERSION }}' }
-          "VERSION=$V" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
-          "APP_VERSION=$V" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
-          "TAG=v$V" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
+          V="${{ github.event.inputs.version }}"
+          REF="${{ github.ref_name }}"
+
+          if [[ -z "$V" && "$REF" =~ ^v.+$ ]]; then
+            TAG="$REF"
+            V="${REF#v}"
+          else
+            TAG="v$V"
+          fi
+
+          if [[ -z "$V" ]]; then V="${VERSION}"; fi
+          if [[ -z "$V" ]]; then V="${{ secrets.VERSION }}"; fi
+          if [[ -z "$V" ]]; then
+            echo "::error::VERSION could not be determined"
+            exit 1
+          fi
+
+          if [[ -z "$TAG" || "$TAG" == "v" ]]; then
+            TAG="v$V"
+          fi
+
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "VERSION=$V" >> "$GITHUB_ENV"
+          echo "APP_VERSION=$V" >> "$GITHUB_ENV"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
 
       - name: Set up JDK 21
         uses: actions/setup-java@v5
@@ -46,106 +71,126 @@ jobs:
         with:
           gradle-version: wrapper
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          cache-read-only: false
 
-      - name: Generate ktlint baseline
-        if: env.ACT != 'true'
-        shell: powershell
-        run: .\gradlew.bat ktlintGenerateBaseline
-
-      - name: Prepare artifact staging directory
-        shell: powershell
+      - name: Build JAR artifacts
+        shell: bash
         run: |
-          New-Item -ItemType Directory -Force -Path app/out | Out-Null
+          ./gradlew app:buildWithProjectModules
+          ./gradlew app:shadowJar
+          ./gradlew app:packageReleaseUberJarForCurrentOS
 
-      - name: Build all distributions
-        shell: powershell
+      - name: Stage JAR artifacts
+        shell: bash
         run: |
-          .\gradlew.bat app:buildWithProjectModules
-          .\gradlew.bat app:shadowJar
-          .\gradlew.bat app:createDistributable
-          .\gradlew.bat app:packageMsi
-          .\gradlew.bat app:packageExe
-          .\gradlew.bat app:packageReleaseUberJarForCurrentOS
-          .\gradlew.bat app:createReleaseDistributable
-          .\gradlew.bat app:packageReleaseMsi
-          .\gradlew.bat app:packageReleaseExe
+          mkdir -p app/out
+          cp app/build/libs/ServerListExplorer.jar app/out/
+          cp app/build/libs/ServerListExplorer-all.jar app/out/
 
-      - name: Copy artifacts to staging directory
-        shell: powershell
-        run: |
-          # Copy JAR distributions
-          Copy-Item app/build/libs/ServerListExplorer.jar app/out/ServerListExplorer.jar -Force
-          Copy-Item app/build/libs/ServerListExplorer-all.jar app/out/ServerListExplorer-all.jar -Force
+          RELEASE_JAR="$(ls app/build/compose/jars/ServerListExplorer-*-release.jar | head -n 1)"
+          if [[ -z "$RELEASE_JAR" ]]; then
+            echo "::error::Release JAR not found"
+            exit 1
+          fi
+          cp "$RELEASE_JAR" app/out/ServerListExplorer-all-minified.jar
 
-          # Copy minified JAR
-          $releaseJar = Get-ChildItem app/build/compose/jars/ServerListExplorer-windows-x64-*-release.jar | Select-Object -First 1
-          Copy-Item $releaseJar.FullName app/out/ServerListExplorer-all-minified.jar -Force
-
-          # Copy MSI installers
-          $msi = Get-ChildItem app/build/compose/binaries/main/msi/ServerListExplorer-*.msi | Select-Object -First 1
-          Copy-Item $msi.FullName ("app/out/ServerListExplorer_$($env:VERSION)_x64.msi") -Force
-
-          $msiMinified = Get-ChildItem app/build/compose/binaries/main-release/msi/ServerListExplorer-*.msi | Select-Object -First 1
-          Copy-Item $msiMinified.FullName ("app/out/ServerListExplorer_$($env:VERSION)-minified_x64.msi") -Force
-
-          # Copy EXE installers
-          $exe = Get-ChildItem app/build/compose/binaries/main/exe/ServerListExplorer-*.exe | Select-Object -First 1
-          Copy-Item $exe.FullName ("app/out/ServerListExplorer_$($env:VERSION)_x64-setup.exe") -Force
-
-          $exeMinified = Get-ChildItem app/build/compose/binaries/main-release/exe/ServerListExplorer-*.exe | Select-Object -First 1
-          Copy-Item $exeMinified.FullName ("app/out/ServerListExplorer_$($env:VERSION)-minified_x64-setup.exe") -Force
-
-          # Create portable ZIP archives
-          $portableDir = "app/build/compose/binaries/main/app/ServerListExplorer"
-          $portableZip = "app/out/ServerListExplorer_$($env:VERSION)_windows-x64-portable.zip"
-          if (Test-Path $portableZip) { Remove-Item $portableZip -Force }
-          Compress-Archive -Path $portableDir -DestinationPath $portableZip -Force
-
-          $portableDirMinified = "app/build/compose/binaries/main-release/app/ServerListExplorer"
-          $portableZipMinified = "app/out/ServerListExplorer_$($env:VERSION)-minified_windows-x64-portable.zip"
-          if (Test-Path $portableZipMinified) { Remove-Item $portableZipMinified -Force }
-          Compress-Archive -Path $portableDirMinified -DestinationPath $portableZipMinified -Force
-
-      - name: List Compose JARs
-        shell: powershell
-        run: |
-          Write-Host "=== app/build/compose/jars ==="
-          Get-ChildItem app/build/compose/jars
-
-      - name: Create GitHub Release
+      - name: Create GitHub Release with JARs
         if: env.ACT != 'true'
         uses: softprops/action-gh-release@v2.4.2
         with:
           tag_name: ${{ env.TAG }}
           name: "Server List Explorer ${{ env.TAG }}"
-          body: ${{ steps.changelog.outputs.changelog }}
           generate_release_notes: true
-          draft: false
-          prerelease: ${{ contains(env.TAG, '-beta') || contains(env.TAG, '-rc') || contains(env.TAG, '-alpha') }}
+          prerelease: ${{ contains(env.TAG, '-alpha') || contains(env.TAG, '-beta') || contains(env.TAG, '-rc') }}
           files: |
             app/out/ServerListExplorer.jar
             app/out/ServerListExplorer-all.jar
             app/out/ServerListExplorer-all-minified.jar
-            app/out/ServerListExplorer_${{ env.VERSION }}-minified_x64.msi
-            app/out/ServerListExplorer_${{ env.VERSION }}_x64.msi
-            app/out/ServerListExplorer_${{ env.VERSION }}-minified_x64-setup.exe
-            app/out/ServerListExplorer_${{ env.VERSION }}_x64-setup.exe
-            app/out/ServerListExplorer_${{ env.VERSION }}-minified_windows-x64-portable.zip
-            app/out/ServerListExplorer_${{ env.VERSION }}_windows-x64-portable.zip
 
-      - name: Upload artifacts to workflow run
-        if: env.ACT != 'true'
-        uses: actions/upload-artifact@v5
+  release-windows-x64:
+    name: Windows x64
+    needs: build-jars
+    runs-on: windows-latest
+    env:
+      VERSION: ${{ needs.build-jars.outputs.version }}
+      APP_VERSION: ${{ needs.build-jars.outputs.version }}
+      TAG: ${{ needs.build-jars.outputs.tag }}
+
+      WIN_ARCH: x64
+      ONLY_WINDOWS_X64: true
+      ONLY_WINDOWS_ARM64: false
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
         with:
-          name: sle-${{ env.TAG }}
-          path: |
-            app/out/ServerListExplorer.jar
-            app/out/ServerListExplorer-all.jar
-            app/out/ServerListExplorer-all-minified.jar
-            app/out/ServerListExplorer_${{ env.VERSION }}-minified_x64.msi
-            app/out/ServerListExplorer_${{ env.VERSION }}_x64.msi
-            app/out/ServerListExplorer_${{ env.VERSION }}-minified_x64-setup.exe
-            app/out/ServerListExplorer_${{ env.VERSION }}_x64-setup.exe
-            app/out/ServerListExplorer_${{ env.VERSION }}-minified_windows-x64-portable.zip
-            app/out/ServerListExplorer_${{ env.VERSION }}_windows-x64-portable.zip
+          distribution: jetbrains
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v5
+        with:
+          gradle-version: wrapper
+
+      - name: Build Windows x64 assets
+        shell: powershell
+        run: |
+          .\gradlew.bat app:createDistributable
+          .\gradlew.bat app:packageMsi
+          .\gradlew.bat app:packageExe
+          .\gradlew.bat app:createReleaseDistributable
+          .\gradlew.bat app:packageReleaseMsi
+          .\gradlew.bat app:packageReleaseExe
+
+      - name: Upload Windows x64 assets
+        uses: softprops/action-gh-release@v2.4.2
+        with:
+          tag_name: ${{ env.TAG }}
+          files: |
+            app/build/**/ServerListExplorer-*.msi
+            app/build/**/ServerListExplorer-*.exe
+            app/build/**/windows-x64-portable.zip
+
+  release-windows-arm64:
+    name: Windows ARM64
+    needs: release-windows-x64
+    runs-on: windows-11-arm
+    env:
+      VERSION: ${{ needs.build-jars.outputs.version }}
+      APP_VERSION: ${{ needs.build-jars.outputs.version }}
+      TAG: ${{ needs.build-jars.outputs.tag }}
+
+      WIN_ARCH: arm64
+      ONLY_WINDOWS_ARM64: true
+      ONLY_WINDOWS_X64: false
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: jetbrains
+          java-version: 21
+          architecture: aarch64
+
+      - uses: gradle/actions/setup-gradle@v5
+        with:
+          gradle-version: wrapper
+
+      - name: Build Windows ARM64 assets
+        shell: powershell
+        run: |
+          .\gradlew.bat app:createDistributable
+          .\gradlew.bat app:packageMsi
+          .\gradlew.bat app:packageExe
+          .\gradlew.bat app:createReleaseDistributable
+          .\gradlew.bat app:packageReleaseMsi
+          .\gradlew.bat app:packageReleaseExe
+
+      - name: Upload Windows ARM64 assets
+        uses: softprops/action-gh-release@v2.4.2
+        with:
+          tag_name: ${{ env.TAG }}
+          files: |
+            app/build/**/ServerListExplorer-*.msi
+            app/build/**/ServerListExplorer-*.exe
+            app/build/**/windows-arm64-portable.zip

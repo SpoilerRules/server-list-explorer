@@ -37,21 +37,22 @@ dependencies {
     implementation(compose.runtime)
 
     val onlyWindowsX64: Boolean by rootProject.extra
+    val onlyWindowsArm64: Boolean by rootProject.extra
     val targetRuntimes =
-        if (onlyWindowsX64) {
-            listOf(
-                compose.desktop.windows_x64,
-            )
-        } else {
-            listOf(
-                compose.desktop.windows_x64,
-                compose.desktop.windows_arm64,
-                compose.desktop.linux_x64,
-                compose.desktop.linux_arm64,
-                compose.desktop.macos_x64,
-                compose.desktop.macos_arm64,
-            )
+        when {
+            onlyWindowsX64 -> listOf(compose.desktop.windows_x64)
+            onlyWindowsArm64 -> listOf(compose.desktop.windows_arm64)
+            else ->
+                listOf(
+                    compose.desktop.windows_x64,
+                    compose.desktop.windows_arm64,
+                    compose.desktop.linux_x64,
+                    compose.desktop.linux_arm64,
+                    compose.desktop.macos_x64,
+                    compose.desktop.macos_arm64,
+                )
         }
+
     targetRuntimes.forEach { runtimeOnly(it) }
 }
 

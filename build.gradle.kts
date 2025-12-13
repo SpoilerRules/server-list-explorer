@@ -60,6 +60,38 @@ val appDistributionProvider: Provider<String> =
             },
         )
 
+val windowsPackagingTasks =
+    setOf(
+        "packageMsi",
+        "packageExe",
+        "createDistributable",
+        "packageReleaseMsi",
+        "packageReleaseExe",
+        "createReleaseDistributable",
+    )
+
+fun isPackagingBuild(): Boolean {
+    val requestedTasks = gradle.startParameter.taskNames.flatMap { it.split(":") }
+    return requestedTasks.any { it in windowsPackagingTasks }
+}
+
+fun isArm64Arch(): Boolean {
+    val arch = System.getProperty("os.arch").lowercase()
+    return arch.contains("aarch64") || arch.contains("arm64")
+}
+
+val onlyWindowsArm64Provider: Provider<Boolean> =
+    providers
+        .environmentVariable("ONLY_WINDOWS_ARM64")
+        .map { it.toBoolean() }
+        .orElse(providers.gradleProperty("onlyWindowsArm64").map { it.toBoolean() })
+        .orElse(
+            provider {
+                val isWindows = System.getProperty("os.name").contains("win", ignoreCase = true)
+                isWindows && isPackagingBuild() && isArm64Arch()
+            },
+        )
+
 val onlyWindowsX64Provider: Provider<Boolean> =
     providers
         .environmentVariable("ONLY_WINDOWS_X64")
@@ -67,28 +99,20 @@ val onlyWindowsX64Provider: Provider<Boolean> =
         .orElse(providers.gradleProperty("onlyWindowsX64").map { it.toBoolean() })
         .orElse(
             provider {
-                val requestedTasks = gradle.startParameter.taskNames.flatMap { it.split(":") }
-                requestedTasks.any { task ->
-                    task in
-                        listOf(
-                            "packageMsi",
-                            "packageExe",
-                            "createDistributable",
-                            "packageReleaseMsi",
-                            "packageReleaseExe",
-                            "createReleaseDistributable",
-                        )
-                }
+                val isWindows = System.getProperty("os.name").contains("win", ignoreCase = true)
+                isWindows && isPackagingBuild() && !isArm64Arch()
             },
         )
 
-val appVersion = appVersionProvider.get()
-val appDistribution = appDistributionProvider.get()
-val onlyWindowsX64 = onlyWindowsX64Provider.get()
+val onlyWindowsArm64: Boolean = onlyWindowsArm64Provider.get()
+val onlyWindowsX64: Boolean = onlyWindowsX64Provider.get() && !onlyWindowsArm64
+val appVersion: String = appVersionProvider.get()
+val appDistribution: String = appDistributionProvider.get()
 
 extra["appVersion"] = appVersion
 extra["appDistribution"] = appDistribution
 extra["onlyWindowsX64"] = onlyWindowsX64
+extra["onlyWindowsArm64"] = onlyWindowsArm64
 version = appVersion
 
 gradle.taskGraph.whenReady {
