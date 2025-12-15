@@ -123,14 +123,22 @@ internal fun FlexibleSettingTile(
     colors: ListItemColors = ListItemDefaults.colors(),
 ) = if (trailingContent == null) {
     ListItem(
-        headlineContent = { Text(text = title) },
+        headlineContent = {
+            SelectionContainer {
+                Text(text = title)
+            }
+        },
         supportingContent = supportingContent,
         modifier = modifier.fillMaxWidth(),
         colors = colors,
     )
 } else {
     ListItem(
-        headlineContent = { Text(text = title) },
+        headlineContent = {
+            SelectionContainer {
+                Text(text = title)
+            }
+        },
         supportingContent = supportingContent,
         trailingContent = trailingContent,
         modifier = modifier.fillMaxWidth(),
