@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.file.kit)
     implementation(libs.composeShimmer)
     implementation(libs.reorderable.jvm)
+    implementation(libs.autolinktext)
 
     // JNA for DWM
     implementation(libs.jna)

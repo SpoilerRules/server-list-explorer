@@ -188,6 +188,7 @@
     <string name="settings_section_preferences">Preferences</string>
     <string name="settings_section_multiplayer">Multiplayer Server List</string>
     <string name="settings_section_window_appearance">Window Appearance &amp; Effects</string>
+    <string name="settings_section_data_privacy">Data and privacy</string>
 
     <!-- Settings: Window Appearance -->
     <string name="setting_window_title_bar_color">Title bar colour</string>
@@ -281,9 +282,17 @@
     <string name="setting_prefs_highlight_delay_note">Only applies when highlighting after scrolling to new entry is enabled.</string>
     <string name="setting_prefs_vsync">VSync</string>
     <string name="setting_prefs_vsync_desc">Limits frame rate to save system resources, but may reduce UI smoothness.</string>
-    <string name="setting_prefs_vsync_note">Changes will apply after you restart the app.</string>
+    <string name="setting_note_restart_required">Changes will apply after you restart the app.</string>
     <string name="setting_prefs_fps_overlay">Show FPS Overlay</string>
     <string name="setting_prefs_fps_overlay_desc">Displays the current frames per second to help with debugging and benchmarking.</string>
     <string name="setting_prefs_window_title_build_info">Show build info in window title</string>
     <string name="setting_prefs_window_title_build_info_desc">Append the current app version and distribution to the window title.</string>
+
+    <!-- Settings: Data & Privacy -->
+    <string name="setting_privacy_share_usage_data">Share usage data</string>
+    <string name="setting_privacy_share_usage_data_desc">Help improve Server List Explorer by sharing anonymous diagnostics. Learn how your data is used in the [Privacy Policy](%1$s).</string>
+    <string name="setting_privacy_disable_error_reporting_title">Share usage data</string>
+    <string name="setting_privacy_disable_error_reporting_desc">Help improve Server List Explorer by sharing anonymous diagnostic data.\n\n• Includes limited technical and usage information\n• Does not intentionally collect personal data\n• Used only to improve stability and performance\n\nLearn more in our [Privacy Policy](%1$s).</string>
+    <string name="setting_privacy_disable_error_reporting_turn_off">Turn off</string>
+    <string name="setting_privacy_disable_error_reporting_keep_on">Keep on</string>
 </resources>

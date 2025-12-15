@@ -22,11 +22,25 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.core.config.Configurator
 
+private const val NO_TELEMETRY_ARG = "--no-telemetry"
+private const val VERBOSE_ARG = "--verbose"
+
+internal data class ParsedArgs(
+    val telemetryEnabled: Boolean,
+    val verboseLoggingEnabled: Boolean,
+)
+
 internal object ArgsParser {
-    fun parse(args: Array<String>) {
-        if ("--verbose" in args) {
+    fun parse(args: Array<String>): ParsedArgs {
+        val verboseLoggingEnabled = VERBOSE_ARG in args
+        if (verboseLoggingEnabled) {
             enableVerboseLogging()
         }
+
+        return ParsedArgs(
+            telemetryEnabled = NO_TELEMETRY_ARG !in args,
+            verboseLoggingEnabled = verboseLoggingEnabled,
+        )
     }
 
     private fun enableVerboseLogging() {
