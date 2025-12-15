@@ -27,6 +27,7 @@ import com.spoiligaming.explorer.ui.widgets.ItemLanguagePickerDropdownMenu
 import com.spoiligaming.explorer.ui.widgets.ItemSwitch
 import com.spoiligaming.explorer.ui.widgets.ItemValueSlider
 import server_list_explorer.ui.generated.resources.Res
+import server_list_explorer.ui.generated.resources.setting_note_restart_required
 import server_list_explorer.ui.generated.resources.setting_prefs_fps_overlay
 import server_list_explorer.ui.generated.resources.setting_prefs_fps_overlay_desc
 import server_list_explorer.ui.generated.resources.setting_prefs_highlight_after_scroll
@@ -50,7 +51,6 @@ import server_list_explorer.ui.generated.resources.setting_prefs_undo_redo_inter
 import server_list_explorer.ui.generated.resources.setting_prefs_undo_redo_note
 import server_list_explorer.ui.generated.resources.setting_prefs_vsync
 import server_list_explorer.ui.generated.resources.setting_prefs_vsync_desc
-import server_list_explorer.ui.generated.resources.setting_prefs_vsync_note
 import server_list_explorer.ui.generated.resources.setting_prefs_window_title_build_info
 import server_list_explorer.ui.generated.resources.setting_prefs_window_title_build_info_desc
 import server_list_explorer.ui.generated.resources.settings_section_preferences
@@ -181,7 +181,7 @@ internal fun PreferenceSettings() {
                     ItemSwitch(
                         title = t(Res.string.setting_prefs_vsync),
                         description = t(Res.string.setting_prefs_vsync_desc),
-                        note = t(Res.string.setting_prefs_vsync_note),
+                        note = t(Res.string.setting_note_restart_required),
                         isChecked = prefs.vsync,
                         onCheckedChange = { newValue ->
                             preferenceSettingsManager.updateSettings {

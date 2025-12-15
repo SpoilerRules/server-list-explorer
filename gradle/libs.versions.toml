@@ -17,6 +17,7 @@ fileKit = "0.12.0"
 materialKolor = "4.0.5"
 navigation-compose = "2.9.1"
 reorderable = "3.0.0"
+autolinktext = "2.0.2"
 shimmer = "1.3.3"
 
 # Networking
@@ -31,6 +32,9 @@ jna = "5.18.1"
 oshi = "6.9.1"
 themeDetector = "3.9.1"
 
+# Telemetry
+sentry-gradle = "5.12.2"
+
 # Minecraft
 nbt = "6.1"
 mcUtils = "1.7.2"
@@ -43,6 +47,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-coroutines-core-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "coroutines" }
 
 # UI & Compose ecosystem
+autolinktext = { module = "sh.calvin.autolinktext:autolinktext", version.ref = "autolinktext" }
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
 composeShimmer = { module = "com.valentinilk.shimmer:compose-shimmer", version.ref = "shimmer" }
 materialKolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
@@ -81,3 +86,6 @@ compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+
+# Telemetry
+sentry = { id = "io.sentry.jvm.gradle", version.ref = "sentry-gradle" }

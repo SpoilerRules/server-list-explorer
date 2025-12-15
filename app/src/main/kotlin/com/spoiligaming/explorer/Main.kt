@@ -18,6 +18,8 @@
 
 package com.spoiligaming.explorer
 
+import com.spoiligaming.explorer.build.BuildConfig
+import com.spoiligaming.explorer.telemetry.SentryReporter
 import com.spoiligaming.explorer.ui.launchInterface
 
 fun main(args: Array<String>) {
@@ -25,7 +27,13 @@ fun main(args: Array<String>) {
     System.setProperty("log4j2.configurationFile", "log4j2-$env.xml")
     System.setProperty("app.logs.dir", LogStorage.logsDir.absolutePath)
 
-    ArgsParser.parse(args)
+    val parsedArgs = ArgsParser.parse(args)
+    if (parsedArgs.telemetryEnabled) {
+        SentryReporter.init(
+            environment = env,
+            releaseVersion = BuildConfig.VERSION,
+        )
+    }
 
     launchInterface()
 }

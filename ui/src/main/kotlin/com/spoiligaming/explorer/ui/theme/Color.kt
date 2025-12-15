@@ -18,7 +18,6 @@
 
 package com.spoiligaming.explorer.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -26,7 +25,15 @@ import androidx.compose.ui.graphics.Color
 internal val SecureChatLight = Color(0xFF1565C0) // blue 800
 internal val SecureChatDark = Color(0xFF64B5F6) // blue 300
 
+internal val LinkLight = Color(0xFF2F6FEB)
+internal val LinkDark = Color(0xFF6EA8FE)
+
 @Suppress("UnusedReceiverParameter")
 internal val ColorScheme.secureChatTint
     @Composable
-    get() = if (isSystemInDarkTheme()) SecureChatDark else SecureChatLight
+    get() = if (LocalDarkTheme.current) SecureChatDark else SecureChatLight
+
+@Suppress("UnusedReceiverParameter")
+internal val ColorScheme.linkTint
+    @Composable
+    get() = if (LocalDarkTheme.current) LinkDark else LinkLight

@@ -16,25 +16,13 @@
  * along with Server List Explorer.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-plugins {
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.sentry)
-}
+package com.spoiligaming.explorer.settings.model
 
-dependencies {
-    implementation(project(":settings"))
-    implementation(project(":nbt"))
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-    implementation(libs.kotlinx.coroutines.core.jvm)
-    implementation(libs.kotlinx.serialization.json)
-
-    implementation(libs.mcUtils)
-
-    implementation(libs.ktor.client.core.jvm)
-    implementation(libs.ktor.client.cio.jvm)
-    testImplementation(libs.ktor.client.core.jvm)
-    testImplementation(libs.ktor.client.cio.jvm)
-    testImplementation(libs.ktor.client.mock.jvm)
-
-    implementation(libs.oshi.core)
-}
+@Serializable
+data class PrivacySettings(
+    @SerialName("usage_data_enabled")
+    val usageDataEnabled: Boolean = true,
+)
