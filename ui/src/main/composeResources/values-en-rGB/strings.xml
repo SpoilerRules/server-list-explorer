@@ -292,7 +292,7 @@
     <string name="setting_privacy_share_usage_data">Share usage data</string>
     <string name="setting_privacy_share_usage_data_desc">Help improve Server List Explorer by sharing anonymous diagnostics. Learn how your data is used in the [Privacy Policy](%1$s).</string>
     <string name="setting_privacy_disable_error_reporting_title">Share usage data</string>
-    <string name="setting_privacy_disable_error_reporting_desc">Help improve Server List Explorer by sharing anonymous diagnostic data.\n\n• Includes limited technical and usage information\n• Does not intentionally collect personal data\n• Used only to improve stability and performance\n\nLearn more in our [Privacy Policy](%1$s).</string>
+    <string name="setting_privacy_disable_error_reporting_desc">Help improve Server List Explorer by sharing anonymous diagnostic data\n\n• Includes limited technical and usage information\n• Does not intentionally collect personal data\n• Used only to improve stability and performance\n\nLearn more in our [Privacy Policy](%1$s)</string>
     <string name="setting_privacy_disable_error_reporting_turn_off">Turn off</string>
     <string name="setting_privacy_disable_error_reporting_keep_on">Keep on</string>
 </resources>
