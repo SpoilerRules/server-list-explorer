@@ -1,7 +1,7 @@
 [versions]
 # Core toolchain
-kotlin = "2.2.21"
-compose = "1.9.3"
+kotlin = "2.3.0"
+compose = "1.9."
 coroutines = "1.10.2"
 serialization = "1.9.0"
 
@@ -25,7 +25,7 @@ ktor = "3.3.3"
 
 # Logging
 kotlin-logging = "7.0.13"
-log4j = "2.25.2"
+log4j = "2.25.3"
 
 # System / native
 jna = "5.18.1"
