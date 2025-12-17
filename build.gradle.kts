@@ -134,7 +134,7 @@ sentry {
     authToken = System.getenv("SENTRY_AUTH_TOKEN")
 
     autoInstallation {
-        enabled = true
+        enabled = false
     }
 }
 
