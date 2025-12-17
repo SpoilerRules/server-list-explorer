@@ -62,7 +62,7 @@ data class ThemeSettings(
     val amoledMode: Boolean = false,
 ) {
     companion object {
-        const val DEFAULT_SEED_COLOR = "#4B4376"
+        const val DEFAULT_SEED_COLOR = "#8D15FFED"
         const val DEFAULT_CONTRAST_LEVEL = 0.0
     }
 }
