@@ -22,7 +22,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class McSrvStatServerStatusResponse(
+internal data class McSrvStatServerStatusResponse(
     val ip: String,
     val port: Long,
     val debug: DebugInfo,
@@ -35,6 +35,7 @@ data class McSrvStatServerStatusResponse(
     val hostname: String,
     @SerialName("icon")
     val rawIcon: String,
+    val software: String? = null,
     val info: Info? = null,
     @SerialName("eula_blocked")
     val eulaBlocked: Boolean,
@@ -44,7 +45,7 @@ data class McSrvStatServerStatusResponse(
 }
 
 @Serializable
-data class DebugInfo(
+internal data class DebugInfo(
     val ping: Boolean,
     val query: Boolean,
     val bedrock: Boolean,
@@ -57,12 +58,12 @@ data class DebugInfo(
     val cachetime: Long,
     val cacheexpire: Long,
     val apiversion: Long,
-    val dns: DnsInfo,
+    val dns: DnsInfo? = null,
     val error: QueryError? = null,
 )
 
 @Serializable
-data class DnsInfo(
+internal data class DnsInfo(
     @SerialName("srv")
     val srv: List<DnsRecord> = emptyList(),
     @SerialName("srv_a")
@@ -70,14 +71,14 @@ data class DnsInfo(
 )
 
 @Serializable
-data class DnsRecord(
-    val name: String,
-    val type: String,
+internal data class DnsRecord(
+    val name: String? = null,
+    val type: String? = null,
     @SerialName("class")
-    val recordClass: String,
-    val ttl: Long,
-    val rdlength: Long,
-    val rdata: String,
+    val recordClass: String? = null,
+    val ttl: Long? = null,
+    val rdlength: Long? = null,
+    val rdata: String? = null,
     val priority: Long? = null,
     val weight: Long? = null,
     val port: Long? = null,
@@ -96,31 +97,31 @@ data class DnsRecord(
 )
 
 @Serializable
-data class QueryError(
+internal data class QueryError(
     val query: String,
 )
 
 @Serializable
-data class Motd(
+internal data class Motd(
     val raw: List<String> = emptyList(),
     val clean: List<String> = emptyList(),
     val html: List<String> = emptyList(),
 )
 
 @Serializable
-data class Players(
+internal data class Players(
     val online: Long,
     val max: Long,
 )
 
 @Serializable
-data class Protocol(
+internal data class Protocol(
     val version: Long,
     val name: String? = null,
 )
 
 @Serializable
-data class Info(
+internal data class Info(
     val raw: List<String> = emptyList(),
     val clean: List<String> = emptyList(),
     val html: List<String> = emptyList(),

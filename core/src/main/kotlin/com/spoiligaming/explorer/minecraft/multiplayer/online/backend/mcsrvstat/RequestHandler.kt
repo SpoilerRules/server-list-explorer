@@ -23,6 +23,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.headers
 
 private val logger = KotlinLogging.logger {}
 
@@ -47,7 +48,16 @@ internal class RequestHandler(
         logger.debug { "Requesting server status at $url" }
 
         return runCatching {
-            val response = client.get(url)
+            val response =
+                client.get(url) {
+                    headers {
+                        append(
+                            "User-Agent",
+                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+                        )
+                        append("Accept", "application/json")
+                    }
+                }
 
             when (response.status) {
                 HttpStatusCode.TooManyRequests -> throw RateLimitException()
