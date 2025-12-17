@@ -136,6 +136,7 @@ import com.spoiligaming.explorer.multiplayer.repository.ServerListRepository
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalAmoledActive
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalMultiplayerSettings
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
+import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalServerQueryMethodConfigurations
 import com.spoiligaming.explorer.ui.dialog.FloatingDialogBuilder
 import com.spoiligaming.explorer.ui.extensions.safeAsImageBitmapOrNull
 import com.spoiligaming.explorer.ui.extensions.stopClickPropagation
@@ -232,18 +233,17 @@ internal fun ServerEntry(
     val amoledOn = LocalAmoledActive.current
     val mpSettings = LocalMultiplayerSettings.current
     val queryMode = mpSettings.serverQueryMethod
+    val queryConfigs = LocalServerQueryMethodConfigurations.current
     val serverFlow =
         remember(
             data.ip,
             queryMode,
-            mpSettings.connectTimeoutMillis,
-            mpSettings.socketTimeoutMillis,
+            queryConfigs,
         ) {
             ServerEntryController.getServerDataFlow(
                 address = data.ip,
                 queryMode = queryMode,
-                connectTimeoutMillis = mpSettings.connectTimeoutMillis,
-                socketTimeoutMillis = mpSettings.socketTimeoutMillis,
+                configurations = queryConfigs,
             )
         }
     val result by serverFlow.collectAsState(initial = serverFlow.value)

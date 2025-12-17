@@ -24,6 +24,7 @@ import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.Onl
 import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.mcsrvstat.McSrvStatServerQueryHandler
 import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.mcutils.McUtilsServerQueryHandler
 import com.spoiligaming.explorer.settings.model.ServerQueryMethod
+import com.spoiligaming.explorer.settings.model.ServerQueryMethodConfigurations
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -34,8 +35,7 @@ import kotlinx.coroutines.flow.flow
 class OnlineServerDataFacade(
     private val serverAddress: String,
     private val queryMode: ServerQueryMethod,
-    private val connectTimeoutMillis: Long,
-    private val socketTimeoutMillis: Long,
+    private val configurations: ServerQueryMethodConfigurations,
 ) {
     fun serverDataFlow() =
         flow {
@@ -77,34 +77,39 @@ class OnlineServerDataFacade(
 
     private fun buildQueryHandler(method: ServerQueryMethod) =
         when (method) {
-            ServerQueryMethod.McSrvStat ->
+            ServerQueryMethod.McSrvStat -> {
+                val timeouts = configurations.mcSrvStat.timeouts
                 McSrvStatServerQueryHandler(
                     serverAddress = serverAddress,
                     client =
                         HttpClient(CIO) {
                             install(HttpTimeout) {
-                                connectTimeoutMillis = this@OnlineServerDataFacade.connectTimeoutMillis
+                                connectTimeoutMillis = timeouts.connectionTimeoutMillis
                                 requestTimeoutMillis =
-                                    this@OnlineServerDataFacade.connectTimeoutMillis + REQUEST_TIMEOUT_BUFFER_MILLIS
-                                socketTimeoutMillis = this@OnlineServerDataFacade.socketTimeoutMillis
+                                    timeouts.connectionTimeoutMillis + REQUEST_TIMEOUT_BUFFER_MILLIS
+                                socketTimeoutMillis = timeouts.responseTimeoutMillis
                             }
                             engine {
                                 endpoint {
-                                    connectTimeout = connectTimeoutMillis
-                                    keepAliveTime = (connectTimeoutMillis + REQUEST_TIMEOUT_BUFFER_MILLIS) * 2
+                                    connectTimeout = timeouts.connectionTimeoutMillis
+                                    keepAliveTime =
+                                        (timeouts.connectionTimeoutMillis + REQUEST_TIMEOUT_BUFFER_MILLIS) * 2
                                 }
                             }
                         },
                 )
+            }
 
-            ServerQueryMethod.McUtils ->
+            ServerQueryMethod.McUtils -> {
+                val timeoutMillis = configurations.mcUtils.timeouts.timeoutMillis
                 McUtilsServerQueryHandler(
                     serverAddress = serverAddress,
-                    connectionTimeoutMillis = connectTimeoutMillis.toInt(),
-                    socketTimeoutMillis = socketTimeoutMillis.toInt(),
+                    enableSrv = configurations.mcUtils.options.enableSrvLookups,
+                    timeoutMillis = timeoutMillis,
                     socketAttempts = DEFAULT_SOCKET_ATTEMPTS,
                     eofAttempts = DEFAULT_EOF_ATTEMPTS,
                 )
+            }
         }
 
     companion object {

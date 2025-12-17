@@ -30,6 +30,7 @@ import com.spoiligaming.explorer.multiplayer.history.MoveServerChange
 import com.spoiligaming.explorer.multiplayer.history.ServerListHistoryService
 import com.spoiligaming.explorer.multiplayer.repository.ServerListRepository
 import com.spoiligaming.explorer.settings.model.ServerQueryMethod
+import com.spoiligaming.explorer.settings.model.ServerQueryMethodConfigurations
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
@@ -121,31 +122,27 @@ internal class ServerListController(
     fun refreshSingle(
         address: String,
         queryMode: ServerQueryMethod,
-        connectTimeoutMillis: Long,
-        socketTimeoutMillis: Long,
+        configurations: ServerQueryMethodConfigurations,
     ) = ServerEntryController.refresh(
         address = address,
         queryMode = queryMode,
-        connectTimeoutMillis = connectTimeoutMillis,
-        socketTimeoutMillis = socketTimeoutMillis,
+        configurations = configurations,
     )
 
     fun refreshSelected(
         queryMode: ServerQueryMethod,
-        connectTimeoutMillis: Long,
-        socketTimeoutMillis: Long,
+        configurations: ServerQueryMethodConfigurations,
     ) = entries.value
         .filter { it.id in selection.selectedIds.value }
         .forEach { server ->
-            refreshSingle(server.ip, queryMode, connectTimeoutMillis, socketTimeoutMillis)
+            refreshSingle(server.ip, queryMode, configurations)
         }
 
     fun refreshAll(
         queryMode: ServerQueryMethod,
-        connectTimeoutMillis: Long,
-        socketTimeoutMillis: Long,
+        configurations: ServerQueryMethodConfigurations,
     ) = entries.value.forEach { server ->
-        refreshSingle(server.ip, queryMode, connectTimeoutMillis, socketTimeoutMillis)
+        refreshSingle(server.ip, queryMode, configurations)
     }
 
     fun move(

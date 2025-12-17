@@ -21,6 +21,7 @@ package com.spoiligaming.explorer.settings.manager
 import com.spoiligaming.explorer.settings.model.MultiplayerSettings
 import com.spoiligaming.explorer.settings.model.Preferences
 import com.spoiligaming.explorer.settings.model.PrivacySettings
+import com.spoiligaming.explorer.settings.model.ServerQueryMethodConfigurations
 import com.spoiligaming.explorer.settings.model.SingleplayerSettings
 import com.spoiligaming.explorer.settings.model.ThemeSettings
 import com.spoiligaming.explorer.settings.model.WindowAppearance
@@ -64,6 +65,11 @@ val themeSettingsManager by UniversalSettingsManager<ThemeSettings>(
 val multiplayerSettingsManager by UniversalSettingsManager<MultiplayerSettings>(
     fileName = "multiplayer.json",
     defaultValueProvider = { MultiplayerSettings() },
+)
+
+val serverQueryMethodConfigurationsManager by UniversalSettingsManager<ServerQueryMethodConfigurations>(
+    fileName = "server_query_method_configs.json",
+    defaultValueProvider = { ServerQueryMethodConfigurations() },
 )
 
 val singleplayerSettingsManager by UniversalSettingsManager<SingleplayerSettings>(

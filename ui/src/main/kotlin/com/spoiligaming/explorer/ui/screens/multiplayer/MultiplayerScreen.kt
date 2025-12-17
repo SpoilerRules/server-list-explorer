@@ -105,11 +105,10 @@ import com.spoiligaming.explorer.multiplayer.history.ServerListHistoryService
 import com.spoiligaming.explorer.multiplayer.history.applyRedo
 import com.spoiligaming.explorer.multiplayer.history.applyUndo
 import com.spoiligaming.explorer.multiplayer.repository.ServerListRepository
-import com.spoiligaming.explorer.settings.manager.multiplayerSettingsManager
 import com.spoiligaming.explorer.settings.model.ActionBarOrientation
-import com.spoiligaming.explorer.settings.model.ServerQueryMethod
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalMultiplayerSettings
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
+import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalServerQueryMethodConfigurations
 import com.spoiligaming.explorer.ui.dialog.ExpressiveDialog
 import com.spoiligaming.explorer.ui.dialog.onClick
 import com.spoiligaming.explorer.ui.dialog.prominent
@@ -139,11 +138,6 @@ import server_list_explorer.ui.generated.resources.dialog_support_text_external_
 import server_list_explorer.ui.generated.resources.dialog_title_external_change
 import server_list_explorer.ui.generated.resources.no_search_matches_message
 import server_list_explorer.ui.generated.resources.no_search_results_for
-import server_list_explorer.ui.generated.resources.query_method_mc_srv_stat
-import server_list_explorer.ui.generated.resources.query_method_mc_utils
-import server_list_explorer.ui.generated.resources.query_method_save_and_refresh_all_entries
-import server_list_explorer.ui.generated.resources.query_method_support_text
-import server_list_explorer.ui.generated.resources.query_method_title
 import server_list_explorer.ui.generated.resources.quick_action_delete_all
 import server_list_explorer.ui.generated.resources.quick_action_sort
 import server_list_explorer.ui.generated.resources.sort_dialog_support_text_mc_utils
@@ -178,6 +172,7 @@ internal fun MultiplayerScreen(
 ) {
     val mpSettings = LocalMultiplayerSettings.current
     val prefs = LocalPrefs.current
+    val queryConfigs = LocalServerQueryMethodConfigurations.current
 
     val scope = rememberCoroutineScope()
     var showConflictDialog by remember { mutableStateOf(false) }
@@ -458,14 +453,12 @@ internal fun MultiplayerScreen(
         if (onlySelected) {
             controller.refreshSelected(
                 queryMode = mpSettings.serverQueryMethod,
-                connectTimeoutMillis = mpSettings.connectTimeoutMillis,
-                socketTimeoutMillis = mpSettings.socketTimeoutMillis,
+                configurations = queryConfigs,
             )
         } else {
             controller.refreshAll(
                 queryMode = mpSettings.serverQueryMethod,
-                connectTimeoutMillis = mpSettings.connectTimeoutMillis,
-                socketTimeoutMillis = mpSettings.socketTimeoutMillis,
+                configurations = queryConfigs,
             )
         }
     }
@@ -582,72 +575,17 @@ internal fun MultiplayerScreen(
         }
     }
 
-    if (showQueryMethodDialog) {
-        val queryMethodTitleText = t(Res.string.query_method_title)
-        val queryMethodSupportText = t(Res.string.query_method_support_text)
-        val queryMethodMcSrvStatText = t(Res.string.query_method_mc_srv_stat)
-        val queryMethodMcUtilsText = t(Res.string.query_method_mc_utils)
-        val queryMethodSaveAndRefreshAllEntriesText = t(Res.string.query_method_save_and_refresh_all_entries)
-        val dialogCancelButtonText = t(Res.string.dialog_cancel_button)
-
-        var pendingQueryMethod by remember(mpSettings.serverQueryMethod) {
-            mutableStateOf(mpSettings.serverQueryMethod)
-        }
-
-        ExpressiveDialog(
-            onDismissRequest = { showQueryMethodDialog = false },
-        ) {
-            title(queryMethodTitleText)
-            supportText(queryMethodSupportText)
-            body {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        RadioButton(
-                            selected = pendingQueryMethod == ServerQueryMethod.McSrvStat,
-                            onClick = { pendingQueryMethod = ServerQueryMethod.McSrvStat },
-                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                        )
-                        Text(queryMethodMcSrvStatText)
-                    }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        RadioButton(
-                            selected = pendingQueryMethod == ServerQueryMethod.McUtils,
-                            onClick = { pendingQueryMethod = ServerQueryMethod.McUtils },
-                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                        )
-                        Text(queryMethodMcUtilsText)
-                    }
-                }
-            }
-            accept(
-                queryMethodSaveAndRefreshAllEntriesText.prominent onClick {
-                    multiplayerSettingsManager.updateSettings {
-                        it.copy(serverQueryMethod = pendingQueryMethod)
-                    }
-
-                    controller.refreshAll(
-                        queryMode = pendingQueryMethod,
-                        connectTimeoutMillis = mpSettings.connectTimeoutMillis,
-                        socketTimeoutMillis = mpSettings.socketTimeoutMillis,
-                    )
-
-                    showQueryMethodDialog = false
-                },
+    ServerQueryMethodDialog(
+        visible = showQueryMethodDialog,
+        currentQueryMethod = mpSettings.serverQueryMethod,
+        onSaveAndRefresh = { queryMethod ->
+            controller.refreshAll(
+                queryMode = queryMethod,
+                configurations = queryConfigs,
             )
-            cancel(
-                dialogCancelButtonText onClick {
-                    showQueryMethodDialog = false
-                },
-            )
-            modifier = Modifier.width(IntrinsicSize.Max)
-        }
-    }
+        },
+        onDismissRequest = { showQueryMethodDialog = false },
+    )
 
     val shakeIntensity =
         mpSettings.dragShakeIntensityDegrees.toFloat()
@@ -902,8 +840,7 @@ internal fun MultiplayerScreen(
                                         isSelectionMod && e.key == Key.R -> {
                                             controller.refreshSelected(
                                                 queryMode = mpSettings.serverQueryMethod,
-                                                connectTimeoutMillis = mpSettings.connectTimeoutMillis,
-                                                socketTimeoutMillis = mpSettings.socketTimeoutMillis,
+                                                configurations = queryConfigs,
                                             )
                                             true
                                         }
@@ -1035,8 +972,7 @@ internal fun MultiplayerScreen(
                                                 controller.refreshSingle(
                                                     serverEntry.ip,
                                                     queryMode = mpSettings.serverQueryMethod,
-                                                    connectTimeoutMillis = mpSettings.connectTimeoutMillis,
-                                                    socketTimeoutMillis = mpSettings.socketTimeoutMillis,
+                                                    configurations = queryConfigs,
                                                 )
                                             },
                                             onDelete = { controller.deleteSingle(serverEntry) },
