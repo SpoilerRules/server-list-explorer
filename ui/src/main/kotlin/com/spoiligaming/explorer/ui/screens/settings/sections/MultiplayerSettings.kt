@@ -44,14 +44,10 @@ import server_list_explorer.ui.generated.resources.action_bar_orientation_right
 import server_list_explorer.ui.generated.resources.action_bar_orientation_top
 import server_list_explorer.ui.generated.resources.setting_mp_action_bar_orientation
 import server_list_explorer.ui.generated.resources.setting_mp_action_bar_orientation_desc
-import server_list_explorer.ui.generated.resources.setting_mp_connection_timeout
-import server_list_explorer.ui.generated.resources.setting_mp_connection_timeout_desc
 import server_list_explorer.ui.generated.resources.setting_mp_drag_shake_intensity
 import server_list_explorer.ui.generated.resources.setting_mp_drag_shake_intensity_desc
 import server_list_explorer.ui.generated.resources.setting_mp_entry_scale
 import server_list_explorer.ui.generated.resources.setting_mp_entry_scale_desc
-import server_list_explorer.ui.generated.resources.setting_mp_socket_timeout
-import server_list_explorer.ui.generated.resources.setting_mp_socket_timeout_desc
 import server_list_explorer.ui.generated.resources.settings_section_multiplayer
 
 @Composable
@@ -106,32 +102,6 @@ internal fun MultiplayerSettings() {
                         onValueChange = { newValue ->
                             multiplayerSettingsManager.updateSettings {
                                 it.copy(dragShakeIntensityDegrees = newValue)
-                            }
-                        },
-                    )
-                }
-                add {
-                    ItemValueSlider(
-                        title = t(Res.string.setting_mp_connection_timeout),
-                        description = t(Res.string.setting_mp_connection_timeout_desc),
-                        value = mpSettings.connectTimeoutMillis / 1000L,
-                        valueRange = 1f..600f,
-                        onValueChange = { newValueInSeconds ->
-                            multiplayerSettingsManager.updateSettings {
-                                it.copy(connectTimeoutMillis = newValueInSeconds * 1000)
-                            }
-                        },
-                    )
-                }
-                add {
-                    ItemValueSlider(
-                        title = t(Res.string.setting_mp_socket_timeout),
-                        description = t(Res.string.setting_mp_socket_timeout_desc),
-                        value = mpSettings.socketTimeoutMillis / 1000L,
-                        valueRange = 1f..60f,
-                        onValueChange = { newValueInSeconds ->
-                            multiplayerSettingsManager.updateSettings {
-                                it.copy(socketTimeoutMillis = newValueInSeconds * 1000)
                             }
                         },
                     )

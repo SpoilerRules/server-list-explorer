@@ -60,9 +60,5 @@ data class MultiplayerSettings(
     val dragShakeIntensityDegrees: Int = 1,
     @SerialName("action_bar_orientation")
     val actionBarOrientation: ActionBarOrientation = ActionBarOrientation.Right,
-    @SerialName("connect_timeout_ms")
-    val connectTimeoutMillis: Long = 120000,
-    @SerialName("socket_timeout_ms")
-    val socketTimeoutMillis: Long = 15000,
     // TODO: auto refresh icons on load/reload
 )

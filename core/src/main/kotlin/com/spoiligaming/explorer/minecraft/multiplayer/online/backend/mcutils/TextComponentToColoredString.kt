@@ -18,8 +18,8 @@
 
 package com.spoiligaming.explorer.minecraft.multiplayer.online.backend.mcutils
 
-import tech.aliorpse.mcutils.model.server.status.TextComponent
-import tech.aliorpse.mcutils.model.server.status.TextStyle
+import tech.aliorpse.mcutils.entity.TextComponent
+import tech.aliorpse.mcutils.entity.TextStyle
 
 internal fun TextComponent.toSectionString(): String {
     fun estimate(node: TextComponent): Int = node.text.length + node.extra.sumOf { estimate(it) }
@@ -144,7 +144,6 @@ private object StyleBits {
     }
 }
 
-// mirror of originalColorMap from JavaServer.kt from the MCUtils dependency
 private val originalColorMap =
     mapOf(
         '0' to "#000000",

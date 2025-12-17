@@ -77,7 +77,7 @@ import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.Onl
 import com.spoiligaming.explorer.minecraft.multiplayer.online.backend.common.OnlineServerDataResourceResult
 import com.spoiligaming.explorer.multiplayer.MultiplayerServer
 import com.spoiligaming.explorer.settings.model.ServerQueryMethod
-import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalMultiplayerSettings
+import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalServerQueryMethodConfigurations
 import com.spoiligaming.explorer.ui.extensions.formatMillis
 import com.spoiligaming.explorer.ui.t
 import kotlinx.coroutines.delay
@@ -128,6 +128,7 @@ private data class SortProcessState(
     val sortStatusText: StringResource,
     val sortComputed: Boolean,
     val onSkipPingingRequest: () -> Unit,
+    val timeoutMillis: Long,
 )
 
 private enum class SortWorkUnit { InMemorySort, PersistSortedList }
@@ -139,13 +140,15 @@ private fun rememberSortProcessState(
     onApplySortedList: suspend (List<MultiplayerServer>) -> Unit,
     onExitRequested: () -> Unit,
 ): SortProcessState {
-    val mp = LocalMultiplayerSettings.current
+    val queryConfigs = LocalServerQueryMethodConfigurations.current
+    val mcUtilsTimeouts = queryConfigs.mcUtils.timeouts
+    val mcUtilsOptions = queryConfigs.mcUtils.options
     val scope = rememberCoroutineScope()
 
     var currentStep by remember { mutableStateOf(SortStep.Pinging) }
     var pingProgress by remember { mutableStateOf(0) }
     val pingedData = remember { mutableStateMapOf<Uuid, OnlineServerData>() }
-    var timeRemaining by remember { mutableStateOf(mp.connectTimeoutMillis) }
+    var timeRemaining by remember { mutableStateOf(mcUtilsTimeouts.timeoutMillis) }
     var skipPinging by remember { mutableStateOf(false) }
 
     val sortWorkUnits = remember { listOf(SortWorkUnit.InMemorySort, SortWorkUnit.PersistSortedList) }
@@ -157,9 +160,9 @@ private fun rememberSortProcessState(
     val sortComputed = completedSortUnits >= totalSortUnits
     val sortProgress = if (totalSortUnits == 0) 1f else completedSortUnits.toFloat() / totalSortUnits.toFloat()
 
-    LaunchedEffect(currentStep, mp.connectTimeoutMillis) {
+    LaunchedEffect(currentStep, mcUtilsTimeouts.timeoutMillis) {
         if (currentStep == SortStep.Pinging) {
-            var t = mp.connectTimeoutMillis
+            var t = mcUtilsTimeouts.timeoutMillis
             while (t > 0 && currentStep == SortStep.Pinging) {
                 delay(COUNTDOWN_INTERVAL_MS.toLong())
                 t -= COUNTDOWN_INTERVAL_MS
@@ -168,7 +171,12 @@ private fun rememberSortProcessState(
         }
     }
 
-    LaunchedEffect(servers, sortType, mp.connectTimeoutMillis, mp.socketTimeoutMillis) {
+    LaunchedEffect(
+        servers,
+        sortType,
+        mcUtilsTimeouts.timeoutMillis,
+        mcUtilsOptions.enableSrvLookups,
+    ) {
         val suggestedCap =
             max(
                 MIN_CONCURRENCY_CAP,
@@ -193,8 +201,7 @@ private fun rememberSortProcessState(
                                     address = server.ip,
                                     // use MCUtils for reliability reasons
                                     queryMode = ServerQueryMethod.McUtils,
-                                    connectTimeoutMillis = mp.connectTimeoutMillis,
-                                    socketTimeoutMillis = mp.socketTimeoutMillis,
+                                    configurations = queryConfigs,
                                 )
                             val result = flow.first { it !is OnlineServerDataResourceResult.Loading }
                             if (result is OnlineServerDataResourceResult.Success) {
@@ -256,6 +263,7 @@ private fun rememberSortProcessState(
         sortStatusText = sortStatusText,
         sortComputed = sortComputed,
         onSkipPingingRequest = skipAction,
+        timeoutMillis = mcUtilsTimeouts.timeoutMillis,
     )
 }
 
@@ -266,8 +274,6 @@ internal fun ServerListSortProcessScreen(
     onExitRequested: () -> Unit,
     onApplySortedList: suspend (List<MultiplayerServer>) -> Unit,
 ) {
-    val mp = LocalMultiplayerSettings.current
-
     val state = rememberSortProcessState(servers, sortType, onApplySortedList, onExitRequested)
     val animatedSortProgress by animateFloatAsState(
         targetValue = state.sortProgress,
@@ -304,7 +310,7 @@ internal fun ServerListSortProcessScreen(
                                 InfoItem(
                                     Icons.Outlined.Schedule,
                                     t(Res.string.sort_info_timeout),
-                                    mp.connectTimeoutMillis.formatMillis(),
+                                    state.timeoutMillis.formatMillis(),
                                 ),
                                 InfoItem(Icons.Outlined.SwapVert, t(Res.string.sort_info_mode), t(sortType.label)),
                             ),

@@ -24,25 +24,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TooltipAnchorPosition
-import androidx.compose.material3.TooltipBox
-import androidx.compose.material3.TooltipDefaults.rememberTooltipPositionProvider
-import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,6 +53,7 @@ import com.spoiligaming.explorer.ui.dialog.onClick
 import com.spoiligaming.explorer.ui.dialog.prominent
 import com.spoiligaming.explorer.ui.t
 import com.spoiligaming.explorer.ui.util.rememberAdaptiveWidth
+import com.spoiligaming.explorer.ui.widgets.PocketInfoTooltip
 import server_list_explorer.ui.generated.resources.Res
 import server_list_explorer.ui.generated.resources.accept_textures_disabled
 import server_list_explorer.ui.generated.resources.accept_textures_enabled
@@ -76,7 +67,6 @@ import server_list_explorer.ui.generated.resources.add_server_label_name
 import server_list_explorer.ui.generated.resources.add_server_placeholder_name
 import server_list_explorer.ui.generated.resources.add_server_resource_packs
 import server_list_explorer.ui.generated.resources.add_server_title
-import server_list_explorer.ui.generated.resources.cd_server_list_file
 import server_list_explorer.ui.generated.resources.dialog_cancel_button
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -185,25 +175,11 @@ internal fun AddServerDialog(
                                 maxLines = 1,
                                 style = MaterialTheme.typography.titleMedium,
                             )
-                            TooltipBox(
-                                positionProvider = rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
-                                tooltip = {
-                                    PlainTooltip(
-                                        modifier = Modifier.widthIn(min = TooltipMinWidth),
-                                    ) {
-                                        Text(t(Res.string.add_server_hide_tooltip))
-                                    }
-                                },
-                                state = rememberTooltipState(isPersistent = true),
-                                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Info,
-                                    contentDescription = t(Res.string.cd_server_list_file),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(IconSize),
-                                )
-                            }
+
+                            PocketInfoTooltip(
+                                text = t(Res.string.add_server_hide_tooltip),
+                                minWidth = TooltipMinWidth,
+                            )
                         }
                         Text(
                             text = t(Res.string.add_server_hide_note),
@@ -239,4 +215,3 @@ private val SpacingLarge = 16.dp
 private val SpacingMedium = 8.dp
 private val SpacingSmall = 4.dp
 private val TooltipMinWidth = 360.dp
-private val IconSize = 22.dp

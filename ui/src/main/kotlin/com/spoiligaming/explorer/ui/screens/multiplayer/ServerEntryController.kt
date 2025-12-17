@@ -34,7 +34,10 @@ import com.spoiligaming.explorer.multiplayer.history.ServerListHistoryService
 import com.spoiligaming.explorer.multiplayer.history.SetHiddenChange
 import com.spoiligaming.explorer.multiplayer.history.UpdateIconChange
 import com.spoiligaming.explorer.multiplayer.repository.ServerListRepository
+import com.spoiligaming.explorer.settings.model.QueryMethodRequestKey
 import com.spoiligaming.explorer.settings.model.ServerQueryMethod
+import com.spoiligaming.explorer.settings.model.ServerQueryMethodConfigurations
+import com.spoiligaming.explorer.settings.model.requestKeyFor
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,10 +61,10 @@ internal object ServerEntryController {
     fun getServerDataFlow(
         address: String,
         queryMode: ServerQueryMethod,
-        connectTimeoutMillis: Long,
-        socketTimeoutMillis: Long,
+        configurations: ServerQueryMethodConfigurations,
     ): StateFlow<OnlineServerDataResourceResult<IServerData>> {
-        val key = Key(address, queryMode, connectTimeoutMillis, socketTimeoutMillis)
+        val requestKey = configurations.requestKeyFor(queryMode)
+        val key = Key(address, queryMode, requestKey)
         return cache.getOrPut(key) {
             MutableStateFlow<OnlineServerDataResourceResult<IServerData>>(
                 OnlineServerDataResourceResult.Loading,
@@ -70,8 +73,7 @@ internal object ServerEntryController {
                     OnlineServerDataFacade(
                         serverAddress = address,
                         queryMode = queryMode,
-                        connectTimeoutMillis = connectTimeoutMillis,
-                        socketTimeoutMillis = socketTimeoutMillis,
+                        configurations = configurations,
                     ).serverDataFlow().collect { flow.value = it }
                 }
             }
@@ -81,10 +83,10 @@ internal object ServerEntryController {
     fun refresh(
         address: String,
         queryMode: ServerQueryMethod,
-        connectTimeoutMillis: Long,
-        socketTimeoutMillis: Long,
+        configurations: ServerQueryMethodConfigurations,
     ) {
-        val key = Key(address, queryMode, connectTimeoutMillis, socketTimeoutMillis)
+        val requestKey = configurations.requestKeyFor(queryMode)
+        val key = Key(address, queryMode, requestKey)
 
         val flow =
             cache
@@ -98,8 +100,7 @@ internal object ServerEntryController {
             OnlineServerDataFacade(
                 serverAddress = address,
                 queryMode = queryMode,
-                connectTimeoutMillis = connectTimeoutMillis,
-                socketTimeoutMillis = socketTimeoutMillis,
+                configurations = configurations,
             ).serverDataFlow().collect { flow.value = it }
         }
     }
@@ -344,8 +345,7 @@ internal object ServerEntryController {
 private data class Key(
     val address: String,
     val queryMode: ServerQueryMethod,
-    val connectTimeout: Long,
-    val socketTimeout: Long,
+    val configuration: QueryMethodRequestKey,
 )
 
 private val logger = KotlinLogging.logger {}

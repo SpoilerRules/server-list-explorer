@@ -174,6 +174,24 @@
     <string name="query_method_mc_srv_stat">MCSrvStatus</string>
     <string name="query_method_mc_utils">MCUtils</string>
     <string name="query_method_save_and_refresh_all_entries">Save and refresh all entries</string>
+    <string name="query_method_tooltip_title">Configure query method</string>
+    <string name="query_method_tooltip_title_mcsrvstat">Configure MCSrvStatus</string>
+    <string name="query_method_tooltip_title_mcutils">Configure MCUtils</string>
+    <string name="query_method_timeout_mcsrvstat_connection_title">Connection timeout</string>
+    <string name="query_method_timeout_mcsrvstat_connection_desc">Maximum time to wait while establishing a connection to the MCSrvStatus API before the request fails</string>
+    <string name="query_method_timeout_mcsrvstat_response_title">Response timeout</string>
+    <string name="query_method_timeout_mcsrvstat_response_desc">Maximum time to wait for incoming data on an established connection to the MCSrvStatus API before timing out</string>
+    <string name="query_method_timeout_mcutils_title">Timeout</string>
+    <string name="query_method_timeout_common_desc">How long to wait for a server to respond before giving up</string>
+    <string name="query_method_timeout_preview_seconds">%1$ds</string>
+    <string name="query_method_chip_editors_choice">Editor's choice</string>
+    <string name="query_method_chip_editors_choice_badge">Editor's choice badge</string>
+    <string name="query_method_chip_srv_support">SRV support</string>
+    <string name="query_method_chip_gs4_query_udp">GS4 Query UDP</string>
+    <string name="query_method_chip_hosted_api">Hosted API</string>
+    <string name="query_method_chip_api_cached">API cached</string>
+    <string name="query_method_mcutils_srv_lookup_title">SRV lookups</string>
+    <string name="query_method_mcutils_srv_lookup_desc">Automatically resolves the Minecraft server's target host and port using DNS Service (SRV) records</string>
 
     <string name="cd_no_search_results">No search results</string>
     <string name="no_search_results_for">No results for "%1$s"</string>
@@ -256,9 +274,6 @@
 
     <string name="setting_mp_drag_shake_intensity">Drag shake intensity (degrees)</string>
     <string name="setting_mp_drag_shake_intensity_desc">Controls how much a server entry shakes when dragged.</string>
-    <string name="setting_mp_connection_timeout">Connection timeout (s)</string>
-    <string name="setting_mp_connection_timeout_desc">Time to wait while connecting to a server.</string>
-    <string name="setting_mp_socket_timeout">Socket timeout (s)</string>
 
     <!-- Settings: Preferences -->
     <string name="setting_prefs_language">Language</string>

@@ -27,6 +27,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import com.spoiligaming.explorer.settings.manager.multiplayerSettingsManager
 import com.spoiligaming.explorer.settings.manager.preferenceSettingsManager
 import com.spoiligaming.explorer.settings.manager.privacySettingsManager
+import com.spoiligaming.explorer.settings.manager.serverQueryMethodConfigurationsManager
 import com.spoiligaming.explorer.settings.manager.singleplayerSettingsManager
 import com.spoiligaming.explorer.settings.manager.themeSettingsManager
 import com.spoiligaming.explorer.settings.manager.windowAppearanceSettingsManager
@@ -34,6 +35,7 @@ import com.spoiligaming.explorer.settings.manager.windowStateSettingsManager
 import com.spoiligaming.explorer.settings.model.MultiplayerSettings
 import com.spoiligaming.explorer.settings.model.Preferences
 import com.spoiligaming.explorer.settings.model.PrivacySettings
+import com.spoiligaming.explorer.settings.model.ServerQueryMethodConfigurations
 import com.spoiligaming.explorer.settings.model.SingleplayerSettings
 import com.spoiligaming.explorer.settings.model.ThemeMode
 import com.spoiligaming.explorer.settings.model.ThemeSettings
@@ -70,6 +72,11 @@ internal val LocalMultiplayerSettings =
         error("LocalMultiplayerSettings not provided")
     }
 
+internal val LocalServerQueryMethodConfigurations =
+    staticCompositionLocalOf<ServerQueryMethodConfigurations> {
+        error("LocalServerQueryMethodConfigurations not provided")
+    }
+
 internal val LocalSingleplayerSettings =
     staticCompositionLocalOf<SingleplayerSettings> {
         error("LocalSingleplayerSettings not provided")
@@ -84,6 +91,7 @@ internal fun ProvideAppSettings(content: @Composable () -> Unit) {
     val windowState by windowStateSettingsManager.settingsFlow.collectAsState()
     val windowAppearance by windowAppearanceSettingsManager.settingsFlow.collectAsState()
     val multiplayerSettings by multiplayerSettingsManager.settingsFlow.collectAsState()
+    val serverQueryMethodConfigurations by serverQueryMethodConfigurationsManager.settingsFlow.collectAsState()
     val singleplayerSettings by singleplayerSettingsManager.settingsFlow.collectAsState()
 
     val amoledOn = themeSettings.amoledMode && themeSettings.themeMode != ThemeMode.Light
@@ -95,6 +103,7 @@ internal fun ProvideAppSettings(content: @Composable () -> Unit) {
         LocalWindowState provides windowState,
         LocalWindowAppearance provides windowAppearance,
         LocalMultiplayerSettings provides multiplayerSettings,
+        LocalServerQueryMethodConfigurations provides serverQueryMethodConfigurations,
         LocalSingleplayerSettings provides singleplayerSettings,
         LocalAmoledActive provides amoledOn,
     ) {

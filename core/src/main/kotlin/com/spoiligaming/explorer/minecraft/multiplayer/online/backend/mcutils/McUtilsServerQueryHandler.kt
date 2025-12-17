@@ -27,8 +27,9 @@ import io.ktor.network.sockets.SocketTimeoutException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import tech.aliorpse.mcutils.modules.server.status.JavaServer
-import tech.aliorpse.mcutils.utils.hostPortOf
+import tech.aliorpse.mcutils.api.MCServer
+import tech.aliorpse.mcutils.api.getStatus
+import tech.aliorpse.mcutils.util.hostPortOf
 import java.io.EOFException
 import java.net.ConnectException
 import java.net.InetAddress
@@ -37,8 +38,8 @@ import java.net.UnknownHostException
 
 internal class McUtilsServerQueryHandler(
     private val serverAddress: String,
-    private val connectionTimeoutMillis: Int,
-    private val socketTimeoutMillis: Int,
+    private val enableSrv: Boolean,
+    private val timeoutMillis: Long,
     private val socketAttempts: Int,
     private val eofAttempts: Int,
 ) : IServerQueryHandler {
@@ -53,7 +54,23 @@ internal class McUtilsServerQueryHandler(
                 resolveIpOrNull(serverAddress)
                     ?: return@withContext OfflineServerData
 
-            val hostPort = hostPortOf(serverAddress)
+            val hostPort =
+                runCatching { hostPortOf(serverAddress) }
+                    .getOrElse { e ->
+                        logger.debug(e) { "Failed to parse host/port for $serverAddress. Returning OfflineServerData." }
+                        return@withContext OfflineServerData
+                    }
+
+            val host =
+                hostPort.host?.takeIf { it.isNotBlank() }
+                    ?: run {
+                        logger.debug {
+                            "Host was null/blank for $serverAddress (parsed: $hostPort). Returning OfflineServerData."
+                        }
+                        return@withContext OfflineServerData
+                    }
+
+            val port = hostPort.port
 
             try {
                 logger.info {
@@ -86,11 +103,11 @@ internal class McUtilsServerQueryHandler(
                             )
                         },
                     ) {
-                        JavaServer.getStatus(
-                            hostPort = hostPort,
-                            connectionTimeout = connectionTimeoutMillis,
-                            readTimeout = socketTimeoutMillis,
-                        )
+                        if (port != null) {
+                            MCServer.getStatus(host = host, port = port, timeout = timeoutMillis, enableSrv = enableSrv)
+                        } else {
+                            MCServer.getStatus(host = host, timeout = timeoutMillis, enableSrv = enableSrv)
+                        }
                     }
 
                 val motd = status.description.toSectionString()
@@ -98,14 +115,14 @@ internal class McUtilsServerQueryHandler(
                 val protocol = status.version.protocol.toInt()
                 val onlinePlayers = status.players.online
                 val maxPlayers = status.players.max
-                val ping = status.ping ?: -1L
+                val ping = status.ping
                 val icon = (status.favicon ?: "").removePrefix("data:image/png;base64,")
                 val info =
                     status.players.sample
                         ?.mapNotNull { player -> player.name.takeIf { it.isNotBlank() } }
                         ?.takeIf { it.isNotEmpty() }
                         ?.joinToString("\n")
-                val enforcesSecureChat = status.enforcesSecureChat
+                val secureChatEnforced = status.secureChatEnforced
 
                 McUtilsOnlineServerData(
                     motd = motd,
@@ -117,7 +134,7 @@ internal class McUtilsServerQueryHandler(
                     protocolVersion = protocol,
                     ip = resolvedIp,
                     info = info,
-                    secureChatEnforced = enforcesSecureChat,
+                    secureChatEnforced = secureChatEnforced,
                 ).also {
                     logger.info {
                         "Successfully fetched data for server $serverAddress " +

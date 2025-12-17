@@ -37,7 +37,7 @@ sentry-gradle = "5.12.2"
 
 # Minecraft
 nbt = "6.1"
-mcUtils = "1.7.2"
+mcUtils = "3.1.0"
 
 [libraries]
 # Core language/runtime
@@ -73,7 +73,7 @@ theme-detector = { module = "com.github.Dansoftowner:jSystemThemeDetector", vers
 
 # Minecraft
 nbt = { module = "com.github.Querz:NBT", version.ref = "nbt" }
-mcUtils = { module = "tech.aliorpse:mcutils", version.ref = "mcUtils" }
+mcUtils = { module = "tech.aliorpse.mcutils:mcutils-server-status", version.ref = "mcUtils" }
 
 [plugins]
 # Kotlin toolchain
