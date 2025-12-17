@@ -74,6 +74,7 @@ internal sealed interface MenuEntry
 internal data class ActionItem(
     val text: String,
     val icon: ImageVector? = null,
+    val enabled: Boolean = true,
     val onClick: () -> Unit,
 ) : MenuEntry
 
@@ -129,11 +130,17 @@ private fun ActionItemContent(
     closeRoot: () -> Unit,
 ) = DropdownMenuItem(
     text = {
+        val textColor =
+            if (item.enabled) {
+                MaterialTheme.colorScheme.onSurface
+            } else {
+                MaterialTheme.colorScheme.onSurface.copy(alpha = DISABLED_CONTENT_ALPHA)
+            }
         Text(
             text = item.text,
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1,
+            color = textColor,
+            maxLines = SINGLE_LINE_MAX_LINES,
             overflow = TextOverflow.Ellipsis,
         )
     },
@@ -141,15 +148,25 @@ private fun ActionItemContent(
         item.onClick()
         closeRoot()
     },
-    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+    enabled = item.enabled,
+    modifier =
+        Modifier.pointerHoverIcon(
+            if (item.enabled) PointerIcon.Hand else PointerIcon.Default,
+        ),
     leadingIcon =
         item.icon?.let { icon ->
+            val iconTint =
+                if (item.enabled) {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = DISABLED_CONTENT_ALPHA)
+                }
             {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(24.dp),
+                    tint = iconTint,
+                    modifier = Modifier.size(MenuItemIconSize),
                 )
             }
         },
@@ -174,7 +191,7 @@ private fun SubmenuItemContent(
                     text = item.text,
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
+                    maxLines = SINGLE_LINE_MAX_LINES,
                     overflow = TextOverflow.Ellipsis,
                 )
             },
@@ -189,7 +206,7 @@ private fun SubmenuItemContent(
                             imageVector = icon,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(MenuItemIconSize),
                         )
                     }
                 },
@@ -233,7 +250,7 @@ private fun SelectableGroupContent(
                         text = item.text,
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
+                        maxLines = SINGLE_LINE_MAX_LINES,
                         overflow = TextOverflow.Ellipsis,
                     )
                 },
@@ -246,7 +263,7 @@ private fun SelectableGroupContent(
                                 imageVector = icon,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(24.dp),
+                                modifier = Modifier.size(MenuItemIconSize),
                             )
                         }
                     },
@@ -273,7 +290,7 @@ private fun SelectableGroupContent(
                                 text = option.text,
                                 style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.onSurface,
-                                maxLines = 1,
+                                maxLines = SINGLE_LINE_MAX_LINES,
                                 overflow = TextOverflow.Ellipsis,
                             )
                         },
@@ -302,7 +319,7 @@ private fun SelectableGroupContent(
                                             imageVector = icon,
                                             contentDescription = null,
                                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            modifier = Modifier.size(24.dp),
+                                            modifier = Modifier.size(MenuItemIconSize),
                                         )
                                     }
                                 },
@@ -323,13 +340,13 @@ private fun TrailingOptionRow(selected: DropdownOption) =
             text = selected.text,
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 1,
+            maxLines = SINGLE_LINE_MAX_LINES,
             overflow = TextOverflow.Ellipsis,
         )
         Icon(
             imageVector = Icons.Filled.ChevronRight,
             contentDescription = null,
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(MenuItemIconSize),
         )
     }
 
@@ -349,14 +366,14 @@ internal fun SelectableDropdown(
     var expanded by remember { mutableStateOf(false) }
 
     val rotation by animateFloatAsState(
-        targetValue = if (expanded) 180f else 0f,
-        animationSpec = tween(250),
+        targetValue = if (expanded) DROPDOWN_ROTATION_EXPANDED_DEGREES else DROPDOWN_ROTATION_COLLAPSED_DEGREES,
+        animationSpec = tween(DROPDOWN_ANIMATION_DURATION_MILLIS),
     )
 
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = it },
-        modifier = modifier.widthIn(min = 112.dp, max = 280.dp),
+        modifier = modifier.widthIn(min = DropdownMinWidth, max = DropdownMaxWidth),
     ) {
         OutlinedButton(
             shape = MaterialTheme.shapes.extraSmall,
@@ -365,7 +382,7 @@ internal fun SelectableDropdown(
                     .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true)
                     .pointerHoverIcon(PointerIcon.Hand),
             onClick = { /* handled by ExposedDropdownMenuBox */ },
-            contentPadding = PaddingValues(all = 12.dp),
+            contentPadding = PaddingValues(all = DropdownContentPadding),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -377,22 +394,22 @@ internal fun SelectableDropdown(
                         imageVector = icon,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier.size(MenuItemIconSize),
                     )
                 }
-                Spacer(Modifier.width(12.dp))
+                Spacer(Modifier.width(DropdownContentPadding))
                 Text(
                     text = selected.text,
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.labelLarge,
-                    maxLines = 1,
+                    maxLines = SINGLE_LINE_MAX_LINES,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(MENU_TEXT_WEIGHT),
                 )
                 Icon(
                     imageVector = Icons.Filled.ArrowDropDown,
                     contentDescription = null,
-                    modifier = Modifier.rotate(rotation).size(24.dp),
+                    modifier = Modifier.rotate(rotation).size(MenuItemIconSize),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -409,7 +426,7 @@ internal fun SelectableDropdown(
                             text = option.text,
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1,
+                            maxLines = SINGLE_LINE_MAX_LINES,
                             overflow = TextOverflow.Ellipsis,
                         )
                     },
@@ -433,7 +450,7 @@ internal fun SelectableDropdown(
                                     imageVector = icon,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(24.dp),
+                                    modifier = Modifier.size(MenuItemIconSize),
                                 )
                             }
                         },
@@ -443,3 +460,15 @@ internal fun SelectableDropdown(
         }
     }
 }
+
+private const val DISABLED_CONTENT_ALPHA = 0.38f
+private const val SINGLE_LINE_MAX_LINES = 1
+private const val DROPDOWN_ROTATION_EXPANDED_DEGREES = 180f
+private const val DROPDOWN_ROTATION_COLLAPSED_DEGREES = 0f
+private const val DROPDOWN_ANIMATION_DURATION_MILLIS = 250
+private const val MENU_TEXT_WEIGHT = 1f
+
+private val MenuItemIconSize = 24.dp
+private val DropdownContentPadding = 12.dp
+private val DropdownMinWidth = 112.dp
+private val DropdownMaxWidth = 280.dp
