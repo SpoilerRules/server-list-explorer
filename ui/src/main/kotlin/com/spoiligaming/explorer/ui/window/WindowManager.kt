@@ -45,7 +45,7 @@ internal object WindowManager {
     private const val WINDOW_TITLE_WITH_BUILD = WINDOW_TITLE + BUILD_SUFFIX
 
     private const val MIN_WIDTH_PX = 850
-    private const val MIN_HEIGHT_PX = 500
+    private const val MIN_HEIGHT_PX = 520
     private val MIN_WINDOW_SIZE = Dimension(MIN_WIDTH_PX, MIN_HEIGHT_PX)
 
     private val CompactWidthThreshold = 1000.dp
