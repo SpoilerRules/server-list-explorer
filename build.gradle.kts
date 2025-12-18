@@ -139,13 +139,6 @@ sentry {
 }
 
 allprojects {
-    repositories {
-        mavenCentral()
-        google()
-        maven("https://repo.azisaba.net/repository/maven-public/")
-        maven("https://jitpack.io/")
-    }
-
     plugins.withId("org.jetbrains.kotlin.jvm") {
         apply(plugin = "com.github.gmazzo.buildconfig")
 

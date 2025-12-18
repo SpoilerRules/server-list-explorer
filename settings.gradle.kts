@@ -26,6 +26,14 @@ pluginManagement {
     }
 }
 
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://jitpack.io/")
+    }
+}
+
 include(":app")
 include(":core")
 include(":settings")
