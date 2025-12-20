@@ -29,7 +29,6 @@ plugins {
     alias(libs.plugins.shadow) apply false
     alias(libs.plugins.buildConfig) apply true
     alias(libs.plugins.ktlint) apply true
-    alias(libs.plugins.sentry) apply true
 }
 
 val appVersionProvider: Provider<String> =
@@ -122,19 +121,6 @@ gradle.taskGraph.whenReady {
     }
     if (onlyWindowsX64) {
         logger.lifecycle("Building for Windows x64 only (optimization enabled)")
-    }
-}
-
-sentry {
-    includeSourceContext = true
-    includeDependenciesReport = true
-
-    org = "server-list-explorer"
-    projectName = "server-list-explorer-v2"
-    authToken = System.getenv("SENTRY_AUTH_TOKEN")
-
-    autoInstallation {
-        enabled = false
     }
 }
 
