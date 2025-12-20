@@ -90,7 +90,7 @@ data class McUtilsTimeouts(
 @Serializable
 data class McUtilsQueryOptions(
     @SerialName("enable_srv")
-    val enableSrvLookups: Boolean = false,
+    val enableSrvLookups: Boolean = true,
 )
 
 fun ServerQueryMethodConfigurations.requestKeyFor(method: ServerQueryMethod): QueryMethodRequestKey =
