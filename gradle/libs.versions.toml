@@ -32,9 +32,6 @@ jna = "5.18.1"
 oshi = "6.9.1"
 themeDetector = "3.9.1"
 
-# Telemetry
-sentry-gradle = "5.12.2"
-
 # Minecraft
 nbt = "6.1"
 mcUtils = "3.1.0"
@@ -86,6 +83,3 @@ compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
-
-# Telemetry
-sentry = { id = "io.sentry.jvm.gradle", version.ref = "sentry-gradle" }
