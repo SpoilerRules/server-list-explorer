@@ -60,8 +60,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
-import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
-import com.spoiligaming.explorer.ui.screens.settings.sections.DataPrivacySettings
+import com.spoiligaming.explorer.ui.LocalPrefs
 import com.spoiligaming.explorer.ui.screens.settings.sections.MultiplayerSettings
 import com.spoiligaming.explorer.ui.screens.settings.sections.PreferenceSettings
 import com.spoiligaming.explorer.ui.screens.settings.sections.ThemeSettings
@@ -74,7 +73,6 @@ import com.spoiligaming.explorer.util.OSUtils
 import kotlinx.coroutines.launch
 import server_list_explorer.ui.generated.resources.Res
 import server_list_explorer.ui.generated.resources.settings_navigator_title
-import server_list_explorer.ui.generated.resources.settings_section_data_privacy
 import server_list_explorer.ui.generated.resources.settings_section_multiplayer
 import server_list_explorer.ui.generated.resources.settings_section_preferences
 import server_list_explorer.ui.generated.resources.settings_section_theme
@@ -98,7 +96,6 @@ internal fun SettingsScreen() {
                             { WindowAppearenceSettings() },
                     )
                 }
-                add(@Composable { t(Res.string.settings_section_data_privacy) } to { DataPrivacySettings() })
             }
         }
 

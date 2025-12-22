@@ -20,7 +20,6 @@ package com.spoiligaming.explorer.settings.manager
 
 import com.spoiligaming.explorer.settings.model.MultiplayerSettings
 import com.spoiligaming.explorer.settings.model.Preferences
-import com.spoiligaming.explorer.settings.model.PrivacySettings
 import com.spoiligaming.explorer.settings.model.ServerQueryMethodConfigurations
 import com.spoiligaming.explorer.settings.model.SingleplayerSettings
 import com.spoiligaming.explorer.settings.model.ThemeSettings
@@ -50,11 +49,6 @@ val windowAppearanceSettingsManager by UniversalSettingsManager<WindowAppearance
 val preferenceSettingsManager by UniversalSettingsManager<Preferences>(
     fileName = "preferences.json",
     defaultValueProvider = { Preferences() },
-)
-
-val privacySettingsManager by UniversalSettingsManager<PrivacySettings>(
-    fileName = "privacy.json",
-    defaultValueProvider = { PrivacySettings() },
 )
 
 val themeSettingsManager by UniversalSettingsManager<ThemeSettings>(

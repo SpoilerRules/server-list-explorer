@@ -16,7 +16,7 @@
  * along with Server List Explorer.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui
+package com.spoiligaming.explorer.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -26,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.spoiligaming.explorer.settings.manager.multiplayerSettingsManager
 import com.spoiligaming.explorer.settings.manager.preferenceSettingsManager
-import com.spoiligaming.explorer.settings.manager.privacySettingsManager
 import com.spoiligaming.explorer.settings.manager.serverQueryMethodConfigurationsManager
 import com.spoiligaming.explorer.settings.manager.singleplayerSettingsManager
 import com.spoiligaming.explorer.settings.manager.themeSettingsManager
@@ -34,7 +33,6 @@ import com.spoiligaming.explorer.settings.manager.windowAppearanceSettingsManage
 import com.spoiligaming.explorer.settings.manager.windowStateSettingsManager
 import com.spoiligaming.explorer.settings.model.MultiplayerSettings
 import com.spoiligaming.explorer.settings.model.Preferences
-import com.spoiligaming.explorer.settings.model.PrivacySettings
 import com.spoiligaming.explorer.settings.model.ServerQueryMethodConfigurations
 import com.spoiligaming.explorer.settings.model.SingleplayerSettings
 import com.spoiligaming.explorer.settings.model.ThemeMode
@@ -45,11 +43,6 @@ import com.spoiligaming.explorer.settings.model.WindowState
 internal val LocalPrefs =
     staticCompositionLocalOf<Preferences> {
         error("LocalPrefs not provided")
-    }
-
-internal val LocalPrivacySettings =
-    staticCompositionLocalOf<PrivacySettings> {
-        error("LocalPrivacySettings not provided")
     }
 
 internal val LocalThemeSettings =
@@ -86,7 +79,6 @@ internal val LocalAmoledActive = compositionLocalOf { false }
 @Composable
 internal fun ProvideAppSettings(content: @Composable () -> Unit) {
     val prefs by preferenceSettingsManager.settingsFlow.collectAsState()
-    val privacySettings by privacySettingsManager.settingsFlow.collectAsState()
     val themeSettings by themeSettingsManager.settingsFlow.collectAsState()
     val windowState by windowStateSettingsManager.settingsFlow.collectAsState()
     val windowAppearance by windowAppearanceSettingsManager.settingsFlow.collectAsState()
@@ -98,7 +90,6 @@ internal fun ProvideAppSettings(content: @Composable () -> Unit) {
 
     CompositionLocalProvider(
         LocalPrefs provides prefs,
-        LocalPrivacySettings provides privacySettings,
         LocalThemeSettings provides themeSettings,
         LocalWindowState provides windowState,
         LocalWindowAppearance provides windowAppearance,
