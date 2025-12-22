@@ -16,7 +16,7 @@
  * along with Server List Explorer.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package com.spoiligaming.explorer.ui
+package com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
