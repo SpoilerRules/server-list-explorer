@@ -50,6 +50,8 @@ data class Preferences(
     val windowTitleShowBuildInfo: Boolean = false,
     @SerialName("scrollbar_always_visible")
     val settingsScrollbarAlwaysVisible: Boolean = false,
+    @SerialName("nav_rail_items_centered")
+    val navRailItemsCentered: Boolean = true,
 ) {
     companion object {
         /**

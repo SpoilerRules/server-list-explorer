@@ -60,7 +60,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
-import com.spoiligaming.explorer.ui.LocalPrefs
+import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
 import com.spoiligaming.explorer.ui.screens.settings.sections.MultiplayerSettings
 import com.spoiligaming.explorer.ui.screens.settings.sections.PreferenceSettings
 import com.spoiligaming.explorer.ui.screens.settings.sections.ThemeSettings
