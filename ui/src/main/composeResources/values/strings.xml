@@ -56,10 +56,10 @@
     <string name="nav_label_singleplayer">Singleplayer</string>
     <string name="nav_label_settings">Settings</string>
 
-    <string name="cd_expand_rail">Expand navigation rail</string>
-    <string name="cd_collapse_rail">Collapse navigation rail</string>
     <string name="cd_switch_to_light_mode">Switch to Light Mode</string>
     <string name="cd_switch_to_dark_mode">Switch to Dark Mode</string>
+    <string name="cd_open_settings_navigation">Open settings navigation</string>
+    <string name="cd_close_settings_navigation">Close settings navigation</string>
 
     <string name="loading_init_repo">Initializing repository</string>
     <string name="loading_setup_monitor">Setting up monitor</string>
@@ -281,6 +281,8 @@
     <string name="setting_prefs_snackbar_at_top_desc">Display snackbar notifications at the top of the screen instead of the bottom.</string>
     <string name="setting_prefs_settings_scrollbar_always_visible">Always show scrollbar</string>
     <string name="setting_prefs_settings_scrollbar_always_visible_desc">Keep scrollbars always visible. When off, scrollbars appear when scrolling or hovering.</string>
+    <string name="setting_prefs_nav_rail_centered">Center navigation rail items</string>
+    <string name="setting_prefs_nav_rail_centered_desc">Centers the navigation items within the rail.</string>
     <string name="setting_prefs_undo_history_size">Undo history size</string>
     <string name="setting_prefs_undo_history_size_desc">The maximum number of changes that can be undone. Higher values allow you to undo more steps but require more memory.</string>
     <string name="setting_prefs_undo_redo_delay">Undo/Redo shortcut repeat delay (ms)</string>

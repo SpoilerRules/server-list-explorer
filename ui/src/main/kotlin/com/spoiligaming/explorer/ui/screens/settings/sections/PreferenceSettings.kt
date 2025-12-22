@@ -36,6 +36,8 @@ import server_list_explorer.ui.generated.resources.setting_prefs_highlight_delay
 import server_list_explorer.ui.generated.resources.setting_prefs_highlight_delay_desc
 import server_list_explorer.ui.generated.resources.setting_prefs_highlight_delay_note
 import server_list_explorer.ui.generated.resources.setting_prefs_language
+import server_list_explorer.ui.generated.resources.setting_prefs_nav_rail_centered
+import server_list_explorer.ui.generated.resources.setting_prefs_nav_rail_centered_desc
 import server_list_explorer.ui.generated.resources.setting_prefs_scroll_after_add
 import server_list_explorer.ui.generated.resources.setting_prefs_scroll_after_add_desc
 import server_list_explorer.ui.generated.resources.setting_prefs_settings_scrollbar_always_visible
@@ -94,6 +96,18 @@ internal fun PreferenceSettings() {
                         onCheckedChange = { newValue ->
                             preferenceSettingsManager.updateSettings {
                                 it.copy(settingsScrollbarAlwaysVisible = newValue)
+                            }
+                        },
+                    )
+                }
+                add {
+                    ItemSwitch(
+                        title = t(Res.string.setting_prefs_nav_rail_centered),
+                        description = t(Res.string.setting_prefs_nav_rail_centered_desc),
+                        isChecked = prefs.navRailItemsCentered,
+                        onCheckedChange = { newValue ->
+                            preferenceSettingsManager.updateSettings {
+                                it.copy(navRailItemsCentered = newValue)
                             }
                         },
                     )

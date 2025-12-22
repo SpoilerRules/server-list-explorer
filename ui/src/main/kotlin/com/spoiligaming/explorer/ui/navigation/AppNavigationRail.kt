@@ -20,10 +20,9 @@ package com.spoiligaming.explorer.ui.navigation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.FiniteAnimationSpec
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
@@ -43,11 +42,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.MenuOpen
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Group
@@ -55,9 +52,7 @@ import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.OutlinedIconButton
@@ -69,6 +64,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
@@ -82,14 +78,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalAmoledActive
+import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
 import com.spoiligaming.explorer.ui.extensions.onHover
 import com.spoiligaming.explorer.ui.t
 import com.spoiligaming.explorer.ui.theme.isDarkTheme
-import com.spoiligaming.explorer.ui.util.rememberAdaptiveWidth
-import com.spoiligaming.explorer.ui.window.WindowManager
 import server_list_explorer.ui.generated.resources.Res
-import server_list_explorer.ui.generated.resources.cd_collapse_rail
-import server_list_explorer.ui.generated.resources.cd_expand_rail
 import server_list_explorer.ui.generated.resources.cd_switch_to_dark_mode
 import server_list_explorer.ui.generated.resources.cd_switch_to_light_mode
 import server_list_explorer.ui.generated.resources.nav_label_multiplayer
@@ -101,22 +94,18 @@ internal fun AppNavigationRail(
     onThemeToggle: () -> Unit,
 ) {
     val amoledOn = LocalAmoledActive.current
-
-    var userRequestedExpand by remember { mutableStateOf(false) }
-    val isActuallyExpanded = if (WindowManager.isWindowCompact) false else userRequestedExpand
-
-    val expandedRailWidth =
-        rememberAdaptiveWidth(min = RailExpandedMinWidth, max = RailExpandedMaxWidth)
-
-    val targetRailWidth = if (isActuallyExpanded) expandedRailWidth else RailCollapsedWidth
-    val animatedRailWidth by animateDpAsState(
-        targetValue = targetRailWidth,
-        animationSpec =
-            tween(
-                durationMillis = RAIL_WIDTH_ANIMATION_DURATION_MS,
-                easing = FastOutSlowInEasing,
-            ),
-    )
+    val prefs = LocalPrefs.current
+    val navItemsCentered = prefs.navRailItemsCentered
+    val navItemsAlignmentBias by
+        animateFloatAsState(
+            targetValue = if (navItemsCentered) NAV_ITEMS_CENTERED_BIAS else NAV_ITEMS_TOP_BIAS,
+            label = "NavigationRailItemAlignmentBias",
+        )
+    val navItemsTopPadding by
+        animateDpAsState(
+            targetValue = if (navItemsCentered) NavItemsCenteredTopPadding else NavItemsTopPadding,
+            label = "NavigationRailItemTopPadding",
+        )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -130,121 +119,53 @@ internal fun AppNavigationRail(
                 } else {
                     MaterialTheme.colorScheme.surfaceContainer
                 },
-            modifier = Modifier.width(animatedRailWidth).fillMaxHeight(),
-            header = {
-                AnimatedVisibility(
-                    visible = !WindowManager.isWindowCompact,
-                    enter =
-                        fadeIn(animationSpec = HeaderFadeSpec) +
-                            slideInVertically(
-                                initialOffsetY = { -it / SLIDE_ANIMATION_OFFSET_DIVIDER },
-                                animationSpec = HeaderSlideSpec,
-                            ),
-                    exit =
-                        fadeOut(animationSpec = HeaderFadeSpec) +
-                            slideOutVertically(
-                                targetOffsetY = { -it / SLIDE_ANIMATION_OFFSET_DIVIDER },
-                                animationSpec = HeaderSlideSpec,
-                            ),
-                ) {
-                    Box(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .height(IntrinsicSize.Max)
-                                .padding(
-                                    horizontal =
-                                        if (isActuallyExpanded) {
-                                            BottomPaddingExpandedHorizontal
-                                        } else {
-                                            BottomPaddingCollapsedHorizontal
-                                        },
-                                ),
-                        contentAlignment =
-                            if (isActuallyExpanded) {
-                                Alignment.CenterStart
-                            } else {
-                                Alignment.Center
-                            },
-                    ) {
-                        ExpandCollapseButton(
-                            expanded = isActuallyExpanded,
-                            onClick = {
-                                userRequestedExpand = !userRequestedExpand
-                            },
-                        )
-                    }
-                }
-            },
+            modifier = Modifier.width(RailWidth).fillMaxHeight(),
         ) {
-            Column(
-                modifier = Modifier.fillMaxHeight(),
-                verticalArrangement = Arrangement.spacedBy(ItemsSpacing),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                railItems.forEach { item ->
-                    if (item.showDividerAbove) {
-                        HorizontalDivider(
-                            modifier =
-                                Modifier.padding(
-                                    horizontal =
-                                        if (isActuallyExpanded) {
-                                            DividerPaddingExpandedHorizontal
-                                        } else {
-                                            DividerPaddingCollapsedHorizontal
-                                        },
-                                    vertical =
-                                        if (isActuallyExpanded) {
-                                            DividerPaddingExpandedVertical
-                                        } else {
-                                            DividerPaddingCollapsedVertical
-                                        },
-                                ),
-                        )
-                    }
+            Column(modifier = Modifier.fillMaxHeight()) {
+                Box(
+                    modifier = Modifier.weight(ITEMS_FILL_WEIGHT).fillMaxWidth(),
+                    contentAlignment = BiasAlignment(NAV_ITEMS_HORIZONTAL_BIAS, navItemsAlignmentBias),
+                ) {
+                    Column(
+                        modifier =
+                            Modifier.padding(
+                                top = navItemsTopPadding,
+                            ),
+                        verticalArrangement = Arrangement.spacedBy(ItemsSpacing),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        railItems.forEach { item ->
+                            if (item.showDividerAbove) {
+                                HorizontalDivider(
+                                    modifier =
+                                        Modifier.padding(
+                                            horizontal = DividerPaddingHorizontal,
+                                            vertical = DividerPaddingVertical,
+                                        ),
+                                )
+                            }
 
-                    val route = item.screen::class.qualifiedName
-                    val isSelected = currentRoute == route
-                    val onClick = { if (!isSelected) navController.navigate(item.screen) }
+                            val route = item.screen::class.qualifiedName
+                            val isSelected = currentRoute == route
+                            val onClick = { if (!isSelected) navController.navigate(item.screen) }
 
-                    if (isActuallyExpanded) {
-                        NavigationDrawerItem(
-                            item = item,
-                            isSelected = isSelected,
-                            disabled = item.disabled,
-                            onClick = onClick,
-                        )
-                    } else {
-                        NavigationRailItem(
-                            item = item,
-                            isSelected = isSelected,
-                            disabled = item.disabled,
-                            onClick = onClick,
-                        )
+                            NavigationRailItem(
+                                item = item,
+                                isSelected = isSelected,
+                                disabled = item.disabled,
+                                onClick = onClick,
+                            )
+                        }
                     }
                 }
-
-                Spacer(Modifier.weight(SPACER_EXPAND_WEIGHT))
 
                 Box(
                     modifier =
                         Modifier
                             .fillMaxWidth()
                             .height(IntrinsicSize.Max)
-                            .padding(
-                                horizontal =
-                                    if (isActuallyExpanded) {
-                                        BottomPaddingExpandedHorizontal
-                                    } else {
-                                        BottomPaddingCollapsedHorizontal
-                                    },
-                            ),
-                    contentAlignment =
-                        if (isActuallyExpanded) {
-                            Alignment.CenterStart
-                        } else {
-                            Alignment.Center
-                        },
+                            .padding(horizontal = BottomPaddingHorizontal),
+                    contentAlignment = Alignment.Center,
                 ) {
                     ThemeToggleButton(
                         onClick = onThemeToggle,
@@ -303,69 +224,10 @@ private fun <E> NavigationRailItem(
 }
 
 @Composable
-private fun <E> NavigationDrawerItem(
-    item: Item<E>,
-    isSelected: Boolean,
-    disabled: Boolean,
-    onClick: () -> Unit,
-) {
-    val contentColor =
-        if (isSelected) {
-            MaterialTheme.colorScheme.onSecondaryContainer
-        } else {
-            MaterialTheme.colorScheme.onSurfaceVariant
-        }
-
-    NavigationDrawerItem(
-        label = {
-            Text(
-                text = item.label,
-                color = contentColor,
-                style = MaterialTheme.typography.labelLarge,
-            )
-        },
-        selected = isSelected,
-        onClick = onClick,
-        // disabled = disabled,
-        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand).focusProperties { canFocus = false },
-        icon = {
-            Icon(
-                modifier = Modifier.size(IconSize),
-                imageVector = if (isSelected) item.filledIcon else item.outlinedIcon,
-                contentDescription = item.label,
-                tint = contentColor,
-            )
-        },
-    )
-}
-
-@Composable
-private fun ExpandCollapseButton(
-    expanded: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val iconVector = if (expanded) Icons.AutoMirrored.Filled.MenuOpen else Icons.Filled.Menu
-    val contentDesc = if (expanded) t(Res.string.cd_collapse_rail) else t(Res.string.cd_expand_rail)
-
-    IconButton(
-        onClick = onClick,
-        modifier = modifier.pointerHoverIcon(PointerIcon.Hand).focusProperties { canFocus = false },
-    ) {
-        Icon(
-            modifier = Modifier.size(IconSize),
-            imageVector = iconVector,
-            contentDescription = contentDesc,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-}
-
-@Composable
 private fun ThemeToggleButton(onClick: () -> Unit) {
     var isHovered by remember { mutableStateOf(false) }
     val iconTint = MaterialTheme.colorScheme.onSurfaceVariant
-    val transition = updateTransition(targetState = isDarkTheme, label = "theme transition")
+    val transition = updateTransition(targetState = isDarkTheme, label = "ThemeModeToggle")
 
     val sunIcon = if (isHovered) Icons.Filled.LightMode else Icons.Outlined.LightMode
     val moonIcon = if (isHovered) Icons.Filled.DarkMode else Icons.Outlined.DarkMode
@@ -478,23 +340,19 @@ private fun getNavigationRailItems() =
         ),
     )
 
-private val RailCollapsedWidth = 96.dp
-private val RailExpandedMinWidth = 220.dp
-private val RailExpandedMaxWidth = 360.dp
-private const val RAIL_WIDTH_ANIMATION_DURATION_MS = 120
-
-private const val HEADER_ANIMATION_DURATION_MS = 200
-private const val SLIDE_ANIMATION_OFFSET_DIVIDER = 2
-
 private val ItemsSpacing = 4.dp
-private val DividerPaddingExpandedHorizontal = 28.dp
-private val DividerPaddingCollapsedHorizontal = 16.dp
-private val DividerPaddingExpandedVertical = 12.dp
-private val DividerPaddingCollapsedVertical = 8.dp
+private val DividerPaddingHorizontal = 16.dp
+private val DividerPaddingVertical = 8.dp
 
-private val BottomPaddingExpandedHorizontal = 16.dp
-private val BottomPaddingCollapsedHorizontal = 0.dp
+private val RailWidth = 96.dp
+private val NavItemsCenteredTopPadding = 0.dp
+private val NavItemsTopPadding = 12.dp
+private val BottomPaddingHorizontal = 0.dp
 private val BottomSpacerHeight = 12.dp
+private const val NAV_ITEMS_CENTERED_BIAS = 0f
+private const val NAV_ITEMS_TOP_BIAS = -1f
+private const val NAV_ITEMS_HORIZONTAL_BIAS = 0f
+private const val ITEMS_FILL_WEIGHT = 1f
 
 private val IconSize = 24.dp
 private val ToggleButtonSize = 56.dp
@@ -502,11 +360,5 @@ private val ToggleIconBoxSize = 24.dp
 private const val TOGGLE_ANIMATION_DURATION_MS = 250
 
 private val DividerThicknessThin = 0.5.dp
-private const val SPACER_EXPAND_WEIGHT = 1f
-
-private val HeaderFadeSpec: FiniteAnimationSpec<Float> =
-    tween(durationMillis = HEADER_ANIMATION_DURATION_MS, easing = LinearOutSlowInEasing)
-private val HeaderSlideSpec: FiniteAnimationSpec<IntOffset> =
-    tween(durationMillis = HEADER_ANIMATION_DURATION_MS, easing = LinearOutSlowInEasing)
 private val ToggleSlideSpec: FiniteAnimationSpec<IntOffset> =
     tween(durationMillis = TOGGLE_ANIMATION_DURATION_MS, easing = FastOutLinearInEasing)
