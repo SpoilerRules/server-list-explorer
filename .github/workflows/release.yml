@@ -114,7 +114,7 @@ jobs:
       APP_VERSION: ${{ needs.build-jars.outputs.version }}
       TAG: ${{ needs.build-jars.outputs.tag }}
 
-      WIN_ARCH: x64
+      WIN_ARCH: x86_64
       ONLY_WINDOWS_X64: true
       ONLY_WINDOWS_ARM64: false
 
@@ -166,16 +166,16 @@ jobs:
           $exe = Get-LatestFile "app/build/compose/binaries/main/exe/ServerListExplorer-*.exe"
           $exeMin = Get-LatestFile "app/build/compose/binaries/main-release/exe/ServerListExplorer-*.exe"
 
-          Copy-Item $msi "app/out/ServerListExplorer_$v`_${arch}.msi" -Force
-          Copy-Item $msiMin "app/out/ServerListExplorer_$v-minified_${arch}.msi" -Force
-          Copy-Item $exe "app/out/ServerListExplorer_$v`_${arch}-setup.exe" -Force
-          Copy-Item $exeMin "app/out/ServerListExplorer_$v-minified_${arch}-setup.exe" -Force
+          Copy-Item $msi "app/out/ServerListExplorer_${arch}.msi" -Force
+          Copy-Item $msiMin "app/out/ServerListExplorer-minified_${arch}.msi" -Force
+          Copy-Item $exe "app/out/ServerListExplorer_${arch}-setup.exe" -Force
+          Copy-Item $exeMin "app/out/ServerListExplorer-minified_${arch}-setup.exe" -Force
 
           $appDir = Get-FirstDir "app/build/compose/binaries/main/app"
           $appDirMin = Get-FirstDir "app/build/compose/binaries/main-release/app"
 
-          $zip = "app/out/ServerListExplorer_$v`_windows-$arch-portable.zip"
-          $zipMin = "app/out/ServerListExplorer_$v-minified_windows-$arch-portable.zip"
+          $zip = "app/out/ServerListExplorer_windows-$arch-portable.zip"
+          $zipMin = "app/out/ServerListExplorer-minified_windows-$arch-portable.zip"
 
           if (Test-Path $zip) { Remove-Item $zip -Force }
           if (Test-Path $zipMin) { Remove-Item $zipMin -Force }
@@ -193,12 +193,12 @@ jobs:
           overwrite_files: true
           fail_on_unmatched_files: true
           files: |
-            app/out/ServerListExplorer_${{ env.VERSION }}_x64.msi
-            app/out/ServerListExplorer_${{ env.VERSION }}-minified_x64.msi
-            app/out/ServerListExplorer_${{ env.VERSION }}_x64-setup.exe
-            app/out/ServerListExplorer_${{ env.VERSION }}-minified_x64-setup.exe
-            app/out/ServerListExplorer_${{ env.VERSION }}_windows-x64-portable.zip
-            app/out/ServerListExplorer_${{ env.VERSION }}-minified_windows-x64-portable.zip
+            app/out/ServerListExplorer_x86_64.msi
+            app/out/ServerListExplorer-minified_x86_64.msi
+            app/out/ServerListExplorer_x86_64-setup.exe
+            app/out/ServerListExplorer-minified_x86_64-setup.exe
+            app/out/ServerListExplorer_windows-x86_64-portable.zip
+            app/out/ServerListExplorer-minified_windows-x86_64-portable.zip
 
   release-windows-arm64:
     name: Windows ARM64
@@ -262,16 +262,16 @@ jobs:
           $exe = Get-LatestFile "app/build/compose/binaries/main/exe/ServerListExplorer-*.exe"
           $exeMin = Get-LatestFile "app/build/compose/binaries/main-release/exe/ServerListExplorer-*.exe"
 
-          Copy-Item $msi "app/out/ServerListExplorer_$v`_${arch}.msi" -Force
-          Copy-Item $msiMin "app/out/ServerListExplorer_$v-minified_${arch}.msi" -Force
-          Copy-Item $exe "app/out/ServerListExplorer_$v`_${arch}-setup.exe" -Force
-          Copy-Item $exeMin "app/out/ServerListExplorer_$v-minified_${arch}-setup.exe" -Force
+          Copy-Item $msi "app/out/ServerListExplorer_${arch}.msi" -Force
+          Copy-Item $msiMin "app/out/ServerListExplorer-minified_${arch}.msi" -Force
+          Copy-Item $exe "app/out/ServerListExplorer_${arch}-setup.exe" -Force
+          Copy-Item $exeMin "app/out/ServerListExplorer-minified_${arch}-setup.exe" -Force
 
           $appDir = Get-FirstDir "app/build/compose/binaries/main/app"
           $appDirMin = Get-FirstDir "app/build/compose/binaries/main-release/app"
 
-          $zip = "app/out/ServerListExplorer_$v`_windows-$arch-portable.zip"
-          $zipMin = "app/out/ServerListExplorer_$v-minified_windows-$arch-portable.zip"
+          $zip = "app/out/ServerListExplorer_windows-$arch-portable.zip"
+          $zipMin = "app/out/ServerListExplorer-minified_windows-$arch-portable.zip"
 
           if (Test-Path $zip) { Remove-Item $zip -Force }
           if (Test-Path $zipMin) { Remove-Item $zipMin -Force }
@@ -289,9 +289,9 @@ jobs:
           overwrite_files: true
           fail_on_unmatched_files: true
           files: |
-            app/out/ServerListExplorer_${{ env.VERSION }}_arm64.msi
-            app/out/ServerListExplorer_${{ env.VERSION }}-minified_arm64.msi
-            app/out/ServerListExplorer_${{ env.VERSION }}_arm64-setup.exe
-            app/out/ServerListExplorer_${{ env.VERSION }}-minified_arm64-setup.exe
-            app/out/ServerListExplorer_${{ env.VERSION }}_windows-arm64-portable.zip
-            app/out/ServerListExplorer_${{ env.VERSION }}-minified_windows-arm64-portable.zip
+            app/out/ServerListExplorer_arm64.msi
+            app/out/ServerListExplorer-minified_arm64.msi
+            app/out/ServerListExplorer_arm64-setup.exe
+            app/out/ServerListExplorer-minified_arm64-setup.exe
+            app/out/ServerListExplorer_windows-arm64-portable.zip
+            app/out/ServerListExplorer-minified_windows-arm64-portable.zip
