@@ -390,8 +390,8 @@ private object SelectionRuntime {
                     it.name == "get" &&
                         it.parameterTypes.size == ONE_PARAMETER_COUNT &&
                         (
-                            it.parameterTypes[0] == java.lang.Long.TYPE ||
-                                it.parameterTypes[0] == java.lang.Long::class.java
+                            it.parameterTypes[0] == Long::class.javaPrimitiveType ||
+                                it.parameterTypes[0] == Long::class.javaObjectType
                         )
                 }.apply { isAccessible = true }
 
