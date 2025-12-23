@@ -28,9 +28,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Make Gradle wrapper executable
-        run: chmod +x ./gradlew
-
       - name: Determine version & tag
         id: meta
         shell: bash
@@ -68,6 +65,13 @@ jobs:
         with:
           gradle-version: wrapper
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Generate license report
+        shell: bash
+        run: ./gradlew generateLicenseReport --no-parallel --no-configuration-cache
 
       - name: Build JAR artifacts
         shell: bash
@@ -131,6 +135,10 @@ jobs:
         with:
           gradle-version: wrapper
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - name: Generate license report
+        shell: powershell
+        run: .\gradlew.bat generateLicenseReport --no-parallel --no-configuration-cache
 
       - name: Build and stage Windows x64 assets
         shell: powershell
@@ -227,6 +235,10 @@ jobs:
         with:
           gradle-version: wrapper
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - name: Generate license report
+        shell: powershell
+        run: .\gradlew.bat generateLicenseReport --no-parallel --no-configuration-cache
 
       - name: Build and stage Windows ARM64 assets
         shell: powershell

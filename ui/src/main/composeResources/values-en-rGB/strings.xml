@@ -208,6 +208,15 @@
     <string name="settings_section_window_appearance">Window Appearance &amp; Effects</string>
     <string name="settings_section_data_privacy">Data and privacy</string>
 
+    <string name="open_source_licenses_button">Open source licences</string>
+    <string name="dialog_title_open_source_licenses">Open source licences</string>
+    <string name="open_source_licenses_loading">Loading licences…</string>
+    <string name="open_source_licenses_empty">No licence data available</string>
+    <string name="open_source_licenses_load_error">Couldn't load open source licences</string>
+    <string name="open_source_license_line">Licence: %1$s</string>
+    <string name="open_source_project_line">Project: %1$s</string>
+    <string name="open_source_version_line">Version %1$s</string>
+
     <!-- Settings: Window Appearance -->
     <string name="setting_window_title_bar_color">Title bar colour</string>
     <string name="setting_window_title_bar_color_desc">Choose a custom colour for the title bar.</string>

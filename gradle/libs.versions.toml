@@ -10,6 +10,7 @@ shadow = "9.3.0"
 buildConfig = "6.0.6"
 ktlint = "14.0.1"
 proguard = "7.8.2"
+licenseReport = "3.0.1"
 
 # UI & Compose ecosystem
 colorPicker = "0.7.0"
@@ -83,3 +84,4 @@ compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+dependencyLicenseReport = { id = "com.github.jk1.dependency-license-report", version.ref = "licenseReport" }
