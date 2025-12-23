@@ -17,6 +17,8 @@
 */
 
 import com.github.gmazzo.buildconfig.BuildConfigExtension
+import com.github.jk1.license.render.JsonReportRenderer
+import com.github.jk1.license.render.ReportRenderer
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
@@ -29,6 +31,7 @@ plugins {
     alias(libs.plugins.shadow) apply false
     alias(libs.plugins.buildConfig) apply true
     alias(libs.plugins.ktlint) apply true
+    alias(libs.plugins.dependencyLicenseReport) apply true
 }
 
 val appVersionProvider: Provider<String> =
@@ -114,6 +117,12 @@ extra["appDistribution"] = appDistribution
 extra["onlyWindowsX64"] = onlyWindowsX64
 extra["onlyWindowsArm64"] = onlyWindowsArm64
 version = appVersion
+
+licenseReport {
+    outputDir = "ui/src/main/resources"
+    projects = arrayOf(project, *project.subprojects.toTypedArray())
+    renderers = arrayOf<ReportRenderer>(JsonReportRenderer("open_source_licenses.json", true))
+}
 
 gradle.taskGraph.whenReady {
     if (appDistribution != "unspecified") {

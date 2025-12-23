@@ -44,6 +44,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -54,6 +55,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
@@ -72,6 +75,7 @@ import com.spoiligaming.explorer.ui.window.WindowManager
 import com.spoiligaming.explorer.util.OSUtils
 import kotlinx.coroutines.launch
 import server_list_explorer.ui.generated.resources.Res
+import server_list_explorer.ui.generated.resources.open_source_licenses_button
 import server_list_explorer.ui.generated.resources.settings_navigator_title
 import server_list_explorer.ui.generated.resources.settings_section_multiplayer
 import server_list_explorer.ui.generated.resources.settings_section_preferences
@@ -82,8 +86,8 @@ import kotlin.math.absoluteValue
 
 @Composable
 internal fun SettingsScreen() {
-    val density = LocalDensity.current
     val prefs = LocalPrefs.current
+    var openSourceDialogVisible by remember { mutableStateOf(false) }
     val sections =
         remember {
             mutableListOf<Pair<@Composable () -> String, @Composable () -> Unit>>().apply {
@@ -106,6 +110,7 @@ internal fun SettingsScreen() {
                 durationMillis = ANIMATION_DURATION_MILLIS,
                 easing = LinearOutSlowInEasing,
             ),
+        label = "SettingsMainPadding",
     )
 
     val animatedWidthFraction by animateFloatAsState(
@@ -120,6 +125,7 @@ internal fun SettingsScreen() {
                 durationMillis = ANIMATION_DURATION_MILLIS,
                 easing = LinearOutSlowInEasing,
             ),
+        label = "SettingsContentWidthFraction",
     )
 
     val animatedSpacerWidth by animateDpAsState(
@@ -129,9 +135,8 @@ internal fun SettingsScreen() {
                 durationMillis = ANIMATION_DURATION_MILLIS,
                 easing = LinearOutSlowInEasing,
             ),
+        label = "SettingsNavigatorSpacerWidth",
     )
-
-    val spacingPx = with(density) { SectionSpacing.toPx() }
 
     val sectionHeights = remember { mutableStateListOf<Int>() }
     var totalContentHeight by remember { mutableStateOf(0) }
@@ -158,7 +163,8 @@ internal fun SettingsScreen() {
                 modifier =
                     Modifier
                         .fillMaxSize()
-                        .verticalScroll(scrollState),
+                        .verticalScroll(scrollState)
+                        .onSizeChanged { totalContentHeight = it.height },
                 verticalArrangement = Arrangement.spacedBy(SectionSpacing),
             ) {
                 sections.forEachIndexed { index, (_, contentComposable) ->
@@ -173,13 +179,17 @@ internal fun SettingsScreen() {
                                 }
 
                                 sectionHeights[index] = h
-
-                                val gapCount = (sections.size - 1).coerceAtLeast(0)
-                                totalContentHeight = sectionHeights.sum() + spacingPx.toInt() * gapCount
                             },
                     ) {
                         contentComposable()
                     }
+                }
+
+                TextButton(
+                    onClick = { openSourceDialogVisible = true },
+                    modifier = Modifier.align(Alignment.Start).pointerHoverIcon(PointerIcon.Hand),
+                ) {
+                    Text(t(Res.string.open_source_licenses_button))
                 }
             }
         }
@@ -207,6 +217,11 @@ internal fun SettingsScreen() {
             modifier = Modifier.width(IntrinsicSize.Max).fillMaxHeight(),
         )
     }
+
+    OpenSourceLicensesDialog(
+        visible = openSourceDialogVisible,
+        onDismissRequest = { openSourceDialogVisible = false },
+    )
 }
 
 @Composable
@@ -296,6 +311,7 @@ private fun SectionNavigator(
                 durationMillis = ANIMATION_DURATION_MILLIS,
                 easing = LinearOutSlowInEasing,
             ),
+        label = "SettingsNavigatorIndicatorOffset",
     )
 
     Box(modifier = modifier) {
