@@ -36,6 +36,7 @@ dependencies {
     implementation(compose.components.resources)
     implementation(compose.material3)
     implementation(compose.materialIconsExtended)
+    implementation(libs.kotlinx.serialization.json)
 
     // Navigation Compose
     implementation(libs.navigation.compose)
