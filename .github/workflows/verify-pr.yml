@@ -49,6 +49,9 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
+      - name: Generate license report
+        run: ./gradlew generateLicenseReport --no-parallel --no-configuration-cache
+
       - name: Gradle build
         run: ./gradlew app:buildWithProjectModules
 
