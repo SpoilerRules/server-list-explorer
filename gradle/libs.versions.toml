@@ -7,7 +7,7 @@ serialization = "1.9.0"
 
 # Build & tooling
 shadow = "9.3.0"
-buildConfig = "6.0.6"
+buildConfig = "6.0.7"
 ktlint = "14.0.1"
 proguard = "7.8.2"
 licenseReport = "3.0.1"
@@ -30,12 +30,12 @@ log4j = "2.25.3"
 
 # System / native
 jna = "5.18.1"
-oshi = "6.9.1"
+oshi = "6.9.2"
 themeDetector = "3.9.1"
 
 # Minecraft
 nbt = "6.1"
-mcUtils = "3.1.0"
+mcUtils = "3.1.1"
 
 [libraries]
 # Core language/runtime
