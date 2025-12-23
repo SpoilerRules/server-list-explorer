@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -96,7 +96,7 @@ jobs:
 
       - name: Create GitHub Release with JARs
         if: env.ACT != 'true'
-        uses: softprops/action-gh-release@v2.4.2
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
           name: "Server List Explorer ${{ env.TAG }}"
@@ -123,7 +123,7 @@ jobs:
       ONLY_WINDOWS_ARM64: false
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-java@v5
         with:
@@ -195,7 +195,7 @@ jobs:
 
       - name: Upload Windows x64 assets
         if: env.ACT != 'true'
-        uses: softprops/action-gh-release@v2.4.2
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
           overwrite_files: true
@@ -222,7 +222,7 @@ jobs:
       ONLY_WINDOWS_X64: false
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-java@v5
         with:
@@ -295,7 +295,7 @@ jobs:
 
       - name: Upload Windows ARM64 assets
         if: env.ACT != 'true'
-        uses: softprops/action-gh-release@v2.4.2
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
           overwrite_files: true
