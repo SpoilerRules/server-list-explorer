@@ -84,7 +84,6 @@
 - [System Requirements](#system-requirements)
 - [Available Downloads](#available-downloads)
 - [How to Build the Project](#how-to-build-the-project)
-- [Wiki](#wiki)
 
 ### Available Downloads
 
@@ -203,8 +202,3 @@ java -jar app/build/libs/ServerListExplorer-all.jar
 ```
 
 If you prefer the normal JAR, make sure to provide all required dependencies on the classpath.
-
-## Wiki
-
-For detailed usage instructions and troubleshooting tips, please refer to
-the [GitHub Wiki](https://github.com/SpoilerRules/server-list-explorer/wiki).
