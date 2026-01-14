@@ -166,8 +166,6 @@ For those who want the full details, the minimum requirements are listed below.
 | Basic read/write access         | —                              |
 | System clock reasonably correct | Helps avoid SSL/network issues |
 
-<hr>
-
 </details>
 
 ## How to Build the Project
