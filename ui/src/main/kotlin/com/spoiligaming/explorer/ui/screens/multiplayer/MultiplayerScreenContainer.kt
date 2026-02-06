@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,7 +37,7 @@ import com.spoiligaming.explorer.multiplayer.ServerListMonitor
 import com.spoiligaming.explorer.multiplayer.history.ServerListHistoryService
 import com.spoiligaming.explorer.multiplayer.history.SortChange
 import com.spoiligaming.explorer.multiplayer.repository.ServerListRepository
-import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalMultiplayerSettings
+import com.spoiligaming.explorer.serverlist.bookmarks.ServerListFileBookmarksManager
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
 import com.spoiligaming.explorer.ui.components.LoadingScreen
 import com.spoiligaming.explorer.ui.navigation.MultiplayerServerListScreen
@@ -49,15 +50,15 @@ import server_list_explorer.ui.generated.resources.loading_setup_monitor
 @Composable
 internal fun MultiplayerScreenContainer(navController: NavController) {
     val scope = rememberCoroutineScope()
-    val mp = LocalMultiplayerSettings.current
     val prefs = LocalPrefs.current
+    val activePath by ServerListFileBookmarksManager.activePath.collectAsState()
 
     var repo by remember { mutableStateOf<ServerListRepository?>(null) }
     var monitor by remember { mutableStateOf<ServerListMonitor?>(null) }
 
     var screenState by remember { mutableStateOf<MultiplayerScreenState>(MultiplayerScreenState.Initializing) }
     val historyService =
-        remember(mp.serverListFile) {
+        remember(activePath) {
             ServerListHistoryService(maxUndoEntries = prefs.maxUndoHistorySize)
         }
 
@@ -71,14 +72,16 @@ internal fun MultiplayerScreenContainer(navController: NavController) {
     val loadingSetupMonitorText = t(Res.string.loading_setup_monitor)
 
     val loadingSteps =
-        remember(Unit) {
+        remember(activePath) {
             listOf(
                 loadingInitRepoText to
                     suspend {
+                        ServerListFileBookmarksManager.load()
+                        val currentPath = ServerListFileBookmarksManager.activePath.value
                         val result =
                             UnifiedModeInitializer.initialize<ServerListRepository>(
                                 IModuleKind.Multiplayer,
-                                mp.serverListFile,
+                                currentPath,
                             )
 
                         result
@@ -184,7 +187,7 @@ internal fun MultiplayerScreenContainer(navController: NavController) {
                 },
             )
 
-        is MultiplayerScreenState.Error -> MultiplayerErrorScreen(navController)
+        is MultiplayerScreenState.Error -> MultiplayerErrorScreen(onReloadRequest = onReloadRequest)
     }
 }
 

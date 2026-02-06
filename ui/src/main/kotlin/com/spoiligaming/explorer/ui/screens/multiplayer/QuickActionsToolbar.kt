@@ -93,6 +93,7 @@ internal fun QuickActionsToolbar(
     onDeleteSelected: () -> Unit,
     onShowQueryMethodDialog: () -> Unit,
     onShowServerListFileConfigurationDialog: () -> Unit,
+    onShowServerListFileConfigurationDialogContent: @Composable () -> Unit,
 ) {
     val mp = LocalMultiplayerSettings.current
     val isVertical =
@@ -232,6 +233,7 @@ internal fun QuickActionsToolbar(
                 label = t(Res.string.label_server_list),
                 shimmer = null,
                 onClick = onShowServerListFileConfigurationDialog,
+                content = onShowServerListFileConfigurationDialogContent,
             )
         }
     }
@@ -244,6 +246,7 @@ private fun QuickActionButton(
     shimmer: Shimmer?,
     onClick: () -> Unit,
     enabled: Boolean = shimmer == null,
+    content: (@Composable () -> Unit)? = null,
 ) {
     val textColor =
         MaterialTheme.colorScheme.onSurfaceVariant.copy(
@@ -306,6 +309,7 @@ private fun QuickActionButton(
                 textAlign = TextAlign.Center,
             )
         }
+        content?.invoke()
     }
 }
 

@@ -113,6 +113,7 @@ import com.spoiligaming.explorer.ui.dialog.ExpressiveDialog
 import com.spoiligaming.explorer.ui.dialog.onClick
 import com.spoiligaming.explorer.ui.dialog.prominent
 import com.spoiligaming.explorer.ui.extensions.clickWithModifiers
+import com.spoiligaming.explorer.ui.screens.multiplayer.serverlistfile.ServerListFileConfigurationFloatingDialog
 import com.spoiligaming.explorer.ui.t
 import com.spoiligaming.explorer.ui.window.WindowManager
 import com.spoiligaming.explorer.util.OSUtils
@@ -477,6 +478,17 @@ internal fun MultiplayerScreen(
             onDeleteSelected = { controller.deleteSelected() },
             onShowQueryMethodDialog = { showQueryMethodDialog = true },
             onShowServerListFileConfigurationDialog = { showServerFileDialog = true },
+            onShowServerListFileConfigurationDialogContent = {
+                ServerListFileConfigurationFloatingDialog(
+                    visible = showServerFileDialog,
+                    onDismissRequest = { showServerFileDialog = false },
+                    onConfirm = {
+                        // reload repo, then notify caller
+                        scope.launch { repo.load() }
+                        onReloadRequest()
+                    },
+                )
+            },
         )
     }
 
@@ -523,18 +535,6 @@ internal fun MultiplayerScreen(
 
     LaunchedEffect(searchQuery) {
         controller.selection.clear()
-    }
-
-    if (showServerFileDialog) {
-        ServerListFileConfigurationDialog(
-            onDismissRequest = { showServerFileDialog = false },
-            onConfirm = {
-                // reload repo, then notify caller
-                scope.launch { repo.load() }
-                onReloadRequest()
-                showServerFileDialog = false
-            },
-        )
     }
 
     if (showSortDialog) {
