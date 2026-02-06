@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.automirrored.outlined.InsertDriveFile
 import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -39,13 +40,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,18 +59,22 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.spoiligaming.explorer.minecraft.common.IModuleKind
 import com.spoiligaming.explorer.minecraft.common.UnifiedModeInitializer
-import com.spoiligaming.explorer.settings.manager.multiplayerSettingsManager
+import com.spoiligaming.explorer.serverlist.bookmarks.ServerListFileBookmarksManager
 import com.spoiligaming.explorer.settings.manager.singleplayerSettingsManager
 import com.spoiligaming.explorer.ui.extensions.onHover
 import com.spoiligaming.explorer.ui.screens.setup.SetupStepContainer
 import com.spoiligaming.explorer.ui.screens.setup.SetupUiState
+import com.spoiligaming.explorer.ui.snackbar.SnackbarController
+import com.spoiligaming.explorer.ui.snackbar.SnackbarEvent
 import com.spoiligaming.explorer.ui.t
 import com.spoiligaming.explorer.ui.util.rememberServerListFilePickerLauncher
 import com.spoiligaming.explorer.ui.util.rememberWorldSavesPickerLauncher
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import server_list_explorer.ui.generated.resources.Res
 import server_list_explorer.ui.generated.resources.cd_browse
+import server_list_explorer.ui.generated.resources.cd_server_list_path_locked_notice
 import server_list_explorer.ui.generated.resources.detecting_server_list
 import server_list_explorer.ui.generated.resources.detecting_world_saves
 import server_list_explorer.ui.generated.resources.detection_wait
@@ -81,12 +89,24 @@ import server_list_explorer.ui.generated.resources.placeholder_server_list
 import server_list_explorer.ui.generated.resources.placeholder_world_saves
 import server_list_explorer.ui.generated.resources.setup_path_step_missing
 import server_list_explorer.ui.generated.resources.setup_path_step_ready
+import server_list_explorer.ui.generated.resources.setup_server_list_path_locked_message
+import server_list_explorer.ui.generated.resources.setup_server_list_path_locked_title
+import server_list_explorer.ui.generated.resources.setup_server_list_path_save_detected_failed
+import server_list_explorer.ui.generated.resources.setup_server_list_path_save_selected_failed
 import server_list_explorer.ui.generated.resources.setup_step_title_paths
 
 @Composable
 internal fun PathStep(state: SetupUiState) {
     var isDetectingServer by remember { mutableStateOf(true) }
     var isDetectingSaves by remember { mutableStateOf(true) }
+    val scope = rememberCoroutineScope()
+    val bookmarkEntries by ServerListFileBookmarksManager.entries.collectAsState()
+    val isServerListFilePathSelectionLocked = bookmarkEntries.isNotEmpty()
+
+    // detected
+    val saveDetectedServerListFailedMessage = t(Res.string.setup_server_list_path_save_detected_failed)
+    // selected
+    val saveSelectedServerListFailedMessage = t(Res.string.setup_server_list_path_save_selected_failed)
 
     LaunchedEffect(state.serverFilePath) {
         if (state.serverFilePath == null) {
@@ -98,9 +118,16 @@ internal fun PathStep(state: SetupUiState) {
 
             if (detected != null) {
                 logger.info { "Server file path detected automatically: $detected" }
-                multiplayerSettingsManager.updateSettings { current ->
-                    current.copy(serverListFile = detected)
-                }
+                runCatching { ServerListFileBookmarksManager.setActivePath(detected) }
+                    .onFailure { e ->
+                        logger.error(e) { "Failed to store detected server list file path" }
+                        SnackbarController.sendEvent(
+                            SnackbarEvent(
+                                message = saveDetectedServerListFailedMessage,
+                                duration = SnackbarDuration.Short,
+                            ),
+                        )
+                    }
                 state.serverFilePath = detected
             } else {
                 logger.warn { "Automatic server file detection failed." }
@@ -148,10 +175,20 @@ internal fun PathStep(state: SetupUiState) {
         rememberServerListFilePickerLauncher(
             title = t(Res.string.placeholder_server_list),
         ) { path ->
-            multiplayerSettingsManager.updateSettings { current ->
-                current.copy(serverListFile = path)
+            scope.launch {
+                runCatching { ServerListFileBookmarksManager.setActivePath(path) }
+                    .onFailure { e ->
+                        logger.error(e) { "Failed to save selected server list file path" }
+                        SnackbarController.sendEvent(
+                            SnackbarEvent(
+                                message = saveSelectedServerListFailedMessage,
+                                duration = SnackbarDuration.Short,
+                            ),
+                        )
+                    }.onSuccess {
+                        state.serverFilePath = path
+                    }
             }
-            state.serverFilePath = path
         }
 
     SetupStepContainer(
@@ -184,15 +221,22 @@ internal fun PathStep(state: SetupUiState) {
             if (isDetectingServer) {
                 AutoDetectionCard(isDirectory = false)
             } else {
-                FilePathSelector(
-                    label = t(Res.string.label_server_list),
-                    path = state.serverFilePath?.toString(),
-                    isDirectory = false,
-                    placeholder = t(Res.string.placeholder_server_list),
-                    onBrowse = { filePickerLauncher.launch() },
-                    isError = state.serverFilePath == null,
-                    errorMessage = t(Res.string.error_server_list_missing),
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(ServerListPathSectionSpacing)) {
+                    FilePathSelector(
+                        label = t(Res.string.label_server_list),
+                        path = state.serverFilePath?.toString(),
+                        isDirectory = false,
+                        placeholder = t(Res.string.placeholder_server_list),
+                        onBrowse = { filePickerLauncher.launch() },
+                        isError = !isServerListFilePathSelectionLocked && state.serverFilePath == null,
+                        errorMessage = t(Res.string.error_server_list_missing),
+                        allowBrowse = !isServerListFilePathSelectionLocked,
+                    )
+
+                    if (isServerListFilePathSelectionLocked) {
+                        SetupServerListPathLockedNotice()
+                    }
+                }
             }
         }
     }
@@ -207,9 +251,11 @@ private fun FilePathSelector(
     onBrowse: () -> Unit,
     isError: Boolean = false,
     errorMessage: String = "",
+    allowBrowse: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     var isHovered by remember { mutableStateOf(false) }
+    val isReadOnly = !allowBrowse
     val genericPlaceholder =
         stringResource(
             Res.string.placeholder_generic,
@@ -221,6 +267,17 @@ private fun FilePathSelector(
                 t(Res.string.generic_file_placeholder)
             },
         )
+    val fieldBackgroundColor =
+        if (isReadOnly) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.surface
+    val fieldTextColor =
+        if (isReadOnly) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
+    val placeholderColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val fieldBorderColor =
+        when {
+            isError -> MaterialTheme.colorScheme.error
+            isReadOnly -> MaterialTheme.colorScheme.outlineVariant
+            else -> MaterialTheme.colorScheme.outline
+        }
 
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(ColumnSpacerDp)) {
         Text(
@@ -234,7 +291,7 @@ private fun FilePathSelector(
             border =
                 BorderStroke(
                     width = BorderWidth,
-                    color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
+                    color = fieldBorderColor,
                 ),
             modifier = Modifier.fillMaxWidth().height(SurfaceHeight),
         ) {
@@ -243,7 +300,7 @@ private fun FilePathSelector(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier =
                     Modifier
-                        .background(MaterialTheme.colorScheme.surface)
+                        .background(fieldBackgroundColor)
                         .padding(horizontal = RowSpacerDp),
             ) {
                 if (path != null) {
@@ -251,46 +308,48 @@ private fun FilePathSelector(
                         Text(
                             text = path,
                             style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1,
+                            color = fieldTextColor,
+                            maxLines = PATH_TEXT_MAX_LINES,
                             overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f).padding(end = PaddingDpEnd),
+                            modifier = Modifier.weight(PATH_TEXT_WEIGHT).padding(end = PaddingDpEnd),
                         )
                     }
                 } else {
                     Text(
                         text = placeholder ?: genericPlaceholder,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
+                        color = placeholderColor,
+                        maxLines = PATH_TEXT_MAX_LINES,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f).padding(end = PaddingDpEnd),
+                        modifier = Modifier.weight(PATH_TEXT_WEIGHT).padding(end = PaddingDpEnd),
                     )
                 }
 
-                IconButton(
-                    onClick = onBrowse,
-                    modifier =
-                        Modifier
-                            .size(IconButtonSize)
-                            .onHover { isHovered = it }
-                            .pointerHoverIcon(PointerIcon.Hand),
-                    colors =
-                        IconButtonDefaults.iconButtonColors(
-                            contentColor = MaterialTheme.colorScheme.primary,
-                        ),
-                ) {
-                    val icon =
-                        when {
-                            isDirectory -> Icons.Filled.FolderOpen
-                            isHovered && !isDirectory -> Icons.AutoMirrored.Filled.InsertDriveFile
-                            else -> Icons.AutoMirrored.Outlined.InsertDriveFile
-                        }
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = t(Res.string.cd_browse),
-                        modifier = Modifier.size(IconSize),
-                    )
+                if (allowBrowse) {
+                    IconButton(
+                        onClick = onBrowse,
+                        modifier =
+                            Modifier
+                                .size(IconButtonSize)
+                                .onHover { isHovered = it }
+                                .pointerHoverIcon(PointerIcon.Hand),
+                        colors =
+                            IconButtonDefaults.iconButtonColors(
+                                contentColor = MaterialTheme.colorScheme.primary,
+                            ),
+                    ) {
+                        val icon =
+                            when {
+                                isDirectory -> Icons.Filled.FolderOpen
+                                isHovered && !isDirectory -> Icons.AutoMirrored.Filled.InsertDriveFile
+                                else -> Icons.AutoMirrored.Outlined.InsertDriveFile
+                            }
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = t(Res.string.cd_browse),
+                            modifier = Modifier.size(IconSize),
+                        )
+                    }
                 }
             }
         }
@@ -305,6 +364,40 @@ private fun FilePathSelector(
         }
     }
 }
+
+@Composable
+private fun SetupServerListPathLockedNotice(modifier: Modifier = Modifier) =
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        tonalElevation = LockedNoticeElevation,
+    ) {
+        Row(
+            modifier = Modifier.padding(LockedNoticePadding),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(LockedNoticeIconSpacing),
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Info,
+                contentDescription = t(Res.string.cd_server_list_path_locked_notice),
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(LockedNoticeIconSize),
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(LockedNoticeTextSpacing)) {
+                Text(
+                    text = t(Res.string.setup_server_list_path_locked_title),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = t(Res.string.setup_server_list_path_locked_message),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
 
 @Composable
 private fun AutoDetectionCard(
@@ -361,3 +454,11 @@ private val PaddingDpEnd = 16.dp
 private val ProgressIndicatorSize = 24.dp
 private val ProgressIndicatorStrokeWidth = 2.dp
 private val CardPadding = 16.dp
+private val ServerListPathSectionSpacing = 12.dp
+private val LockedNoticePadding = 12.dp
+private val LockedNoticeIconSize = 24.dp
+private val LockedNoticeIconSpacing = 10.dp
+private val LockedNoticeElevation = 2.dp
+private val LockedNoticeTextSpacing = 4.dp
+private const val PATH_TEXT_MAX_LINES = 1
+private const val PATH_TEXT_WEIGHT = 1f

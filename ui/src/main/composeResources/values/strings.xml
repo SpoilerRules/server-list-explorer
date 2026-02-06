@@ -10,6 +10,10 @@
 
     <string name="setup_path_step_ready">Review the selected paths and continue</string>
     <string name="setup_path_step_missing">Select the required paths to proceed</string>
+    <string name="setup_server_list_path_locked_title">Server list file already saved</string>
+    <string name="setup_server_list_path_locked_message">You already have saved server list file path(s). The setup wizard can’t change them. Manage server list files from Multiplayer settings.</string>
+    <string name="setup_server_list_path_save_detected_failed">Couldn't save the detected server list file</string>
+    <string name="setup_server_list_path_save_selected_failed">Couldn't save the selected server list file</string>
     <string name="setup_wizard_step_counter">Setup Wizard • Step %1$d of %2$d</string>
 
     <string name="label_world_saves">World Saves Folder</string>
@@ -31,6 +35,7 @@
 
     <string name="button_browse">Browse...</string>
     <string name="cd_server_list_file">Server list file</string>
+    <string name="cd_server_list_path_locked_notice">Server list path locked notice</string>
     <string name="cd_browse">Browse</string>
     <string name="generic_file_placeholder">file</string>
     <string name="generic_folder_placeholder">folder</string>
