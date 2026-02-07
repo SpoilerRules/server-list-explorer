@@ -20,10 +20,8 @@ package com.spoiligaming.explorer.ui.dialog
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -133,7 +131,7 @@ internal fun SimpleTextEditDialog(
                 }
             },
         )
-        modifier = Modifier.width(IntrinsicSize.Max)
+        modifier = Modifier.fillMaxWidth(0.85f)
     }
 }
 
