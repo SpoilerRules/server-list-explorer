@@ -18,10 +18,8 @@
 
 package com.spoiligaming.explorer.settings.model
 
-import com.spoiligaming.explorer.settings.serializer.PathSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.nio.file.Path
 
 @Serializable
 enum class ActionBarOrientation {
@@ -49,9 +47,6 @@ enum class ServerQueryMethod {
 
 @Serializable
 data class MultiplayerSettings(
-    @SerialName("server_list_file")
-    @Serializable(with = PathSerializer::class)
-    val serverListFile: Path? = null,
     @SerialName("server_query_method")
     val serverQueryMethod: ServerQueryMethod = ServerQueryMethod.McUtils,
     @SerialName("entry_size_scale")

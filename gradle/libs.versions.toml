@@ -1,12 +1,13 @@
 [versions]
 # Core toolchain
-kotlin = "2.3.0"
-compose = "1.9.3"
+kotlin = "2.3.10"
+compose = "1.10.0"
+compose-material3 = "1.11.0-alpha02"
 coroutines = "1.10.2"
-serialization = "1.9.0"
+serialization = "1.10.0"
 
 # Build & tooling
-shadow = "9.3.0"
+shadow = "9.3.1"
 buildConfig = "6.0.7"
 ktlint = "14.0.1"
 proguard = "7.8.2"
@@ -15,33 +16,35 @@ licenseReport = "3.0.1"
 # UI & Compose ecosystem
 colorPicker = "0.7.0"
 fileKit = "0.12.0"
-materialKolor = "4.0.5"
+materialKolor = "4.1.1"
 navigation-compose = "2.9.1"
 reorderable = "3.0.0"
 autolinktext = "2.0.2"
 shimmer = "1.3.3"
+compose-materialIconsExtended = "1.7.3"
 
 # Networking
-ktor = "3.3.3"
+ktor = "3.4.0"
 
 # Logging
-kotlin-logging = "7.0.13"
+kotlin-logging = "7.0.14"
 log4j = "2.25.3"
 
 # System / native
 jna = "5.18.1"
-oshi = "6.9.2"
+oshi = "6.9.3"
 themeDetector = "3.9.1"
 
 # Minecraft
 nbt = "6.1"
-mcUtils = "3.1.1"
+mcUtils = "3.6.11"
 
 [libraries]
 # Core language/runtime
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm", version.ref = "serialization" }
+kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "serialization" }
 kotlinx-coroutines-core-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "coroutines" }
 
 # UI & Compose ecosystem
@@ -52,6 +55,15 @@ materialKolor = { module = "com.materialkolor:material-kolor", version.ref = "ma
 color-picker = { module = "com.godaddy.android.colorpicker:compose-color-picker-jvm", version.ref = "colorPicker" }
 reorderable-jvm = { module = "sh.calvin.reorderable:reorderable-jvm", version.ref = "reorderable" }
 file-kit = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "fileKit" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-material3" }
+compose-materialIconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "compose-materialIconsExtended" }
+compose-desktop-jvm-windows-x64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-windows-x64", version.ref = "compose" }
+compose-desktop-jvm-windows-arm64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-windows-arm64", version.ref = "compose" }
+compose-desktop-jvm-linux-x64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-linux-x64", version.ref = "compose" }
+compose-desktop-jvm-linux-arm64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-linux-arm64", version.ref = "compose" }
+compose-desktop-jvm-macos-x64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-macos-x64", version.ref = "compose" }
+compose-desktop-jvm-macos-arm64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-macos-arm64", version.ref = "compose" }
 
 # Networking
 ktor-client-core-jvm = { module = "io.ktor:ktor-client-core-jvm", version.ref = "ktor" }

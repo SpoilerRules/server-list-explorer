@@ -1,6 +1,6 @@
 /*
  * This file is part of Server List Explorer.
- * Copyright (C) 2025 SpoilerRules
+ * Copyright (C) 2025-2026 SpoilerRules
  *
  * Server List Explorer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,9 @@ internal val SecureChatDark = Color(0xFF64B5F6) // blue 300
 internal val LinkLight = Color(0xFF2F6FEB)
 internal val LinkDark = Color(0xFF6EA8FE)
 
+internal val ActiveLight = Color(0xFF2E7D32)
+internal val ActiveDark = Color(0xFF81C784)
+
 @Suppress("UnusedReceiverParameter")
 internal val ColorScheme.secureChatTint
     @Composable
@@ -37,3 +40,8 @@ internal val ColorScheme.secureChatTint
 internal val ColorScheme.linkTint
     @Composable
     get() = if (LocalDarkTheme.current) LinkDark else LinkLight
+
+@Suppress("UnusedReceiverParameter")
+internal val ColorScheme.activeTint
+    @Composable
+    get() = if (LocalDarkTheme.current) ActiveDark else ActiveLight

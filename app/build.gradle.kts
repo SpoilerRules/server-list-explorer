@@ -1,6 +1,6 @@
 /*
  * This file is part of Server List Explorer.
- * Copyright (C) 2025 SpoilerRules
+ * Copyright (C) 2025-2026 SpoilerRules
  *
  * Server List Explorer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,22 +34,22 @@ dependencies {
     compileOnly(libs.log4j.core)
     runtimeOnly(libs.log4j.slf4j2.impl)
 
-    implementation(compose.runtime)
+    implementation(libs.compose.runtime)
 
     val onlyWindowsX64: Boolean by rootProject.extra
     val onlyWindowsArm64: Boolean by rootProject.extra
     val targetRuntimes =
         when {
-            onlyWindowsX64 -> listOf(compose.desktop.windows_x64)
-            onlyWindowsArm64 -> listOf(compose.desktop.windows_arm64)
+            onlyWindowsX64 -> listOf(libs.compose.desktop.jvm.windows.x64)
+            onlyWindowsArm64 -> listOf(libs.compose.desktop.jvm.windows.arm64)
             else ->
                 listOf(
-                    compose.desktop.windows_x64,
-                    compose.desktop.windows_arm64,
-                    compose.desktop.linux_x64,
-                    compose.desktop.linux_arm64,
-                    compose.desktop.macos_x64,
-                    compose.desktop.macos_arm64,
+                    libs.compose.desktop.jvm.windows.x64,
+                    libs.compose.desktop.jvm.windows.arm64,
+                    libs.compose.desktop.jvm.linux.x64,
+                    libs.compose.desktop.jvm.linux.arm64,
+                    libs.compose.desktop.jvm.macos.x64,
+                    libs.compose.desktop.jvm.macos.arm64,
                 )
         }
 

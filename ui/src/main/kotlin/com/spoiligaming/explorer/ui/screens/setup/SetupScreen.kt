@@ -40,7 +40,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,7 +53,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalMultiplayerSettings
+import com.spoiligaming.explorer.serverlist.bookmarks.ServerListFileBookmarksManager
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalSingleplayerSettings
 import com.spoiligaming.explorer.ui.screens.setup.steps.LanguageSelectionStep
 import com.spoiligaming.explorer.ui.screens.setup.steps.PathStep
@@ -121,7 +123,7 @@ internal class SetupUiState(
         }
     }
 
-    fun isCurrentStepValid(): Boolean =
+    fun isCurrentStepValid() =
         when (currentStep) {
             SetupStep.PATH_CONFIGURATION -> worldSavesPath != null && serverFilePath != null
             SetupStep.LANGUAGE_SELECTION -> true
@@ -135,15 +137,23 @@ internal fun SetupWizard(
     floatAnimationSpec: FiniteAnimationSpec<Float>,
 ) {
     val sp = LocalSingleplayerSettings.current
-    val mp = LocalMultiplayerSettings.current
+    val activeServerListFilePath by ServerListFileBookmarksManager.activePath.collectAsState()
+
+    LaunchedEffect(Unit) {
+        ServerListFileBookmarksManager.load()
+    }
 
     val state =
         remember {
             SetupUiState(
                 initialWorldSavesPath = sp.savesDirectory,
-                initialServerFilePath = mp.serverListFile,
+                initialServerFilePath = activeServerListFilePath,
             )
         }
+
+    LaunchedEffect(activeServerListFilePath) {
+        state.serverFilePath = activeServerListFilePath
+    }
 
     Box(Modifier.fillMaxSize()) {
         Box(
@@ -220,6 +230,7 @@ private fun SetupProgressBar(
     val animatedProgress by animateFloatAsState(
         targetValue = progressTarget,
         animationSpec = floatAnimationSpec,
+        label = "SetupProgress",
     )
 
     LinearProgressIndicator(

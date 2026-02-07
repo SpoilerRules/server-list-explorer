@@ -26,7 +26,7 @@ import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.util.concurrent.atomic.AtomicBoolean
 
-internal object SettingsStorage {
+object SettingsStorage {
     private const val APP_DIR = "ServerListExplorer"
 
     private val migrated = AtomicBoolean(false)
@@ -43,19 +43,19 @@ internal object SettingsStorage {
     private val isMac
         get() = osName.contains("mac")
 
-    val settingsDir
+    internal val settingsDir
         get() =
             if (isPortableWindows) {
                 legacyDir
             } else {
                 migrateLegacyIfNeeded()
-                platformDir
+                platformConfigDir
             }
 
-    val legacyDir
+    private val legacyDir
         get() = File("config")
 
-    private val platformDir
+    val platformConfigDir
         get() =
             when {
                 isWindows -> windowsDir()
@@ -104,7 +104,7 @@ internal object SettingsStorage {
             return
         }
 
-        val target = platformDir
+        val target = platformConfigDir
         runCatching { Files.createDirectories(target.toPath()) }
             .onFailure { e ->
                 logger.error(e) { "Could not create new settings directory at ${target.absolutePath}" }

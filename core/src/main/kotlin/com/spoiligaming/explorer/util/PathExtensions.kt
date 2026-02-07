@@ -14,27 +14,22 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Server List Explorer.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
-plugins {
-    alias(libs.plugins.kotlin.serialization)
+package com.spoiligaming.explorer.util
+
+import java.nio.file.Path
+import java.util.Locale
+
+fun Path.canonicalize(): Path = toAbsolutePath().normalize()
+
+fun Path.serverListBookmarkKey(): String {
+    val snapshot = toString()
+    return if (OSUtils.isWindows) {
+        snapshot.lowercase(Locale.getDefault())
+    } else {
+        snapshot
+    }
 }
 
-dependencies {
-    implementation(project(":settings"))
-    implementation(project(":nbt"))
-
-    implementation(libs.kotlinx.coroutines.core.jvm)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.kotlinx.serialization.protobuf)
-
-    implementation(libs.mcUtils)
-
-    implementation(libs.ktor.client.core.jvm)
-    implementation(libs.ktor.client.cio.jvm)
-    testImplementation(libs.ktor.client.core.jvm)
-    testImplementation(libs.ktor.client.cio.jvm)
-    testImplementation(libs.ktor.client.mock.jvm)
-
-    implementation(libs.oshi.core)
-}
+fun Path.readableName() = fileName?.toString() ?: toString()
