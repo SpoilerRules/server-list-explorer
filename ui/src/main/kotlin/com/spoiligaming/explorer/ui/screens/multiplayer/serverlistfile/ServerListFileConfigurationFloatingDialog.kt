@@ -31,7 +31,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
@@ -59,7 +58,6 @@ import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TooltipDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -80,7 +78,6 @@ import androidx.compose.ui.unit.dp
 import com.spoiligaming.explorer.multiplayer.repository.ServerListRepository
 import com.spoiligaming.explorer.serverlist.bookmarks.ServerListFileBookmarkEntry
 import com.spoiligaming.explorer.serverlist.bookmarks.ServerListFileBookmarksManager
-import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalAmoledActive
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
 import com.spoiligaming.explorer.ui.dialog.FloatingDialogBuilder
 import com.spoiligaming.explorer.ui.t
@@ -144,18 +141,6 @@ internal fun ServerListFileConfigurationFloatingDialog(
     ) {
         RichTooltip(
             maxWidth = TooltipMaxWidth,
-            modifier =
-                Modifier.then(
-                    if (LocalAmoledActive.current) {
-                        Modifier.border(
-                            width = TooltipBorderWidth,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = TOOLTIP_BORDER_ALPHA),
-                            shape = TooltipDefaults.richTooltipContainerShape,
-                        )
-                    } else {
-                        Modifier
-                    },
-                ),
             title = { Text(t(Res.string.server_list_file_configuration_dialog_title)) },
             text = {
                 ServerListFileDialogContent(
@@ -714,7 +699,6 @@ private enum class HighlightStyle { None, Added, Error }
 
 private const val HIGHLIGHT_ANIMATION_MILLIS = 800
 private const val FIRST_VALID_INDEX = 0
-private const val TOOLTIP_BORDER_ALPHA = 0.35f
 private const val HEADER_SPACER_WEIGHT = 1f
 private const val LIST_CONTAINER_WEIGHT = 1f
 private const val LIST_COLUMN_WEIGHT = 1f
@@ -730,7 +714,6 @@ private const val ENTRY_PATH_MAX_LINES = 1
 private const val ENTRY_CONTENT_WEIGHT = 1f
 
 private val TooltipMaxWidth = 400.dp
-private val TooltipBorderWidth = 1.dp
 private val SelectedBorderWidth = 1.5.dp
 private val DialogContentMaxHeight = 300.dp
 private val DialogContentTopPadding = 4.dp
