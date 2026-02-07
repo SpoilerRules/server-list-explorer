@@ -215,6 +215,7 @@ internal fun ExpressiveDialog(
                     Modifier
                         .focusable()
                         .then(consumeEscape),
+                label = "ExpressiveDialogVisibility",
                 enter =
                     fadeIn(EnterFadeSpec) +
                         scaleIn(
