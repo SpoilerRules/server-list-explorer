@@ -18,6 +18,7 @@
 
 package com.spoiligaming.explorer.util
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.awt.Desktop
 import java.io.IOException
 import java.net.URI
@@ -27,10 +28,12 @@ import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 
 object DesktopSystemLauncher {
+    private val logger = KotlinLogging.logger {}
     private const val WINDOWS_EXPLORER_EXE = "explorer.exe"
     private const val WINDOWS_SELECT_SWITCH = "/select,"
 
     fun openUrl(url: String): Result<Unit> {
+        logger.debug { "Opening URL: $url" }
         val uri =
             try {
                 URI(url)
@@ -44,10 +47,14 @@ object DesktopSystemLauncher {
             runCatching {
                 val desktop = Desktop.getDesktop()
                 if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                    logger.debug { "Opening URL via Desktop.browse: $uri" }
                     desktop.browse(uri)
                     return Result.success(Unit)
                 }
-            }.onFailure { e -> failures.add(e) }
+            }.onFailure { e ->
+                logger.warn(e) { "Desktop.browse failed for URL: $url" }
+                failures.add(e)
+            }
         }
 
         val command =
@@ -58,10 +65,16 @@ object DesktopSystemLauncher {
             }
 
         runCatching {
+            logger.debug { "Opening URL via command: ${command.joinToString(" ")}" }
             ProcessBuilder(command).start()
             Unit
-        }.onSuccess { return Result.success(Unit) }
-            .onFailure { e -> failures.add(e) }
+        }.onSuccess {
+            logger.debug { "URL open command launched successfully for: $url" }
+            return Result.success(Unit)
+        }.onFailure { e ->
+            logger.warn(e) { "URL open command failed for: $url" }
+            failures.add(e)
+        }
 
         return Result.failure(failures.toFailure("Unable to open URL: $url"))
     }
@@ -73,6 +86,7 @@ object DesktopSystemLauncher {
      */
     fun revealInFileManager(path: Path): Result<Unit> {
         val selection = path.canonicalize()
+        logger.debug { "Revealing path in file manager: $selection" }
         if (!Files.exists(selection)) return Result.failure(NoSuchFileException(selection.toString()))
 
         val failures = ArrayList<Throwable>(3)
@@ -81,10 +95,14 @@ object DesktopSystemLauncher {
             runCatching {
                 val desktop = Desktop.getDesktop()
                 if (desktop.isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
+                    logger.debug { "Revealing path via Desktop.browseFileDirectory: $selection" }
                     desktop.browseFileDirectory(selection.toFile())
                     return Result.success(Unit)
                 }
-            }.onFailure { e -> failures.add(e) }
+            }.onFailure { e ->
+                logger.warn(e) { "Desktop.browseFileDirectory failed for path: $selection" }
+                failures.add(e)
+            }
         }
 
         runCatching {
@@ -93,8 +111,13 @@ object DesktopSystemLauncher {
                 OSUtils.isMacOS -> revealMac(selection)
                 else -> openDirectoryInternal(selection.parent ?: selection)
             }
-        }.onSuccess { return Result.success(Unit) }
-            .onFailure { e -> failures.add(e) }
+        }.onSuccess {
+            logger.debug { "Reveal command launched successfully for path: $selection" }
+            return Result.success(Unit)
+        }.onFailure { e ->
+            logger.warn(e) { "Reveal command failed for path: $selection" }
+            failures.add(e)
+        }
 
         return Result.failure(failures.toFailure("Unable to reveal in file manager: $selection"))
     }
@@ -106,6 +129,7 @@ object DesktopSystemLauncher {
      */
     fun openInFileManager(path: Path): Result<Unit> {
         val resolved = path.canonicalize()
+        logger.debug { "Opening in file manager for path: $resolved" }
 
         val targetDirectory =
             when {
@@ -116,6 +140,7 @@ object DesktopSystemLauncher {
             }
 
         return runCatching { openDirectoryInternal(targetDirectory) }
+            .onFailure { e -> logger.warn(e) { "Open in file manager failed for path: $targetDirectory" } }
     }
 
     private fun openDirectoryInternal(directory: Path) {
@@ -124,6 +149,7 @@ object DesktopSystemLauncher {
         if (Desktop.isDesktopSupported()) {
             val desktop = Desktop.getDesktop()
             if (desktop.isSupported(Desktop.Action.OPEN)) {
+                logger.debug { "Opening directory via Desktop.open: $directory" }
                 desktop.open(directory.toFile())
                 return
             }
@@ -136,16 +162,19 @@ object DesktopSystemLauncher {
                 else -> listOf("xdg-open", directory.toString())
             }
 
+        logger.debug { "Opening directory via command: ${command.joinToString(" ")}" }
         val process = ProcessBuilder(command).start()
         if (!process.isAlive) throw IOException("Failed to launch file manager command: ${command.joinToString(" ")}")
     }
 
     private fun revealWindows(selection: Path) {
-        val selectionArg = WINDOWS_SELECT_SWITCH + selection.toString()
-        ProcessBuilder(WINDOWS_EXPLORER_EXE, selectionArg).start()
+        val command = listOf(WINDOWS_EXPLORER_EXE, WINDOWS_SELECT_SWITCH, selection.toString())
+        logger.debug { "Revealing path via Windows Explorer command: ${command.joinToString(" ")}" }
+        ProcessBuilder(command).start()
     }
 
     private fun revealMac(selection: Path) {
+        logger.debug { "Revealing path via macOS command: open -R $selection" }
         ProcessBuilder("open", "-R", selection.toString()).start()
     }
 }
