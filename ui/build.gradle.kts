@@ -1,6 +1,6 @@
 /*
  * This file is part of Server List Explorer.
- * Copyright (C) 2025 SpoilerRules
+ * Copyright (C) 2025-2026 SpoilerRules
  *
  * Server List Explorer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,9 +33,9 @@ dependencies {
         exclude(group = "org.jetbrains.compose.material", module = "material-desktop")
         exclude(group = "org.jetbrains.compose.material", module = "material-ripple")
     }
-    implementation(compose.components.resources)
-    implementation(compose.material3)
-    implementation(compose.materialIconsExtended)
+    implementation(libs.compose.components.resources)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.materialIconsExtended)
     implementation(libs.kotlinx.serialization.json)
 
     // Navigation Compose
@@ -58,9 +58,6 @@ dependencies {
         exclude(group = "net.java.dev.jna", module = "jna")
         exclude(group = "net.java.dev.jna", module = "jna-platform")
     }
-
-    // Resources
-    implementation(compose.components.resources)
 }
 
 compose {

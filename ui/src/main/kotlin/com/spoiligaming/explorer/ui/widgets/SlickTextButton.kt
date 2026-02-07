@@ -1,6 +1,6 @@
 /*
  * This file is part of Server List Explorer.
- * Copyright (C) 2025 SpoilerRules
+ * Copyright (C) 2025-2026 SpoilerRules
  *
  * Server List Explorer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ internal fun SlickTextButton(
     colors =
         ButtonDefaults.textButtonColors(
             contentColor = contentColor,
-            disabledContentColor = ListItemDefaults.colors().supportingTextColor,
+            disabledContentColor = ListItemDefaults.colors().supportingContentColor,
         ),
 ) {
     content()
