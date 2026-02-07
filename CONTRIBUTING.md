@@ -117,35 +117,26 @@ requests.
    val offset = (-1).dp
    val negativeIndex = (-list.size)
    ```
-3. If `t` can't be used inline because the current scope isn’t composable, create a variable instead
-    - Contain the full, descriptive name of the string resource (no vague abbreviations).
-    - Be converted to snake_case in the resource name but camelCase in the variable.
-    - End with the word 'Text' so nobody mistakes it for anything else.
+3. If `t` can't be used inline because the current scope isn't composable, create a variable with a meaningful name
+    - Use a descriptive name that makes the text's purpose clear at the call site.
+    - Avoid vague abbreviations.
     - Good:
    ```kotlin
-   val pleaseDoNotPushTheBigRedButtonText = t(Res.string.please_do_not_push_the_big_red_button)
+   val reactorOverheatingWarning = t(
+       Res.string.reactor_overheating_warning,
+       reactorTemperature,
+       reactorPressure
+   )
 
    LaunchedEffect(nuclearReactor) {
-       Text(pleaseDoNotPushTheBigRedButtonText)
-   }
-   ```
-   - Good with overload (using args):
-   ```kotlin
-   val reactorOverheatingWarningText =
-       t(Res.string.reactor_overheating_warning, reactorTemperature, reactorPressure)
-
-   LaunchedEffect(nuclearReactor) {
-       Text(reactorOverheatingWarningText)
+       Text(reactorOverheatingWarning)
    }
    ```
     - Bad:
    ```kotlin
-   // What even is this? "txt"? Which text? Where from?
-   val txt = t(Res.string.txt)
+   val txt = t(Res.string.reactor_overheating_warning)
 
    LaunchedEffect(nuclearReactor) {
-       // Is this a warning? A tooltip? A button label?
-       // Future maintainers have to dig into resources to find out
        Text(txt)
    }
    ```
