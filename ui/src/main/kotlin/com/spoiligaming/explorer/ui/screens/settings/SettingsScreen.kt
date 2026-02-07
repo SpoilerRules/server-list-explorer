@@ -81,7 +81,6 @@ import server_list_explorer.ui.generated.resources.settings_section_multiplayer
 import server_list_explorer.ui.generated.resources.settings_section_preferences
 import server_list_explorer.ui.generated.resources.settings_section_theme
 import server_list_explorer.ui.generated.resources.settings_section_window_appearance
-import kotlin.math.abs
 import kotlin.math.absoluteValue
 
 @Composable
@@ -276,24 +275,33 @@ private fun SectionNavigator(
         derivedStateOf {
             if (sectionHeights.isEmpty() || viewportHeightPx <= 0) return@derivedStateOf 0
 
-            val anchor = scrollState.value + viewportHeightPx / 2
+            val spacing = spacingPx.toInt()
+            val sectionStarts = calculateSectionStarts(sectionHeights = sectionHeights, spacingPx = spacing)
+            val viewportCenter = scrollState.value + viewportHeightPx / 2
 
-            val gap = with(density) { SectionSpacing.toPx() }.toInt()
+            val sectionIndexContainingViewportCenter =
+                sectionStarts
+                    .withIndex()
+                    .firstOrNull { (index, sectionTop) ->
+                        val sectionBottom = sectionTop + sectionHeights.getOrElse(index) { 0 }
+                        viewportCenter in sectionTop..sectionBottom
+                    }?.index
 
-            var offset = 0
-            val centers =
-                sectionHeights.map { height ->
-                    val center = offset + height / 2
-                    offset += height + gap
-                    center
-                }
-
-            centers
-                .withIndex()
-                .minByOrNull { (_, center) -> abs(center - anchor) }
-                ?.index
-                ?.coerceIn(0, sectionTitles.lastIndex)
-                ?: 0
+            sectionIndexContainingViewportCenter?.coerceIn(0, sectionTitles.lastIndex)
+                ?: (
+                    sectionStarts
+                        .withIndex()
+                        .minByOrNull { (index, sectionTop) ->
+                            val sectionBottom = sectionTop + sectionHeights.getOrElse(index) { 0 }
+                            when {
+                                viewportCenter < sectionTop -> sectionTop - viewportCenter
+                                viewportCenter > sectionBottom -> viewportCenter - sectionBottom
+                                else -> 0
+                            }
+                        }?.index
+                        ?.coerceIn(0, sectionTitles.lastIndex)
+                        ?: 0
+                )
         }
     }
 
@@ -359,11 +367,19 @@ private fun SectionNavigator(
 
                     val onClickAction: () -> Unit = {
                         scope.launch {
-                            if (sectionHeights.isEmpty()) return@launch
+                            if (sectionHeights.size <= index) return@launch
 
                             val spacing = spacingPx.toInt()
-                            val gaps = (index - 1).coerceAtLeast(0)
-                            val target = sectionHeights.take(index).sum() + spacing * gaps
+                            val sectionStarts =
+                                calculateSectionStarts(sectionHeights = sectionHeights, spacingPx = spacing)
+                            val sectionTop = sectionStarts.getOrElse(index) { 0 }
+                            val sectionHeight = sectionHeights.getOrElse(index) { 0 }
+                            val target =
+                                if (sectionHeight in 1 until viewportHeightPx) {
+                                    sectionTop - (viewportHeightPx - sectionHeight) / 2
+                                } else {
+                                    sectionTop
+                                }
 
                             val maxScroll = (totalContentHeight - viewportHeightPx).coerceAtLeast(0)
                             val clamped = target.coerceIn(0, maxScroll)
@@ -421,3 +437,18 @@ private val SectionNavigatorPaddingStart = 8.dp
 private val NavigatorShaftWidth = 2.dp
 private val NavigatorThumbWidth = 2.dp
 private val NavigatorBaseOffset = -4.dp
+
+private fun calculateSectionStarts(
+    sectionHeights: List<Int>,
+    spacingPx: Int,
+): List<Int> {
+    var runningOffset = 0
+    return sectionHeights.mapIndexed { index, height ->
+        val start = runningOffset
+        runningOffset += height
+        if (index < sectionHeights.lastIndex) {
+            runningOffset += spacingPx
+        }
+        start
+    }
+}
