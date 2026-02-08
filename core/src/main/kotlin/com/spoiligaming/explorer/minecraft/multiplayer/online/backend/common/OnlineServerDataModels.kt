@@ -39,6 +39,7 @@ data class McSrvStatOnlineServerData(
     override val ip: String,
     override val info: String?,
     val versionName: String?,
+    val software: String?,
     val eulaBlocked: Boolean,
 ) : OnlineServerData
 
