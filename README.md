@@ -40,8 +40,6 @@
 <p align="center">
   <b>Server List Explorer</b> is a tool for managing
   your <a href="https://www.minecraft.net/">Minecraft: Java Edition</a> server list and, in the future, your single-player world list.
-  A complete overview of the features can be found on the
-  <a href="https://github.com/SpoilerRules/server-list-explorer/wiki/Feature-List">Feature List wiki page</a>.
 </p>
 
 <table align="center">
