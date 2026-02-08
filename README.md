@@ -32,8 +32,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/SpoilerRules/server-list-explorer/releases/latest">
-    <img alt="Download latest" src="https://img.shields.io/badge/Download-Latest%20Release-blue?style=for-the-badge"/>
+  <a href="#available-downloads">
+    <img alt="Available downloads" src="https://img.shields.io/badge/Available%20Downloads-0891B2?style=for-the-badge&logo=github&logoColor=white&logoSize=auto"/>
   </a>
 </p>
 
