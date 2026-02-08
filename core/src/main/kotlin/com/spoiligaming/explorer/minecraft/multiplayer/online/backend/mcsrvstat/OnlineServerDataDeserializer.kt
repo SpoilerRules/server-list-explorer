@@ -41,6 +41,7 @@ internal object OnlineServerDataSerializer {
             protocolVersion = response.protocol.version.toInt(),
             ip = response.ip,
             info = response.info?.raw?.joinToString(separator = "\n"),
+            software = response.software,
             eulaBlocked = response.eulaBlocked,
         )
 

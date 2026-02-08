@@ -69,6 +69,7 @@ import androidx.compose.material.icons.filled.NetworkPing
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.SettingsEthernet
+import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -1004,6 +1005,11 @@ private fun OnlineServerDataRow(
                 buildList {
                     add { InfoChip(Icons.Filled.People, playerCountText) }
                     add { InfoChip(Icons.Filled.Dns, onlineData.ip) }
+                    if (onlineData is McSrvStatOnlineServerData) {
+                        onlineData.software?.let { software ->
+                            add { InfoChip(Icons.Filled.Terminal, software) }
+                        }
+                    }
 
                     if (onlineData is McUtilsOnlineServerData) {
                         add {
