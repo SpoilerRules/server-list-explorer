@@ -140,7 +140,6 @@ private fun ActionItemContent(
             text = item.text,
             style = MaterialTheme.typography.labelLarge,
             color = textColor,
-            maxLines = SINGLE_LINE_MAX_LINES,
             overflow = TextOverflow.Ellipsis,
         )
     },
@@ -150,9 +149,11 @@ private fun ActionItemContent(
     },
     enabled = item.enabled,
     modifier =
-        Modifier.pointerHoverIcon(
-            if (item.enabled) PointerIcon.Hand else PointerIcon.Default,
-        ),
+        Modifier
+            .widthIn(min = DropdownMinWidth, max = DropdownMaxWidth)
+            .pointerHoverIcon(
+                if (item.enabled) PointerIcon.Hand else PointerIcon.Default,
+            ),
     leadingIcon =
         item.icon?.let { icon ->
             val iconTint =
@@ -396,8 +397,8 @@ internal fun SelectableDropdown(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(MenuItemIconSize),
                     )
+                    Spacer(Modifier.width(DropdownContentPadding))
                 }
-                Spacer(Modifier.width(DropdownContentPadding))
                 Text(
                     text = selected.text,
                     color = MaterialTheme.colorScheme.onSurface,
