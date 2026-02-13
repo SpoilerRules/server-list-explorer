@@ -10,6 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
+          <option value="ui:clean" />
           <option value="ui:generateResourceAccessorsForMain" />
           <option value="ui:generateActualResourceCollectorsForMain" />
         </list>
@@ -18,8 +19,11 @@
     </ExternalSystemSettings>
     <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+    <ExternalSystemDebugDisabled>true</ExternalSystemDebugDisabled>
     <DebugAllEnabled>false</DebugAllEnabled>
     <RunAsTest>false</RunAsTest>
+    <GradleProfilingDisabled>false</GradleProfilingDisabled>
+    <GradleCoverageDisabled>false</GradleCoverageDisabled>
     <method v="2" />
   </configuration>
 </component>
