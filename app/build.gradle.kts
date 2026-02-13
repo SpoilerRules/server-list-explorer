@@ -35,6 +35,7 @@ dependencies {
     runtimeOnly(libs.log4j.slf4j2.impl)
 
     implementation(libs.compose.runtime)
+    implementation(libs.compose.native.tray)
 
     val onlyWindowsX64: Boolean by rootProject.extra
     val onlyWindowsArm64: Boolean by rootProject.extra
@@ -181,6 +182,18 @@ val copyrightYears =
         if (now > it) "$it–$now" else "$it"
     }
 
+val optimizedJvmArgs =
+    listOf(
+        "-Xms128m",
+        "-Xmx2g",
+        "-XX:+UseG1GC",
+        "-XX:MaxGCPauseMillis=50",
+        "-XX:InitiatingHeapOccupancyPercent=30",
+        "-XX:G1ReservePercent=15",
+        "-XX:+ParallelRefProcEnabled",
+        "-XX:+UseStringDeduplication",
+    )
+
 compose.desktop.application {
     mainClass = mainFunction
     javaHome = sequenceOf(
@@ -206,6 +219,8 @@ compose.desktop.application {
               - Configure a Java 21 Gradle toolchain
             """.trimIndent(),
         )
+
+    jvmArgs += optimizedJvmArgs
 
     nativeDistributions {
         packageName = "ServerListExplorer"
@@ -244,6 +259,7 @@ compose.desktop.application {
         obfuscate.set(false)
         configurationFiles.from(
             rootProject.file("proguard/base.pro"),
+            rootProject.file("proguard/ComposeNativeTray.pro"),
             rootProject.file("proguard/compose.pro"),
             rootProject.file("proguard/jna.pro"),
             rootProject.file("proguard/ktor.pro"),
