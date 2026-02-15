@@ -34,6 +34,9 @@ dependencies {
     compileOnly(libs.log4j.core)
     runtimeOnly(libs.log4j.slf4j2.impl)
 
+    implementation(libs.jna)
+    implementation(libs.jna.platform)
+
     implementation(libs.compose.runtime)
     implementation(libs.compose.native.tray)
 
