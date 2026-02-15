@@ -18,14 +18,43 @@
 
 package com.spoiligaming.explorer
 
+import com.kdroid.composetray.utils.SingleInstanceManager
+import com.spoiligaming.explorer.settings.manager.startupSettingsManager
 import com.spoiligaming.explorer.ui.launchInterface
+import com.spoiligaming.explorer.util.AppActivationSignal
+import com.spoiligaming.explorer.util.ComputerStartupRegistrationManager
+import io.github.oshai.kotlinlogging.KotlinLogging
 
 fun main(args: Array<String>) {
     val env = if (System.getProperty("env") == "dev") "dev" else "prod"
+    val logsDir = LogStorage.logsDir
+    logsDir.mkdirs()
     System.setProperty("log4j2.configurationFile", "log4j2-$env.xml")
-    System.setProperty("app.logs.dir", LogStorage.logsDir.absolutePath)
+    System.setProperty("app.logs.dir", logsDir.absolutePath)
 
     ArgsParser.parse(args)
+    WindowsProcessPriority.applyAutoStartupPriority()
 
-    launchInterface()
+    val startupSettings = startupSettingsManager.getCachedSettings()
+    runCatching {
+        ComputerStartupRegistrationManager.reconcile(startupSettings.computerStartupBehavior)
+    }.onFailure { e ->
+        logger.error(e) {
+            "Failed to reconcile OS startup registration for behavior=${startupSettings.computerStartupBehavior}"
+        }
+    }
+
+    if (startupSettings.singleInstanceHandling) {
+        val isPrimary =
+            SingleInstanceManager.isSingleInstance(
+                onRestoreRequest = { AppActivationSignal.publish() },
+            )
+        if (!isPrimary) {
+            return
+        }
+    }
+
+    launchInterface(isAutoStartupLaunch = ArgsParser.isAutoStartupLaunch)
 }
+
+private val logger by lazy { KotlinLogging.logger {} }

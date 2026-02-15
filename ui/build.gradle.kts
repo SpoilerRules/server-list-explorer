@@ -49,6 +49,9 @@ dependencies {
     implementation(libs.reorderable.jvm)
     implementation(libs.autolinktext)
 
+    // System tray UI components
+    implementation(libs.compose.native.tray)
+
     // JNA for DWM
     implementation(libs.jna)
     implementation(libs.jna.platform)
