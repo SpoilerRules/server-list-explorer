@@ -153,12 +153,10 @@ object OSUtils {
                     ?.absolutePath ?: return false
 
             val executableName = File(processCommand).name.lowercase(Locale.ROOT)
-            return (
-                executableName == "java" ||
-                    executableName == "java.exe" ||
-                    executableName == "javaw" ||
-                    executableName == "javaw.exe"
-            )
+            return executableName == "java" ||
+                executableName == "java.exe" ||
+                executableName == "javaw" ||
+                executableName == "javaw.exe"
         }
 
     val windowsBuild
