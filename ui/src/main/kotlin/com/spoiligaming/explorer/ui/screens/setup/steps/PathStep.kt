@@ -1,6 +1,6 @@
 /*
  * This file is part of Server List Explorer.
- * Copyright (C) 2025 SpoilerRules
+ * Copyright (C) 2025-2026 SpoilerRules
  *
  * Server List Explorer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,7 +48,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,17 +58,13 @@ import androidx.compose.ui.unit.dp
 import com.spoiligaming.explorer.minecraft.common.IModuleKind
 import com.spoiligaming.explorer.minecraft.common.UnifiedModeInitializer
 import com.spoiligaming.explorer.serverlist.bookmarks.ServerListFileBookmarksManager
-import com.spoiligaming.explorer.settings.manager.singleplayerSettingsManager
 import com.spoiligaming.explorer.ui.extensions.onHover
 import com.spoiligaming.explorer.ui.screens.setup.SetupStepContainer
 import com.spoiligaming.explorer.ui.screens.setup.SetupUiState
-import com.spoiligaming.explorer.ui.snackbar.SnackbarController
-import com.spoiligaming.explorer.ui.snackbar.SnackbarEvent
 import com.spoiligaming.explorer.ui.t
 import com.spoiligaming.explorer.ui.util.rememberServerListFilePickerLauncher
 import com.spoiligaming.explorer.ui.util.rememberWorldSavesPickerLauncher
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import server_list_explorer.ui.generated.resources.Res
 import server_list_explorer.ui.generated.resources.cd_browse
@@ -91,22 +85,14 @@ import server_list_explorer.ui.generated.resources.setup_path_step_missing
 import server_list_explorer.ui.generated.resources.setup_path_step_ready
 import server_list_explorer.ui.generated.resources.setup_server_list_path_locked_message
 import server_list_explorer.ui.generated.resources.setup_server_list_path_locked_title
-import server_list_explorer.ui.generated.resources.setup_server_list_path_save_detected_failed
-import server_list_explorer.ui.generated.resources.setup_server_list_path_save_selected_failed
 import server_list_explorer.ui.generated.resources.setup_step_title_paths
 
 @Composable
 internal fun PathStep(state: SetupUiState) {
     var isDetectingServer by remember { mutableStateOf(true) }
     var isDetectingSaves by remember { mutableStateOf(true) }
-    val scope = rememberCoroutineScope()
     val bookmarkEntries by ServerListFileBookmarksManager.entries.collectAsState()
     val isServerListFilePathSelectionLocked = bookmarkEntries.isNotEmpty()
-
-    // detected
-    val saveDetectedServerListFailedMessage = t(Res.string.setup_server_list_path_save_detected_failed)
-    // selected
-    val saveSelectedServerListFailedMessage = t(Res.string.setup_server_list_path_save_selected_failed)
 
     LaunchedEffect(state.serverFilePath) {
         if (state.serverFilePath == null) {
@@ -118,16 +104,6 @@ internal fun PathStep(state: SetupUiState) {
 
             if (detected != null) {
                 logger.info { "Server file path detected automatically: $detected" }
-                runCatching { ServerListFileBookmarksManager.setActivePath(detected) }
-                    .onFailure { e ->
-                        logger.error(e) { "Failed to store detected server list file path" }
-                        SnackbarController.sendEvent(
-                            SnackbarEvent(
-                                message = saveDetectedServerListFailedMessage,
-                                duration = SnackbarDuration.Short,
-                            ),
-                        )
-                    }
                 state.serverFilePath = detected
             } else {
                 logger.warn { "Automatic server file detection failed." }
@@ -148,9 +124,6 @@ internal fun PathStep(state: SetupUiState) {
 
             if (detected != null) {
                 logger.info { "World saves path detected automatically: $detected" }
-                singleplayerSettingsManager.updateSettings {
-                    it.copy(savesDirectory = detected)
-                }
                 state.worldSavesPath = detected
             } else {
                 logger.warn { "Automatic world saves detection failed." }
@@ -165,9 +138,6 @@ internal fun PathStep(state: SetupUiState) {
         rememberWorldSavesPickerLauncher(
             title = t(Res.string.placeholder_world_saves),
         ) { path ->
-            singleplayerSettingsManager.updateSettings {
-                it.copy(savesDirectory = path)
-            }
             state.worldSavesPath = path
         }
 
@@ -175,20 +145,7 @@ internal fun PathStep(state: SetupUiState) {
         rememberServerListFilePickerLauncher(
             title = t(Res.string.placeholder_server_list),
         ) { path ->
-            scope.launch {
-                runCatching { ServerListFileBookmarksManager.setActivePath(path) }
-                    .onFailure { e ->
-                        logger.error(e) { "Failed to save selected server list file path" }
-                        SnackbarController.sendEvent(
-                            SnackbarEvent(
-                                message = saveSelectedServerListFailedMessage,
-                                duration = SnackbarDuration.Short,
-                            ),
-                        )
-                    }.onSuccess {
-                        state.serverFilePath = path
-                    }
-            }
+            state.serverFilePath = path
         }
 
     SetupStepContainer(
@@ -385,16 +342,20 @@ private fun SetupServerListPathLockedNotice(modifier: Modifier = Modifier) =
                 modifier = Modifier.size(LockedNoticeIconSize),
             )
             Column(verticalArrangement = Arrangement.spacedBy(LockedNoticeTextSpacing)) {
-                Text(
-                    text = t(Res.string.setup_server_list_path_locked_title),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Text(
-                    text = t(Res.string.setup_server_list_path_locked_message),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                SelectionContainer {
+                    Text(
+                        text = t(Res.string.setup_server_list_path_locked_title),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+                SelectionContainer {
+                    Text(
+                        text = t(Res.string.setup_server_list_path_locked_message),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }

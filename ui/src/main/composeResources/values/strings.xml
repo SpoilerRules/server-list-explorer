@@ -2,11 +2,17 @@
     <string name="preferred_language_label">Choose your preferred language</string>
 
     <string name="setup_step_title_localization">Localization</string>
+    <string name="setup_step_title_startup">Startup Experience</string>
     <string name="setup_step_title_paths">Minecraft Path Configuration</string>
 
     <string name="button_back">Back</string>
     <string name="button_next">Next</string>
     <string name="button_finish">Finish</string>
+
+    <string name="tray_item_open">Open</string>
+    <string name="tray_item_hide">Hide</string>
+    <string name="tray_item_exit">Exit</string>
+    <string name="tray_content_description_icon">System tray icon</string>
 
     <string name="setup_path_step_ready">Review the selected paths and continue</string>
     <string name="setup_path_step_missing">Select the required paths to proceed</string>
@@ -14,6 +20,29 @@
     <string name="setup_server_list_path_locked_message">You already have saved server list file path(s). The setup wizard can’t change them. Manage server list files from Multiplayer settings.</string>
     <string name="setup_server_list_path_save_detected_failed">Couldn't save the detected server list file</string>
     <string name="setup_server_list_path_save_selected_failed">Couldn't save the selected server list file</string>
+    <string name="setup_startup_step_subtitle">Choose how Server List Explorer behaves when your computer starts and when it closes</string>
+    <string name="setup_startup_step_subtitle_close_behavior">Choose how Server List Explorer behaves when it closes</string>
+    <string name="setup_startup_low_memory_title">Memory tip</string>
+    <string name="setup_startup_low_memory_message">This device has less than 8 GB of memory. Server List Explorer is expected to use at least 300 MB while idle in the system tray.</string>
+    <string name="setup_startup_low_memory_icon_content_description">Low memory warning</string>
+    <string name="setup_startup_save_failed">Couldn't update startup preference. Please try again.</string>
+    <string name="settings_section_startup">Startup</string>
+    <string name="startup_when_computer_starts_dropdown_title">When my computer starts</string>
+    <string name="startup_when_computer_starts_dropdown_description">Choose how Server List Explorer starts when your computer starts.</string>
+    <string name="startup_when_computer_starts_section_title">When your computer starts, Server List Explorer will...</string>
+    <string name="startup_behavior_do_not_start">Do not start</string>
+    <string name="startup_behavior_start_visible">Start visible</string>
+    <string name="startup_behavior_start_minimized_to_system_tray">Start minimized to system tray</string>
+    <string name="startup_save_failed">Couldn't update startup preference. Please try again.</string>
+    <string name="startup_minimize_to_tray_on_close_title">Minimize to tray on close</string>
+    <string name="startup_minimize_to_tray_on_close_description">Keep Server List Explorer running in the system tray when you close Server List Explorer.</string>
+    <string name="startup_single_instance_handling_title">Single-instance handling</string>
+    <string name="startup_single_instance_handling_description">Prevent duplicate windows and restore the existing one.</string>
+    <string name="startup_restore_previous_state_title">Restore previous state when reopened from system tray</string>
+    <string name="startup_restore_previous_state_description_short">Reopen where you left off instead of starting with a fresh session.</string>
+    <string name="startup_restore_previous_state_description_long">When Server List Explorer is minimized to the system tray, reopening it returns you to the exact state you left. Turn this off to start fresh each time you bring it back from the tray.</string>
+    <string name="startup_restore_previous_state_note">Zero impact on system performance. Whether this is on or off, the memory footprint remains the same. Only enable this if you prefer a clean slate every time you open Server List Explorer.</string>
+    <string name="setup_wizard_finish_failed">Couldn't finish setup. Please try again.</string>
     <string name="setup_wizard_step_counter">Setup Wizard • Step %1$d of %2$d</string>
 
     <string name="label_world_saves">World Saves Folder</string>

@@ -66,6 +66,7 @@ import androidx.compose.ui.unit.times
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
 import com.spoiligaming.explorer.ui.screens.settings.sections.MultiplayerSettings
 import com.spoiligaming.explorer.ui.screens.settings.sections.PreferenceSettings
+import com.spoiligaming.explorer.ui.screens.settings.sections.StartupSettingsSection
 import com.spoiligaming.explorer.ui.screens.settings.sections.ThemeSettings
 import com.spoiligaming.explorer.ui.screens.settings.sections.WindowAppearenceSettings
 import com.spoiligaming.explorer.ui.t
@@ -79,6 +80,7 @@ import server_list_explorer.ui.generated.resources.open_source_licenses_button
 import server_list_explorer.ui.generated.resources.settings_navigator_title
 import server_list_explorer.ui.generated.resources.settings_section_multiplayer
 import server_list_explorer.ui.generated.resources.settings_section_preferences
+import server_list_explorer.ui.generated.resources.settings_section_startup
 import server_list_explorer.ui.generated.resources.settings_section_theme
 import server_list_explorer.ui.generated.resources.settings_section_window_appearance
 import kotlin.math.absoluteValue
@@ -93,6 +95,7 @@ internal fun SettingsScreen() {
                 add(@Composable { t(Res.string.settings_section_theme) } to { ThemeSettings() })
                 add(@Composable { t(Res.string.settings_section_preferences) } to { PreferenceSettings() })
                 add(@Composable { t(Res.string.settings_section_multiplayer) } to { MultiplayerSettings() })
+                add(@Composable { t(Res.string.settings_section_startup) } to { StartupSettingsSection() })
                 if (OSUtils.isWindows) {
                     add(
                         @Composable { t(Res.string.settings_section_window_appearance) } to
