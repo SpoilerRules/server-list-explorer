@@ -66,7 +66,7 @@ internal fun ApplicationScope.AppSystemTray(
     val isSystemTraySupported = SystemTray.isSupported()
     if (!isSystemTraySupported) {
         logger.warn { "System tray is not supported on this environment. Restoring main window." }
-        LaunchedEffect("SystemTrayUnsupportedRestoreWindow") {
+        LaunchedEffect(isWindowVisible) {
             onOpen()
         }
         return
@@ -75,7 +75,7 @@ internal fun ApplicationScope.AppSystemTray(
     val trayIconBitmap = rememberTrayIconBitmap()
     if (trayIconBitmap == null) {
         logger.warn { "No JVM tray icon could be resolved. Restoring main window instead of rendering tray." }
-        LaunchedEffect("SystemTrayIconMissingRestoreWindow") {
+        LaunchedEffect(isWindowVisible) {
             onOpen()
         }
         return
