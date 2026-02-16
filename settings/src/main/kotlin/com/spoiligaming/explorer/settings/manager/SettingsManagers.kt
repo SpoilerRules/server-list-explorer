@@ -1,6 +1,6 @@
 /*
  * This file is part of Server List Explorer.
- * Copyright (C) 2025 SpoilerRules
+ * Copyright (C) 2025-2026 SpoilerRules
  *
  * Server List Explorer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import com.spoiligaming.explorer.settings.model.MultiplayerSettings
 import com.spoiligaming.explorer.settings.model.Preferences
 import com.spoiligaming.explorer.settings.model.ServerQueryMethodConfigurations
 import com.spoiligaming.explorer.settings.model.SingleplayerSettings
+import com.spoiligaming.explorer.settings.model.StartupSettings
 import com.spoiligaming.explorer.settings.model.ThemeSettings
 import com.spoiligaming.explorer.settings.model.WindowAppearance
 import com.spoiligaming.explorer.settings.model.WindowState
@@ -69,4 +70,9 @@ val serverQueryMethodConfigurationsManager by UniversalSettingsManager<ServerQue
 val singleplayerSettingsManager by UniversalSettingsManager<SingleplayerSettings>(
     fileName = "singleplayer.json",
     defaultValueProvider = { SingleplayerSettings() },
+)
+
+val startupSettingsManager by UniversalSettingsManager<StartupSettings>(
+    fileName = "startup.json",
+    defaultValueProvider = { StartupSettings() },
 )
