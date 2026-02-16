@@ -34,6 +34,7 @@ import org.jetbrains.compose.resources.decodeToImageBitmap
 import server_list_explorer.ui.generated.resources.Res
 import server_list_explorer.ui.generated.resources.tray_content_description_icon
 import server_list_explorer.ui.generated.resources.tray_item_exit
+import server_list_explorer.ui.generated.resources.tray_item_hide
 import server_list_explorer.ui.generated.resources.tray_item_open
 import java.awt.SystemTray
 import java.awt.image.BufferedImage
@@ -49,12 +50,16 @@ import javax.swing.filechooser.FileSystemView
 @Composable
 internal fun ApplicationScope.AppSystemTray(
     isSystemTrayFeatureEnabled: Boolean,
+    shouldMinimizeToSystemTrayOnClose: Boolean,
     isWindowVisible: Boolean,
     tooltip: String,
+    onHide: () -> Unit,
     onOpen: () -> Unit,
     onExit: () -> Unit,
 ) {
-    val shouldShowTray = isSystemTrayFeatureEnabled && !isWindowVisible
+    val shouldShowTray =
+        isSystemTrayFeatureEnabled &&
+            (!isWindowVisible || shouldMinimizeToSystemTrayOnClose)
     if (!shouldShowTray) return
 
     logger.info { "Attempting to render system tray" }
@@ -77,6 +82,7 @@ internal fun ApplicationScope.AppSystemTray(
     }
 
     val trayIconContentDescription = t(Res.string.tray_content_description_icon)
+    val trayHideItemLabel = t(Res.string.tray_item_hide)
     val trayOpenItemLabel = t(Res.string.tray_item_open)
     val trayExitItemLabel = t(Res.string.tray_item_exit)
 
@@ -91,7 +97,11 @@ internal fun ApplicationScope.AppSystemTray(
         tooltip = tooltip,
         primaryAction = onOpen,
     ) {
-        Item(trayOpenItemLabel, onClick = onOpen)
+        if (isWindowVisible) {
+            Item(trayHideItemLabel, onClick = onHide)
+        } else {
+            Item(trayOpenItemLabel, onClick = onOpen)
+        }
         Item(trayExitItemLabel, onClick = onExit)
     }
 }

@@ -131,8 +131,12 @@ internal object WindowManager {
 
             AppSystemTray(
                 isSystemTrayFeatureEnabled = startupSettings.isSystemTrayFeatureEnabled,
+                shouldMinimizeToSystemTrayOnClose = startupSettings.minimizeToSystemTrayOnClose,
                 isWindowVisible = isWindowVisible,
                 tooltip = WINDOW_TITLE,
+                onHide = {
+                    isWindowVisible = false
+                },
                 onOpen = {
                     isWindowVisible = true
                     shouldFocusWindow = true
