@@ -34,6 +34,7 @@ log4j = "2.25.3"
 jna = "5.18.1"
 oshi = "6.9.3"
 themeDetector = "3.9.1"
+composeNativeTray = "1.1.0"
 
 # Minecraft
 nbt = "6.1"
@@ -55,6 +56,7 @@ materialKolor = { module = "com.materialkolor:material-kolor", version.ref = "ma
 color-picker = { module = "com.godaddy.android.colorpicker:compose-color-picker-jvm", version.ref = "colorPicker" }
 reorderable-jvm = { module = "sh.calvin.reorderable:reorderable-jvm", version.ref = "reorderable" }
 file-kit = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "fileKit" }
+compose-native-tray = { module = "io.github.kdroidfilter:composenativetray", version.ref = "composeNativeTray" }
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-material3" }
 compose-materialIconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "compose-materialIconsExtended" }

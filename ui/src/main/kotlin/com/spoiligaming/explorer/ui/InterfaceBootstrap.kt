@@ -1,6 +1,6 @@
 /*
  * This file is part of Server List Explorer.
- * Copyright (C) 2025 SpoilerRules
+ * Copyright (C) 2025-2026 SpoilerRules
  *
  * Server List Explorer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,8 +64,10 @@ import com.spoiligaming.explorer.ui.window.WindowManager
 import com.spoiligaming.explorer.util.FirstRunManager
 import kotlinx.coroutines.launch
 
-fun launchInterface() {
-    WindowManager.launch { AppContainer() }
+fun launchInterface(isAutoStartupLaunch: Boolean) {
+    WindowManager.launch(isAutoStartupLaunch = isAutoStartupLaunch) {
+        AppContainer()
+    }
 }
 
 @Composable

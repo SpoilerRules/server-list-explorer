@@ -1,6 +1,6 @@
 /*
  * This file is part of Server List Explorer.
- * Copyright (C) 2025 SpoilerRules
+ * Copyright (C) 2025-2026 SpoilerRules
  *
  * Server List Explorer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,6 +48,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,23 +57,41 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.spoiligaming.explorer.serverlist.bookmarks.ServerListFileBookmarksManager
+import com.spoiligaming.explorer.settings.manager.UniversalSettingsManager
+import com.spoiligaming.explorer.settings.manager.preferenceSettingsManager
+import com.spoiligaming.explorer.settings.manager.singleplayerSettingsManager
+import com.spoiligaming.explorer.settings.manager.startupSettingsManager
+import com.spoiligaming.explorer.settings.model.ComputerStartupBehavior
+import com.spoiligaming.explorer.settings.model.StartupSettings
+import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalSingleplayerSettings
+import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalStartupSettings
 import com.spoiligaming.explorer.ui.screens.setup.steps.LanguageSelectionStep
 import com.spoiligaming.explorer.ui.screens.setup.steps.PathStep
+import com.spoiligaming.explorer.ui.screens.setup.steps.StartupStep
+import com.spoiligaming.explorer.ui.snackbar.SnackbarController
+import com.spoiligaming.explorer.ui.snackbar.SnackbarEvent
 import com.spoiligaming.explorer.ui.t
+import com.spoiligaming.explorer.util.ComputerStartupRegistrationManager
+import com.spoiligaming.explorer.util.OSUtils
+import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import server_list_explorer.ui.generated.resources.Res
 import server_list_explorer.ui.generated.resources.button_back
 import server_list_explorer.ui.generated.resources.button_finish
 import server_list_explorer.ui.generated.resources.button_next
+import server_list_explorer.ui.generated.resources.setup_wizard_finish_failed
 import server_list_explorer.ui.generated.resources.setup_wizard_step_counter
 import java.nio.file.Path
+import java.util.Locale
 
 internal enum class SetupStep(
     val order: Int,
 ) {
     LANGUAGE_SELECTION(0),
-    PATH_CONFIGURATION(1),
+    STARTUP_CONFIGURATION(1),
+    PATH_CONFIGURATION(2),
     ;
 
     companion object {
@@ -95,10 +116,16 @@ internal enum class SetupStep(
 
 @Stable
 internal class SetupUiState(
+    initialLocale: Locale,
+    initialStartupSettings: StartupSettings,
     initialWorldSavesPath: Path?,
     initialServerFilePath: Path?,
 ) {
     var currentStep by mutableStateOf(SetupStep.firstStep)
+    var isFinishing by mutableStateOf(false)
+
+    var locale by mutableStateOf(initialLocale)
+    var startupSettings by mutableStateOf(initialStartupSettings)
 
     var worldSavesPath by mutableStateOf(initialWorldSavesPath)
     var serverFilePath by mutableStateOf(initialServerFilePath)
@@ -127,6 +154,7 @@ internal class SetupUiState(
         when (currentStep) {
             SetupStep.PATH_CONFIGURATION -> worldSavesPath != null && serverFilePath != null
             SetupStep.LANGUAGE_SELECTION -> true
+            SetupStep.STARTUP_CONFIGURATION -> true
         }
 }
 
@@ -136,8 +164,13 @@ internal fun SetupWizard(
     intOffsetAnimationSpec: FiniteAnimationSpec<IntOffset>,
     floatAnimationSpec: FiniteAnimationSpec<Float>,
 ) {
+    val prefs = LocalPrefs.current
     val sp = LocalSingleplayerSettings.current
+    val startupSettings = LocalStartupSettings.current
+    val scope = rememberCoroutineScope()
     val activeServerListFilePath by ServerListFileBookmarksManager.activePath.collectAsState()
+    val setupWizardFinishFailedMessage = t(Res.string.setup_wizard_finish_failed)
+    val supportsStartupRegistration = (OSUtils.isWindows || OSUtils.isDebian) && !OSUtils.isRunningOnBareJvm
 
     LaunchedEffect(Unit) {
         ServerListFileBookmarksManager.load()
@@ -146,41 +179,92 @@ internal fun SetupWizard(
     val state =
         remember {
             SetupUiState(
+                initialLocale = prefs.locale,
+                initialStartupSettings =
+                    resolveInitialSetupStartupSettings(
+                        startupSettings = startupSettings,
+                        supportsStartupRegistration = supportsStartupRegistration,
+                    ),
                 initialWorldSavesPath = sp.savesDirectory,
                 initialServerFilePath = activeServerListFilePath,
             )
         }
 
     LaunchedEffect(activeServerListFilePath) {
-        state.serverFilePath = activeServerListFilePath
+        if (state.serverFilePath == null && activeServerListFilePath != null) {
+            state.serverFilePath = activeServerListFilePath
+        }
+    }
+
+    suspend fun persistSetupState() =
+        runCatching {
+            if (prefs.locale != state.locale) {
+                persistSettingsUpdate(
+                    manager = preferenceSettingsManager,
+                    context = "locale setting",
+                    update = { it.copy(locale = state.locale) },
+                    isPersisted = { it.locale == state.locale },
+                )
+            }
+
+            if (sp.savesDirectory != state.worldSavesPath) {
+                persistSettingsUpdate(
+                    manager = singleplayerSettingsManager,
+                    context = "singleplayer saves directory setting",
+                    update = { it.copy(savesDirectory = state.worldSavesPath) },
+                    isPersisted = { it.savesDirectory == state.worldSavesPath },
+                )
+            }
+
+            if (startupSettings.computerStartupBehavior != state.startupSettings.computerStartupBehavior) {
+                ComputerStartupRegistrationManager
+                    .applyBehavior(state.startupSettings.computerStartupBehavior)
+                    .getOrThrow()
+            }
+            if (startupSettings != state.startupSettings) {
+                persistSettingsUpdate(
+                    manager = startupSettingsManager,
+                    context = "startup settings",
+                    update = { state.startupSettings },
+                    isPersisted = { it == state.startupSettings },
+                )
+            }
+
+            val selectedServerFilePath = state.serverFilePath
+            if (selectedServerFilePath != null && selectedServerFilePath != activeServerListFilePath) {
+                ServerListFileBookmarksManager.setActivePath(selectedServerFilePath)
+            }
+        }.onFailure { e ->
+            logger.error(e) { "Failed to finalize setup wizard settings." }
+            SnackbarController.sendEvent(
+                SnackbarEvent(
+                    message = setupWizardFinishFailedMessage,
+                    duration = SnackbarDuration.Short,
+                ),
+            )
+        }.isSuccess
+
+    fun finalizeSetup() {
+        if (state.isFinishing) {
+            return
+        }
+        state.isFinishing = true
+        scope.launch {
+            try {
+                if (persistSetupState()) {
+                    onFinished()
+                }
+            } finally {
+                state.isFinishing = false
+            }
+        }
     }
 
     Box(Modifier.fillMaxSize()) {
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(bottom = BottomStatusPadding),
-            contentAlignment = Alignment.BottomCenter,
-        ) {
-            Text(
-                text =
-                    stringResource(
-                        Res.string.setup_wizard_step_counter,
-                        state.currentStep.getStepNumber(),
-                        SetupStep.totalSteps,
-                    ),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(VerticalSpacing),
         ) {
-            SetupProgressBar(state, floatAnimationSpec)
-
             Box(
                 modifier =
                     Modifier
@@ -207,15 +291,17 @@ internal fun SetupWizard(
                     },
                 ) { targetStep ->
                     when (targetStep) {
-                        SetupStep.LANGUAGE_SELECTION -> LanguageSelectionStep()
+                        SetupStep.LANGUAGE_SELECTION -> LanguageSelectionStep(state = state)
+                        SetupStep.STARTUP_CONFIGURATION -> StartupStep(state = state)
                         SetupStep.PATH_CONFIGURATION -> PathStep(state = state)
                     }
                 }
             }
 
+            SetupProgressBar(state, floatAnimationSpec)
             NavigationControls(
                 state = state,
-                onFinished = onFinished,
+                onFinished = ::finalizeSetup,
             )
         }
     }
@@ -247,51 +333,94 @@ private fun NavigationControls(
     state: SetupUiState,
     onFinished: () -> Unit,
     modifier: Modifier = Modifier,
-) = Row(
+) = Box(
     modifier =
         modifier
             .fillMaxWidth()
             .padding(start = ScreenPadding, end = ScreenPadding, bottom = ScreenPadding),
-    horizontalArrangement = Arrangement.SpaceBetween,
-    verticalAlignment = Alignment.CenterVertically,
 ) {
-    if (!state.currentStep.isFirst()) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (!state.currentStep.isFirst()) {
+            OutlinedButton(
+                onClick = { state.navigateToPrevious() },
+                modifier = Modifier.pointerHoverIcon(if (!state.isFinishing) PointerIcon.Hand else PointerIcon.Default),
+                enabled = !state.isFinishing,
+            ) {
+                Text(t(Res.string.button_back))
+            }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        val isCurrentStepValid = state.isCurrentStepValid() && !state.isFinishing
+
         Button(
-            onClick = { state.navigateToPrevious() },
-            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+            onClick = {
+                if (!state.currentStep.isLast()) {
+                    state.navigateToNext()
+                } else {
+                    onFinished()
+                }
+            },
+            modifier =
+                Modifier.pointerHoverIcon(
+                    if (isCurrentStepValid) PointerIcon.Hand else PointerIcon.Default,
+                ),
+            enabled = isCurrentStepValid,
         ) {
-            Text(t(Res.string.button_back))
+            Text(
+                if (state.currentStep.isLast()) {
+                    t(Res.string.button_finish)
+                } else {
+                    t(Res.string.button_next)
+                },
+            )
         }
     }
-
-    Spacer(modifier = Modifier.weight(1f))
-
-    val isCurrentStepValid = state.isCurrentStepValid()
-
-    Button(
-        onClick = {
-            if (!state.currentStep.isLast()) {
-                state.navigateToNext()
-            } else {
-                onFinished()
-            }
-        },
-        modifier =
-            Modifier.pointerHoverIcon(
-                if (isCurrentStepValid) PointerIcon.Hand else PointerIcon.Default,
+    Text(
+        text =
+            stringResource(
+                Res.string.setup_wizard_step_counter,
+                state.currentStep.getStepNumber(),
+                SetupStep.totalSteps,
             ),
-        enabled = isCurrentStepValid,
-    ) {
-        Text(
-            if (state.currentStep.isLast()) {
-                t(Res.string.button_finish)
-            } else {
-                t(Res.string.button_next)
-            },
-        )
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.align(Alignment.Center),
+    )
+}
+
+private fun resolveInitialSetupStartupSettings(
+    startupSettings: StartupSettings,
+    supportsStartupRegistration: Boolean,
+) = if (
+    supportsStartupRegistration &&
+    startupSettings.computerStartupBehavior == ComputerStartupBehavior.DoNotStart
+) {
+    startupSettings.copy(
+        computerStartupBehavior = ComputerStartupBehavior.StartMinimizedToSystemTray,
+    )
+} else {
+    startupSettings
+}
+
+private suspend fun <T : Any> persistSettingsUpdate(
+    manager: UniversalSettingsManager<T>,
+    context: String,
+    update: (T) -> T,
+    isPersisted: (T) -> Boolean,
+) {
+    manager.updateSettings(update).join()
+    check(isPersisted(manager.settingsFlow.value)) {
+        "Failed to persist $context."
     }
 }
 
 private val ScreenPadding = 16.dp
 private val VerticalSpacing = 16.dp
-private val BottomStatusPadding = 16.dp
+
+private val logger = KotlinLogging.logger {}

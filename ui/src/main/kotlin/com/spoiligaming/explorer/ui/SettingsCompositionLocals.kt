@@ -1,6 +1,6 @@
 /*
  * This file is part of Server List Explorer.
- * Copyright (C) 2025 SpoilerRules
+ * Copyright (C) 2025-2026 SpoilerRules
  *
  * Server List Explorer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import com.spoiligaming.explorer.settings.manager.multiplayerSettingsManager
 import com.spoiligaming.explorer.settings.manager.preferenceSettingsManager
 import com.spoiligaming.explorer.settings.manager.serverQueryMethodConfigurationsManager
 import com.spoiligaming.explorer.settings.manager.singleplayerSettingsManager
+import com.spoiligaming.explorer.settings.manager.startupSettingsManager
 import com.spoiligaming.explorer.settings.manager.themeSettingsManager
 import com.spoiligaming.explorer.settings.manager.windowAppearanceSettingsManager
 import com.spoiligaming.explorer.settings.manager.windowStateSettingsManager
@@ -35,6 +36,7 @@ import com.spoiligaming.explorer.settings.model.MultiplayerSettings
 import com.spoiligaming.explorer.settings.model.Preferences
 import com.spoiligaming.explorer.settings.model.ServerQueryMethodConfigurations
 import com.spoiligaming.explorer.settings.model.SingleplayerSettings
+import com.spoiligaming.explorer.settings.model.StartupSettings
 import com.spoiligaming.explorer.settings.model.ThemeMode
 import com.spoiligaming.explorer.settings.model.ThemeSettings
 import com.spoiligaming.explorer.settings.model.WindowAppearance
@@ -74,6 +76,11 @@ internal val LocalSingleplayerSettings =
     staticCompositionLocalOf<SingleplayerSettings> {
         error("LocalSingleplayerSettings not provided")
     }
+
+internal val LocalStartupSettings =
+    staticCompositionLocalOf<StartupSettings> {
+        error("LocalStartupSettings not provided")
+    }
 internal val LocalAmoledActive = compositionLocalOf { false }
 
 @Composable
@@ -85,6 +92,7 @@ internal fun ProvideAppSettings(content: @Composable () -> Unit) {
     val multiplayerSettings by multiplayerSettingsManager.settingsFlow.collectAsState()
     val serverQueryMethodConfigurations by serverQueryMethodConfigurationsManager.settingsFlow.collectAsState()
     val singleplayerSettings by singleplayerSettingsManager.settingsFlow.collectAsState()
+    val startupSettings by startupSettingsManager.settingsFlow.collectAsState()
 
     val amoledOn = themeSettings.amoledMode && themeSettings.themeMode != ThemeMode.Light
 
@@ -96,6 +104,7 @@ internal fun ProvideAppSettings(content: @Composable () -> Unit) {
         LocalMultiplayerSettings provides multiplayerSettings,
         LocalServerQueryMethodConfigurations provides serverQueryMethodConfigurations,
         LocalSingleplayerSettings provides singleplayerSettings,
+        LocalStartupSettings provides startupSettings,
         LocalAmoledActive provides amoledOn,
     ) {
         content()

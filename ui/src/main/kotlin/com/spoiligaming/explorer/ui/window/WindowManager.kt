@@ -1,6 +1,6 @@
 /*
  * This file is part of Server List Explorer.
- * Copyright (C) 2025 SpoilerRules
+ * Copyright (C) 2025-2026 SpoilerRules
  *
  * Server List Explorer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,10 @@ package com.spoiligaming.explorer.ui.window
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
@@ -33,11 +35,17 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.spoiligaming.explorer.build.BuildConfig
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
+import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalStartupSettings
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalWindowState
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.ProvideAppSettings
+import com.spoiligaming.explorer.ui.systemtray.AppSystemTray
+import com.spoiligaming.explorer.util.AppActivationSignal
+import com.spoiligaming.explorer.util.FirstRunManager
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.hostOs
 import java.awt.Dimension
+import java.awt.Frame
 
 internal object WindowManager {
     private const val WINDOW_TITLE = "Server List Explorer"
@@ -60,42 +68,102 @@ internal object WindowManager {
     var isWindowShort by mutableStateOf(false)
         private set
 
-    fun launch(content: @Composable () -> Unit) =
-        application {
-            ProvideAppSettings {
-                val ws = LocalWindowState.current
-                val prefs = LocalPrefs.current
+    fun launch(
+        isAutoStartupLaunch: Boolean,
+        content: @Composable () -> Unit,
+    ) = application {
+        var shouldFocusWindow by remember { mutableStateOf(false) }
 
-                LaunchedEffect(prefs.vsync) {
-                    System.setProperty(SKIKO_VSYNC_PROPERTY, prefs.vsync.toString())
-                }
-
-                val windowPlacement =
-                    if (ws.isWindowMaximized) WindowPlacement.Maximized else WindowPlacement.Floating
-
-                val windowState =
-                    rememberWindowState(
-                        placement = windowPlacement,
-                        width = ws.width.dp,
-                        height = ws.height.dp,
-                        position = WindowPosition.Aligned(DefaultAlignment),
+        ProvideAppSettings {
+            val ws = LocalWindowState.current
+            val prefs = LocalPrefs.current
+            val startupSettings = LocalStartupSettings.current
+            val isFirstRun by FirstRunManager.isFirstRun.collectAsState()
+            var isWindowVisible by
+                remember(isAutoStartupLaunch, startupSettings.shouldStartMinimizedToSystemTray) {
+                    mutableStateOf(
+                        !(isAutoStartupLaunch && startupSettings.shouldStartMinimizedToSystemTray),
                     )
-
-                SideEffect {
-                    isWindowCompact =
-                        !ws.isWindowMaximized &&
-                        ws.currentWidth.dp < CompactWidthThreshold
-                    isWindowShort =
-                        !ws.isWindowMaximized &&
-                        ws.currentHeight.dp < ShortHeightThreshold
+                }
+            var shouldPrimeWindowComposition by
+                remember(
+                    isAutoStartupLaunch,
+                    startupSettings.isSystemTrayFeatureEnabled,
+                    startupSettings.shouldStartMinimizedToSystemTray,
+                ) {
+                    mutableStateOf(
+                        isAutoStartupLaunch &&
+                            startupSettings.isSystemTrayFeatureEnabled &&
+                            startupSettings.shouldStartMinimizedToSystemTray,
+                    )
                 }
 
+            LaunchedEffect(prefs.vsync) {
+                System.setProperty(SKIKO_VSYNC_PROPERTY, prefs.vsync.toString())
+            }
+
+            LaunchedEffect(Unit) {
+                AppActivationSignal.events.collect {
+                    isWindowVisible = true
+                    shouldFocusWindow = true
+                }
+            }
+
+            val windowPlacement =
+                if (ws.isWindowMaximized) WindowPlacement.Maximized else WindowPlacement.Floating
+
+            val windowState =
+                rememberWindowState(
+                    placement = windowPlacement,
+                    width = ws.width.dp,
+                    height = ws.height.dp,
+                    position = WindowPosition.Aligned(DefaultAlignment),
+                )
+
+            SideEffect {
+                isWindowCompact =
+                    !ws.isWindowMaximized &&
+                    ws.currentWidth.dp < CompactWidthThreshold
+                isWindowShort =
+                    !ws.isWindowMaximized &&
+                    ws.currentHeight.dp < ShortHeightThreshold
+            }
+
+            AppSystemTray(
+                isSystemTrayFeatureEnabled = startupSettings.isSystemTrayFeatureEnabled,
+                shouldMinimizeToSystemTrayOnClose = startupSettings.minimizeToSystemTrayOnClose,
+                isWindowVisible = isWindowVisible,
+                tooltip = WINDOW_TITLE,
+                onHide = {
+                    isWindowVisible = false
+                },
+                onOpen = {
+                    isWindowVisible = true
+                    shouldFocusWindow = true
+                },
+                onExit = {
+                    exitApplication()
+                },
+            )
+
+            val shouldKeepWindowComposed =
+                startupSettings.persistentSessionState && startupSettings.isSystemTrayFeatureEnabled
+            val shouldComposeWindow =
+                isWindowVisible || shouldKeepWindowComposed || shouldPrimeWindowComposition
+
+            if (shouldComposeWindow) {
                 val windowTitle =
                     if (prefs.windowTitleShowBuildInfo) WINDOW_TITLE_WITH_BUILD else WINDOW_TITLE
 
                 Window(
-                    onCloseRequest = ::exitApplication,
-                    visible = true,
+                    onCloseRequest = {
+                        if (startupSettings.minimizeToSystemTrayOnClose && isFirstRun.not()) {
+                            isWindowVisible = false
+                        } else {
+                            exitApplication()
+                        }
+                    },
+                    visible = isWindowVisible,
                     title = windowTitle,
                     state = windowState,
                 ) {
@@ -112,8 +180,33 @@ internal object WindowManager {
                         }
                     }
 
+                    LaunchedEffect(isWindowVisible) {
+                        if (isWindowVisible) {
+                            shouldPrimeWindowComposition = false
+                        }
+                    }
+
+                    LaunchedEffect(window, isWindowVisible, shouldFocusWindow) {
+                        if (isWindowVisible && shouldFocusWindow) {
+                            shouldFocusWindow = false
+                            runCatching {
+                                if (window.extendedState == Frame.ICONIFIED) {
+                                    window.extendedState = Frame.NORMAL
+                                }
+                                window.toFront()
+                                window.requestFocus()
+                                window.requestFocusInWindow()
+                            }.onFailure { e ->
+                                logger.error(e) { "Window activation request failed during tray restore." }
+                            }
+                        }
+                    }
+
                     content()
                 }
             }
         }
+    }
 }
+
+private val logger = KotlinLogging.logger {}

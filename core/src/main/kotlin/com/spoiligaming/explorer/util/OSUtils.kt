@@ -1,6 +1,6 @@
 /*
  * This file is part of Server List Explorer.
- * Copyright (C) 2025 SpoilerRules
+ * Copyright (C) 2025-2026 SpoilerRules
  *
  * Server List Explorer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,13 +19,20 @@
 package com.spoiligaming.explorer.util
 
 import oshi.SystemInfo
+import java.io.File
 import java.util.Locale
+import kotlin.io.path.Path
+import kotlin.io.path.exists
+import kotlin.io.path.readLines
 
 object OSUtils {
     private val systemInfo by lazy { SystemInfo() }
     private val os by lazy { systemInfo.operatingSystem }
     private val versionInfo
         get() = os.versionInfo
+
+    val totalPhysicalMemoryBytes
+        get() = runCatching { systemInfo.hardware.memory.total }.getOrDefault(0L)
 
     sealed class OSType {
         data class Windows(
@@ -117,6 +124,44 @@ object OSUtils {
     val isLinux
         get() = currentOSType is OSType.Linux
 
+    val jPackageLauncherPath: String?
+        get() =
+            System
+                .getProperty("jpackage.app-path")
+                ?.trim()
+                ?.takeIf { it.isNotEmpty() }
+                ?.let(::File)
+                ?.takeIf { it.exists() && it.isFile }
+                ?.absolutePath
+
+    val isJPackageLauncher
+        get() = jPackageLauncherPath != null
+
+    val isRunningOnBareJvm: Boolean
+        get() {
+            if (isJPackageLauncher) {
+                return false
+            }
+
+            val processCommand =
+                ProcessHandle
+                    .current()
+                    .info()
+                    .command()
+                    .orElse(null)
+                    ?.trim()
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let(::File)
+                    ?.takeIf { it.exists() && it.isFile }
+                    ?.absolutePath ?: return false
+
+            val executableName = File(processCommand).name.lowercase(Locale.ROOT)
+            return executableName == "java" ||
+                executableName == "java.exe" ||
+                executableName == "javaw" ||
+                executableName == "javaw.exe"
+        }
+
     val windowsBuild
         get() = (currentOSType as? OSType.Windows)?.buildNumber ?: -1
 
@@ -160,7 +205,57 @@ object OSUtils {
         }
     }
 
-    val osSummary
+    val isDebian: Boolean
+        get() {
+            if (!isLinux) return false
+
+            val id = linuxOsRelease["ID"].orEmpty()
+            if (id == "debian") {
+                return true
+            }
+
+            val idLikeTokens =
+                linuxOsRelease["ID_LIKE"]
+                    .orEmpty()
+                    .split(Regex("[,\\s]+"))
+                    .map { it.trim() }
+                    .filter { it.isNotEmpty() }
+            if ("debian" in idLikeTokens) {
+                return true
+            }
+
+            return linuxDistro.contains("debian", ignoreCase = true)
+        }
+
+    private val linuxOsRelease by lazy {
+        val osReleasePath =
+            sequenceOf("/etc/os-release", "/usr/lib/os-release")
+                .map(::Path)
+                .firstOrNull { it.exists() }
+                ?: return@lazy emptyMap()
+
+        runCatching {
+            osReleasePath
+                .readLines()
+                .asSequence()
+                .map { it.trim() }
+                .filter { it.isNotEmpty() && !it.startsWith("#") && it.contains('=') }
+                .associate { line ->
+                    val (key, value) = line.split("=", limit = 2)
+                    key.trim().uppercase(Locale.ROOT) to normalizeOsReleaseValue(value)
+                }
+        }.getOrElse { emptyMap() }
+    }
+
+    private fun normalizeOsReleaseValue(value: String) =
+        value
+            .trim()
+            .removeSurrounding("\"")
+            .removeSurrounding("'")
+            .trim()
+            .lowercase(Locale.ROOT)
+
+    val osSummary: String
         get() =
             when (val o = currentOSType) {
                 is OSType.Windows ->

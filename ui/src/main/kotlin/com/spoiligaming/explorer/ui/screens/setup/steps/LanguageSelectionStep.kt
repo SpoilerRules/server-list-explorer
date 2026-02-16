@@ -27,9 +27,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import com.spoiligaming.explorer.settings.manager.preferenceSettingsManager
-import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
 import com.spoiligaming.explorer.ui.screens.setup.SetupStepContainer
+import com.spoiligaming.explorer.ui.screens.setup.SetupUiState
 import com.spoiligaming.explorer.ui.t
 import com.spoiligaming.explorer.ui.widgets.LanguagePickerDropdownMenu
 import server_list_explorer.ui.generated.resources.Res
@@ -37,9 +36,7 @@ import server_list_explorer.ui.generated.resources.preferred_language_label
 import server_list_explorer.ui.generated.resources.setup_step_title_localization
 
 @Composable
-internal fun LanguageSelectionStep() {
-    val currentLocale = LocalPrefs.current.locale
-
+internal fun LanguageSelectionStep(state: SetupUiState) {
     SetupStepContainer(title = t(Res.string.setup_step_title_localization)) {
         Column(
             verticalArrangement = Arrangement.spacedBy(LanguageStepItemSpacing),
@@ -50,11 +47,9 @@ internal fun LanguageSelectionStep() {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             LanguagePickerDropdownMenu(
-                selectedLocale = currentLocale,
+                selectedLocale = state.locale,
                 onLocaleSelected = { locale ->
-                    preferenceSettingsManager.updateSettings {
-                        it.copy(locale = locale)
-                    }
+                    state.locale = locale
                 },
             )
         }
