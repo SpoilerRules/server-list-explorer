@@ -1,6 +1,6 @@
 /*
  * This file is part of Server List Explorer.
- * Copyright (C) 2025 SpoilerRules
+ * Copyright (C) 2025-2026 SpoilerRules
  *
  * Server List Explorer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,9 @@ object OSUtils {
     private val os by lazy { systemInfo.operatingSystem }
     private val versionInfo
         get() = os.versionInfo
+
+    val totalPhysicalMemoryBytes
+        get() = runCatching { systemInfo.hardware.memory.total }.getOrDefault(0L)
 
     sealed class OSType {
         data class Windows(
