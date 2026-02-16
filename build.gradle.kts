@@ -49,13 +49,13 @@ val appDistributionProvider: Provider<String> =
                 val requestedTasks = gradle.startParameter.taskNames.flatMap { it.split(":") }
 
                 when {
-                    "packageReleaseMsi" in requestedTasks -> "MSI Installer (Minified Fat JAR)"
-                    "packageReleaseExe" in requestedTasks -> "EXE Installer (Minified Fat JAR)"
-                    "createReleaseDistributable" in requestedTasks -> "Portable (Minified Fat JAR)"
+                    "packageReleaseMsi" in requestedTasks -> "MSI Installer (Minified)"
+                    "packageReleaseExe" in requestedTasks -> "EXE Installer (Minified)"
+                    "createReleaseDistributable" in requestedTasks -> "Portable (Minified)"
                     "packageReleaseUberJarForCurrentOS" in requestedTasks -> "Minified Fat JAR"
-                    "packageMsi" in requestedTasks -> "MSI Installer (Fat JAR)"
-                    "packageExe" in requestedTasks -> "EXE Installer (Fat JAR)"
-                    "createDistributable" in requestedTasks -> "Portable (Fat JAR)"
+                    "packageMsi" in requestedTasks -> "MSI Installer"
+                    "packageExe" in requestedTasks -> "EXE Installer"
+                    "createDistributable" in requestedTasks -> "Portable"
                     "shadowJar" in requestedTasks -> "Fat JAR"
                     "buildWithProjectModules" in requestedTasks -> "JAR"
                     else -> "unspecified"
