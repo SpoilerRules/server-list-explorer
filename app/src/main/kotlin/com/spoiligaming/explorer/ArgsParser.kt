@@ -1,6 +1,6 @@
 /*
  * This file is part of Server List Explorer.
- * Copyright (C) 2025 SpoilerRules
+ * Copyright (C) 2025-2026 SpoilerRules
  *
  * Server List Explorer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,20 @@ import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.core.config.Configurator
 
 internal object ArgsParser {
+    private const val STARTUP_SOURCE_ARG_PREFIX = "--startup-source="
+    private const val STARTUP_SOURCE_OS = "os"
+
+    var isAutoStartupLaunch = false
+        private set
+
     fun parse(args: Array<String>) {
+        val startupSource =
+            args
+                .firstOrNull { it.startsWith(STARTUP_SOURCE_ARG_PREFIX) }
+                ?.substringAfter(STARTUP_SOURCE_ARG_PREFIX)
+
+        isAutoStartupLaunch = startupSource == STARTUP_SOURCE_OS
+
         if ("--verbose" in args) {
             enableVerboseLogging()
         }

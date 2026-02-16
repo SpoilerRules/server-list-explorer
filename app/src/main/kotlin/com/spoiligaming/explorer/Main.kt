@@ -1,6 +1,6 @@
 /*
  * This file is part of Server List Explorer.
- * Copyright (C) 2025 SpoilerRules
+ * Copyright (C) 2025-2026 SpoilerRules
  *
  * Server List Explorer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,13 +36,13 @@ fun main(args: Array<String>) {
     WindowsProcessPriority.applyAutoStartupPriority()
 
     val startupSettings = startupSettingsManager.getCachedSettings()
-    runCatching {
-        ComputerStartupRegistrationManager.reconcile(startupSettings.computerStartupBehavior)
-    }.onFailure { e ->
-        logger.error(e) {
-            "Failed to reconcile OS startup registration for behavior=${startupSettings.computerStartupBehavior}"
+    ComputerStartupRegistrationManager
+        .reconcile(startupSettings.computerStartupBehavior)
+        .onFailure { e ->
+            logger.error(e) {
+                "Failed to reconcile OS startup registration for behavior=${startupSettings.computerStartupBehavior}"
+            }
         }
-    }
 
     if (startupSettings.singleInstanceHandling) {
         val isPrimary =
