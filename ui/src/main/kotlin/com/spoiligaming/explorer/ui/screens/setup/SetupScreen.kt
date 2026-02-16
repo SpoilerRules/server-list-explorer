@@ -57,6 +57,7 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.spoiligaming.explorer.serverlist.bookmarks.ServerListFileBookmarksManager
+import com.spoiligaming.explorer.settings.manager.UniversalSettingsManager
 import com.spoiligaming.explorer.settings.manager.preferenceSettingsManager
 import com.spoiligaming.explorer.settings.manager.singleplayerSettingsManager
 import com.spoiligaming.explorer.settings.manager.startupSettingsManager
@@ -198,11 +199,21 @@ internal fun SetupWizard(
     suspend fun persistSetupState() =
         runCatching {
             if (prefs.locale != state.locale) {
-                preferenceSettingsManager.updateSettings { it.copy(locale = state.locale) }
+                persistSettingsUpdate(
+                    manager = preferenceSettingsManager,
+                    context = "locale setting",
+                    update = { it.copy(locale = state.locale) },
+                    isPersisted = { it.locale == state.locale },
+                )
             }
 
             if (sp.savesDirectory != state.worldSavesPath) {
-                singleplayerSettingsManager.updateSettings { it.copy(savesDirectory = state.worldSavesPath) }
+                persistSettingsUpdate(
+                    manager = singleplayerSettingsManager,
+                    context = "singleplayer saves directory setting",
+                    update = { it.copy(savesDirectory = state.worldSavesPath) },
+                    isPersisted = { it.savesDirectory == state.worldSavesPath },
+                )
             }
 
             if (startupSettings.computerStartupBehavior != state.startupSettings.computerStartupBehavior) {
@@ -211,7 +222,12 @@ internal fun SetupWizard(
                     .getOrThrow()
             }
             if (startupSettings != state.startupSettings) {
-                startupSettingsManager.updateSettings { state.startupSettings }
+                persistSettingsUpdate(
+                    manager = startupSettingsManager,
+                    context = "startup settings",
+                    update = { state.startupSettings },
+                    isPersisted = { it == state.startupSettings },
+                )
             }
 
             val selectedServerFilePath = state.serverFilePath
@@ -390,6 +406,18 @@ private fun resolveInitialSetupStartupSettings(
     )
 } else {
     startupSettings
+}
+
+private suspend fun <T : Any> persistSettingsUpdate(
+    manager: UniversalSettingsManager<T>,
+    context: String,
+    update: (T) -> T,
+    isPersisted: (T) -> Boolean,
+) {
+    manager.updateSettings(update).join()
+    check(isPersisted(manager.settingsFlow.value)) {
+        "Failed to persist $context."
+    }
 }
 
 private val ScreenPadding = 16.dp
