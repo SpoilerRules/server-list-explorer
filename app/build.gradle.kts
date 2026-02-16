@@ -38,7 +38,7 @@ dependencies {
     implementation(libs.jna.platform)
 
     implementation(libs.compose.runtime)
-    implementation(libs.compose.native.tray)
+    implementation(libs.composeNativeTray)
 
     val onlyWindowsX64: Boolean by rootProject.extra
     val onlyWindowsArm64: Boolean by rootProject.extra

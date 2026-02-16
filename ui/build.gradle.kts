@@ -50,7 +50,7 @@ dependencies {
     implementation(libs.autolinktext)
 
     // System tray UI components
-    implementation(libs.compose.native.tray)
+    implementation(libs.composeNativeTray)
 
     // JNA for DWM
     implementation(libs.jna)
