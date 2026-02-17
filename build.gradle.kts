@@ -40,48 +40,69 @@ val appVersionProvider: Provider<String> =
         .orElse(providers.gradleProperty("appVersion"))
         .orElse("0.0.0-dev")
 
+val requestedTasks = gradle.startParameter.taskNames.flatMap { it.split(":") }
+
+fun isWindowsHost() = System.getProperty("os.name").contains("win", ignoreCase = true)
+
+fun isLinuxHost() = System.getProperty("os.name").contains("linux", ignoreCase = true)
+
+fun isArm64Arch(): Boolean {
+    val arch = System.getProperty("os.arch").lowercase()
+    return arch.contains("aarch64") || arch.contains("arm64")
+}
+
+fun portableBuildTargetLabel() =
+    when {
+        isWindowsHost() && isArm64Arch() -> "Windows ARM64"
+        isWindowsHost() -> "Windows x64"
+        isLinuxHost() && isArm64Arch() -> "Linux ARM64"
+        isLinuxHost() -> "Linux x64"
+        else -> "Current OS"
+    }
+
+fun portableDistributionLabel(minified: Boolean) =
+    if (minified) {
+        "Portable (${portableBuildTargetLabel()}, Minified)"
+    } else {
+        "Portable (${portableBuildTargetLabel()})"
+    }
+
+val packagingTasks =
+    setOf(
+        "packageMsi",
+        "packageExe",
+        "packageDeb",
+        "createDistributable",
+        "packageReleaseMsi",
+        "packageReleaseExe",
+        "packageReleaseDeb",
+        "createReleaseDistributable",
+    )
+
+fun isPackagingBuild() = requestedTasks.any { it in packagingTasks }
+
 val appDistributionProvider: Provider<String> =
     providers
         .environmentVariable("APP_DISTRIBUTION")
         .orElse(providers.gradleProperty("appDistribution"))
         .orElse(
             provider {
-                val requestedTasks = gradle.startParameter.taskNames.flatMap { it.split(":") }
-
                 when {
                     "packageReleaseMsi" in requestedTasks -> "MSI Installer (Minified)"
                     "packageReleaseExe" in requestedTasks -> "EXE Installer (Minified)"
-                    "createReleaseDistributable" in requestedTasks -> "Portable (Minified)"
+                    "packageReleaseDeb" in requestedTasks -> "DEB Package (Minified)"
+                    "createReleaseDistributable" in requestedTasks -> portableDistributionLabel(minified = true)
                     "packageReleaseUberJarForCurrentOS" in requestedTasks -> "Minified Fat JAR"
                     "packageMsi" in requestedTasks -> "MSI Installer"
                     "packageExe" in requestedTasks -> "EXE Installer"
-                    "createDistributable" in requestedTasks -> "Portable"
+                    "packageDeb" in requestedTasks -> "DEB Package"
+                    "createDistributable" in requestedTasks -> portableDistributionLabel(minified = false)
                     "shadowJar" in requestedTasks -> "Fat JAR"
                     "buildWithProjectModules" in requestedTasks -> "JAR"
                     else -> "unspecified"
                 }
             },
         )
-
-val windowsPackagingTasks =
-    setOf(
-        "packageMsi",
-        "packageExe",
-        "createDistributable",
-        "packageReleaseMsi",
-        "packageReleaseExe",
-        "createReleaseDistributable",
-    )
-
-fun isPackagingBuild(): Boolean {
-    val requestedTasks = gradle.startParameter.taskNames.flatMap { it.split(":") }
-    return requestedTasks.any { it in windowsPackagingTasks }
-}
-
-fun isArm64Arch(): Boolean {
-    val arch = System.getProperty("os.arch").lowercase()
-    return arch.contains("aarch64") || arch.contains("arm64")
-}
 
 val onlyWindowsArm64Provider: Provider<Boolean> =
     providers
@@ -90,8 +111,7 @@ val onlyWindowsArm64Provider: Provider<Boolean> =
         .orElse(providers.gradleProperty("onlyWindowsArm64").map { it.toBoolean() })
         .orElse(
             provider {
-                val isWindows = System.getProperty("os.name").contains("win", ignoreCase = true)
-                isWindows && isPackagingBuild() && isArm64Arch()
+                isWindowsHost() && isPackagingBuild() && isArm64Arch()
             },
         )
 
@@ -102,13 +122,36 @@ val onlyWindowsX64Provider: Provider<Boolean> =
         .orElse(providers.gradleProperty("onlyWindowsX64").map { it.toBoolean() })
         .orElse(
             provider {
-                val isWindows = System.getProperty("os.name").contains("win", ignoreCase = true)
-                isWindows && isPackagingBuild() && !isArm64Arch()
+                isWindowsHost() && isPackagingBuild() && !isArm64Arch()
+            },
+        )
+
+val onlyLinuxArm64Provider: Provider<Boolean> =
+    providers
+        .environmentVariable("ONLY_LINUX_ARM64")
+        .map { it.toBoolean() }
+        .orElse(providers.gradleProperty("onlyLinuxArm64").map { it.toBoolean() })
+        .orElse(
+            provider {
+                isLinuxHost() && isPackagingBuild() && isArm64Arch()
+            },
+        )
+
+val onlyLinuxX64Provider: Provider<Boolean> =
+    providers
+        .environmentVariable("ONLY_LINUX_X64")
+        .map { it.toBoolean() }
+        .orElse(providers.gradleProperty("onlyLinuxX64").map { it.toBoolean() })
+        .orElse(
+            provider {
+                isLinuxHost() && isPackagingBuild() && !isArm64Arch()
             },
         )
 
 val onlyWindowsArm64: Boolean = onlyWindowsArm64Provider.get()
 val onlyWindowsX64: Boolean = onlyWindowsX64Provider.get() && !onlyWindowsArm64
+val onlyLinuxArm64: Boolean = onlyLinuxArm64Provider.get() && !onlyWindowsArm64 && !onlyWindowsX64
+val onlyLinuxX64: Boolean = onlyLinuxX64Provider.get() && !onlyWindowsArm64 && !onlyWindowsX64 && !onlyLinuxArm64
 val appVersion: String = appVersionProvider.get()
 val appDistribution: String = appDistributionProvider.get()
 
@@ -116,6 +159,8 @@ extra["appVersion"] = appVersion
 extra["appDistribution"] = appDistribution
 extra["onlyWindowsX64"] = onlyWindowsX64
 extra["onlyWindowsArm64"] = onlyWindowsArm64
+extra["onlyLinuxX64"] = onlyLinuxX64
+extra["onlyLinuxArm64"] = onlyLinuxArm64
 version = appVersion
 
 licenseReport {
@@ -130,6 +175,15 @@ gradle.taskGraph.whenReady {
     }
     if (onlyWindowsX64) {
         logger.lifecycle("Building for Windows x64 only (optimization enabled)")
+    }
+    if (onlyWindowsArm64) {
+        logger.lifecycle("Building for Windows ARM64 only (optimization enabled)")
+    }
+    if (onlyLinuxX64) {
+        logger.lifecycle("Building for Linux x64 only (optimization enabled)")
+    }
+    if (onlyLinuxArm64) {
+        logger.lifecycle("Building for Linux ARM64 only (optimization enabled)")
     }
 }
 

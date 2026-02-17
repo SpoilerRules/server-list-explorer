@@ -14,20 +14,16 @@ on:
         required: true
 
 jobs:
-  build-jars:
-    name: Build & Publish JARs
+  prepare_release_meta:
+    name: Prepare Release Metadata
     runs-on: ubuntu-latest
 
     outputs:
       version: ${{ steps.meta.outputs.version }}
       tag: ${{ steps.meta.outputs.tag }}
+      asset_version: ${{ steps.meta.outputs.asset_version }}
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
       - name: Determine version & tag
         id: meta
         shell: bash
@@ -47,11 +43,47 @@ jobs:
             exit 1
           fi
 
-          echo "version=$V" >> "$GITHUB_OUTPUT"
+          BUILD_VERSION="$(echo "$V" | sed -E 's/[.-](dev|alpha|beta|rc)[.-]?([0-9]+)/-\1.\2/g')"
+          ASSET_VERSION="$(echo "$V" | sed -E 's/[.-](dev|alpha|beta|rc)[.-]?([0-9]+)/-\1\2/g')"
+
+          echo "version=$BUILD_VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "VERSION=$V" >> "$GITHUB_ENV"
-          echo "APP_VERSION=$V" >> "$GITHUB_ENV"
-          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          echo "asset_version=$ASSET_VERSION" >> "$GITHUB_OUTPUT"
+
+  create_release:
+    name: Initialize GitHub Release
+    needs: prepare_release_meta
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ needs.prepare_release_meta.outputs.tag }}
+    steps:
+      - name: Create GitHub release
+        if: env.ACT != 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          name: "Server List Explorer ${{ env.TAG }}"
+          generate_release_notes: true
+          prerelease: ${{ contains(env.TAG, '-alpha') || contains(env.TAG, '.alpha') || contains(env.TAG, '-beta') || contains(env.TAG, '.beta') || contains(env.TAG, '-rc') || contains(env.TAG, '.rc') }}
+          overwrite_files: true
+
+  build-jars:
+    name: JARs
+    needs:
+      - prepare_release_meta
+      - create_release
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.asset_version }}
+      APP_VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      TAG: ${{ needs.prepare_release_meta.outputs.tag }}
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 21
         uses: actions/setup-java@v5
@@ -71,7 +103,7 @@ jobs:
 
       - name: Generate license report
         shell: bash
-        run: ./gradlew generateLicenseReport --no-parallel --no-configuration-cache
+        run: ./gradlew generateLicenseReport --no-parallel
 
       - name: Build JAR artifacts
         shell: bash
@@ -84,41 +116,154 @@ jobs:
         shell: bash
         run: |
           mkdir -p app/out
-          cp app/build/libs/ServerListExplorer.jar app/out/
-          cp app/build/libs/ServerListExplorer-all.jar app/out/
+          v="$ASSET_VERSION"
+
+          cp app/build/libs/ServerListExplorer.jar "app/out/ServerListExplorer-$v.jar"
+          cp app/build/libs/ServerListExplorer-all.jar "app/out/ServerListExplorer-$v-all.jar"
 
           RELEASE_JAR="$(ls app/build/compose/jars/ServerListExplorer-*-release.jar | head -n 1)"
           if [[ -z "$RELEASE_JAR" ]]; then
             echo "::error::Release JAR not found"
             exit 1
           fi
-          cp "$RELEASE_JAR" app/out/ServerListExplorer-all-minified.jar
+          cp "$RELEASE_JAR" "app/out/ServerListExplorer-$v-minified-all.jar"
 
-      - name: Create GitHub Release with JARs
+      - name: Upload JAR assets
         if: env.ACT != 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
-          name: "Server List Explorer ${{ env.TAG }}"
-          generate_release_notes: true
-          prerelease: ${{ contains(env.TAG, '-alpha') || contains(env.TAG, '-beta') || contains(env.TAG, '-rc') }}
           overwrite_files: true
           fail_on_unmatched_files: true
           files: |
-            app/out/ServerListExplorer.jar
-            app/out/ServerListExplorer-all.jar
-            app/out/ServerListExplorer-all-minified.jar
+            app/out/ServerListExplorer-${{ env.ASSET_VERSION }}.jar
+            app/out/ServerListExplorer-${{ env.ASSET_VERSION }}-all.jar
+            app/out/ServerListExplorer-${{ env.ASSET_VERSION }}-minified-all.jar
+
+  release-linux-x64:
+    name: Linux x64
+    needs:
+      - prepare_release_meta
+      - create_release
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.asset_version }}
+      APP_VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      TAG: ${{ needs.prepare_release_meta.outputs.tag }}
+
+      LINUX_ARCH: x64
+      DEB_ARCH: amd64
+      ONLY_LINUX_X64: true
+      ONLY_LINUX_ARM64: false
+      ONLY_WINDOWS_X64: false
+      ONLY_WINDOWS_ARM64: false
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-java@v5
+        with:
+          # Note: GraalVM locks files
+          distribution: jetbrains
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v5
+        with:
+          gradle-version: wrapper
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Generate license report
+        shell: bash
+        run: ./gradlew generateLicenseReport --no-parallel
+
+      - name: Build and stage Linux x64 assets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p app/out
+
+          ./gradlew app:createDistributable
+          ./gradlew app:packageDeb
+          ./gradlew app:createReleaseDistributable
+          ./gradlew app:packageReleaseDeb
+
+          get_latest_file() {
+            local root="$1"
+            local pattern="$2"
+            local file
+
+            file="$(find "$root" -type f -name "$pattern" -printf '%T@ %p\n' | sort -nr | head -n 1 | cut -d' ' -f2-)"
+            if [[ -z "$file" ]]; then
+              echo "::error::Not found: $pattern under $root"
+              exit 1
+            fi
+            printf '%s\n' "$file"
+          }
+
+          get_first_dir() {
+            local root="$1"
+            local dir
+
+            dir="$(find "$root" -mindepth 1 -maxdepth 1 -type d | sort | head -n 1)"
+            if [[ -z "$dir" ]]; then
+              echo "::error::Not found directory under $root"
+              exit 1
+            fi
+            printf '%s\n' "$dir"
+          }
+
+          v="$ASSET_VERSION"
+          debVersion="$ASSET_VERSION"
+          arch="$LINUX_ARCH"
+          debArch="$DEB_ARCH"
+
+          deb="$(get_latest_file "app/build/compose/binaries/main" "*.deb")"
+          debMin="$(get_latest_file "app/build/compose/binaries/main-release" "*.deb")"
+
+          cp "$deb" "app/out/server-list-explorer_${debVersion}_${debArch}.deb"
+          cp "$debMin" "app/out/server-list-explorer_${debVersion}+opt_${debArch}.deb"
+
+          appDir="$(get_first_dir "app/build/compose/binaries/main/app")"
+          appDirMin="$(get_first_dir "app/build/compose/binaries/main-release/app")"
+
+          tar -C "$(dirname "$appDir")" -czf "app/out/ServerListExplorer-$v-linux-$arch.tar.gz" "$(basename "$appDir")"
+          tar -C "$(dirname "$appDirMin")" -czf "app/out/ServerListExplorer-minified-$v-linux-$arch.tar.gz" "$(basename "$appDirMin")"
+
+          ls -lh app/out
+
+      - name: Upload Linux x64 assets
+        if: env.ACT != 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          gh release upload "$TAG" \
+            "app/out/ServerListExplorer-${ASSET_VERSION}-linux-x64.tar.gz" \
+            "app/out/ServerListExplorer-minified-${ASSET_VERSION}-linux-x64.tar.gz" \
+            "app/out/server-list-explorer_${ASSET_VERSION}_amd64.deb" \
+            "app/out/server-list-explorer_${ASSET_VERSION}+opt_amd64.deb" \
+            --clobber
 
   release-windows-x64:
     name: Windows x64
-    needs: build-jars
+    needs:
+      - prepare_release_meta
+      - create_release
     runs-on: windows-latest
     env:
-      VERSION: ${{ needs.build-jars.outputs.version }}
-      APP_VERSION: ${{ needs.build-jars.outputs.version }}
-      TAG: ${{ needs.build-jars.outputs.tag }}
+      VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.asset_version }}
+      APP_VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      TAG: ${{ needs.prepare_release_meta.outputs.tag }}
 
-      WIN_ARCH: x86_64
+      WIN_ARCH: x64
       ONLY_WINDOWS_X64: true
       ONLY_WINDOWS_ARM64: false
 
@@ -138,7 +283,7 @@ jobs:
 
       - name: Generate license report
         shell: powershell
-        run: .\gradlew.bat generateLicenseReport --no-parallel --no-configuration-cache
+        run: .\gradlew.bat generateLicenseReport --no-parallel
 
       - name: Build and stage Windows x64 assets
         shell: powershell
@@ -166,7 +311,7 @@ jobs:
             return $d.FullName
           }
 
-          $v = $env:VERSION
+          $v = $env:ASSET_VERSION
           $arch = $env:WIN_ARCH
 
           $msi = Get-LatestFile "app/build/compose/binaries/main/msi/ServerListExplorer-*.msi"
@@ -174,16 +319,16 @@ jobs:
           $exe = Get-LatestFile "app/build/compose/binaries/main/exe/ServerListExplorer-*.exe"
           $exeMin = Get-LatestFile "app/build/compose/binaries/main-release/exe/ServerListExplorer-*.exe"
 
-          Copy-Item $msi "app/out/ServerListExplorer_${arch}.msi" -Force
-          Copy-Item $msiMin "app/out/ServerListExplorer-minified_${arch}.msi" -Force
-          Copy-Item $exe "app/out/ServerListExplorer_${arch}-setup.exe" -Force
-          Copy-Item $exeMin "app/out/ServerListExplorer-minified_${arch}-setup.exe" -Force
+          Copy-Item $msi "app/out/ServerListExplorer-$v-windows-$arch.msi" -Force
+          Copy-Item $msiMin "app/out/ServerListExplorer-minified-$v-windows-$arch.msi" -Force
+          Copy-Item $exe "app/out/ServerListExplorer-$v-windows-$arch-setup.exe" -Force
+          Copy-Item $exeMin "app/out/ServerListExplorer-minified-$v-windows-$arch-setup.exe" -Force
 
           $appDir = Get-FirstDir "app/build/compose/binaries/main/app"
           $appDirMin = Get-FirstDir "app/build/compose/binaries/main-release/app"
 
-          $zip = "app/out/ServerListExplorer_windows-$arch-portable.zip"
-          $zipMin = "app/out/ServerListExplorer-minified_windows-$arch-portable.zip"
+          $zip = "app/out/ServerListExplorer-$v-windows-$arch-portable.zip"
+          $zipMin = "app/out/ServerListExplorer-minified-$v-windows-$arch-portable.zip"
 
           if (Test-Path $zip) { Remove-Item $zip -Force }
           if (Test-Path $zipMin) { Remove-Item $zipMin -Force }
@@ -201,21 +346,24 @@ jobs:
           overwrite_files: true
           fail_on_unmatched_files: true
           files: |
-            app/out/ServerListExplorer_x86_64.msi
-            app/out/ServerListExplorer-minified_x86_64.msi
-            app/out/ServerListExplorer_x86_64-setup.exe
-            app/out/ServerListExplorer-minified_x86_64-setup.exe
-            app/out/ServerListExplorer_windows-x86_64-portable.zip
-            app/out/ServerListExplorer-minified_windows-x86_64-portable.zip
+            app/out/ServerListExplorer-${{ env.ASSET_VERSION }}-windows-x64.msi
+            app/out/ServerListExplorer-minified-${{ env.ASSET_VERSION }}-windows-x64.msi
+            app/out/ServerListExplorer-${{ env.ASSET_VERSION }}-windows-x64-setup.exe
+            app/out/ServerListExplorer-minified-${{ env.ASSET_VERSION }}-windows-x64-setup.exe
+            app/out/ServerListExplorer-${{ env.ASSET_VERSION }}-windows-x64-portable.zip
+            app/out/ServerListExplorer-minified-${{ env.ASSET_VERSION }}-windows-x64-portable.zip
 
   release-windows-arm64:
     name: Windows ARM64
-    needs: build-jars
+    needs:
+      - prepare_release_meta
+      - create_release
     runs-on: windows-11-arm
     env:
-      VERSION: ${{ needs.build-jars.outputs.version }}
-      APP_VERSION: ${{ needs.build-jars.outputs.version }}
-      TAG: ${{ needs.build-jars.outputs.tag }}
+      VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.asset_version }}
+      APP_VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      TAG: ${{ needs.prepare_release_meta.outputs.tag }}
 
       WIN_ARCH: arm64
       ONLY_WINDOWS_ARM64: true
@@ -238,7 +386,7 @@ jobs:
 
       - name: Generate license report
         shell: powershell
-        run: .\gradlew.bat generateLicenseReport --no-parallel --no-configuration-cache
+        run: .\gradlew.bat generateLicenseReport --no-parallel
 
       - name: Build and stage Windows ARM64 assets
         shell: powershell
@@ -266,7 +414,7 @@ jobs:
             return $d.FullName
           }
 
-          $v = $env:VERSION
+          $v = $env:ASSET_VERSION
           $arch = $env:WIN_ARCH
 
           $msi = Get-LatestFile "app/build/compose/binaries/main/msi/ServerListExplorer-*.msi"
@@ -274,16 +422,16 @@ jobs:
           $exe = Get-LatestFile "app/build/compose/binaries/main/exe/ServerListExplorer-*.exe"
           $exeMin = Get-LatestFile "app/build/compose/binaries/main-release/exe/ServerListExplorer-*.exe"
 
-          Copy-Item $msi "app/out/ServerListExplorer_${arch}.msi" -Force
-          Copy-Item $msiMin "app/out/ServerListExplorer-minified_${arch}.msi" -Force
-          Copy-Item $exe "app/out/ServerListExplorer_${arch}-setup.exe" -Force
-          Copy-Item $exeMin "app/out/ServerListExplorer-minified_${arch}-setup.exe" -Force
+          Copy-Item $msi "app/out/ServerListExplorer-$v-windows-$arch.msi" -Force
+          Copy-Item $msiMin "app/out/ServerListExplorer-minified-$v-windows-$arch.msi" -Force
+          Copy-Item $exe "app/out/ServerListExplorer-$v-windows-$arch-setup.exe" -Force
+          Copy-Item $exeMin "app/out/ServerListExplorer-minified-$v-windows-$arch-setup.exe" -Force
 
           $appDir = Get-FirstDir "app/build/compose/binaries/main/app"
           $appDirMin = Get-FirstDir "app/build/compose/binaries/main-release/app"
 
-          $zip = "app/out/ServerListExplorer_windows-$arch-portable.zip"
-          $zipMin = "app/out/ServerListExplorer-minified_windows-$arch-portable.zip"
+          $zip = "app/out/ServerListExplorer-$v-windows-$arch-portable.zip"
+          $zipMin = "app/out/ServerListExplorer-minified-$v-windows-$arch-portable.zip"
 
           if (Test-Path $zip) { Remove-Item $zip -Force }
           if (Test-Path $zipMin) { Remove-Item $zipMin -Force }
@@ -301,9 +449,138 @@ jobs:
           overwrite_files: true
           fail_on_unmatched_files: true
           files: |
-            app/out/ServerListExplorer_arm64.msi
-            app/out/ServerListExplorer-minified_arm64.msi
-            app/out/ServerListExplorer_arm64-setup.exe
-            app/out/ServerListExplorer-minified_arm64-setup.exe
-            app/out/ServerListExplorer_windows-arm64-portable.zip
-            app/out/ServerListExplorer-minified_windows-arm64-portable.zip
+            app/out/ServerListExplorer-${{ env.ASSET_VERSION }}-windows-arm64.msi
+            app/out/ServerListExplorer-minified-${{ env.ASSET_VERSION }}-windows-arm64.msi
+            app/out/ServerListExplorer-${{ env.ASSET_VERSION }}-windows-arm64-setup.exe
+            app/out/ServerListExplorer-minified-${{ env.ASSET_VERSION }}-windows-arm64-setup.exe
+            app/out/ServerListExplorer-${{ env.ASSET_VERSION }}-windows-arm64-portable.zip
+            app/out/ServerListExplorer-minified-${{ env.ASSET_VERSION }}-windows-arm64-portable.zip
+
+  release-linux-arm64:
+    name: Linux ARM64
+    needs:
+      - prepare_release_meta
+      - create_release
+    runs-on: ubuntu-24.04-arm
+    env:
+      VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.asset_version }}
+      APP_VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      TAG: ${{ needs.prepare_release_meta.outputs.tag }}
+
+      LINUX_ARCH: arm64
+      DEB_ARCH: arm64
+      ONLY_LINUX_ARM64: true
+      ONLY_LINUX_X64: false
+      ONLY_WINDOWS_X64: false
+      ONLY_WINDOWS_ARM64: false
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-java@v5
+        with:
+          # Note: GraalVM locks files
+          distribution: jetbrains
+          java-version: 21
+          architecture: aarch64
+
+      - uses: gradle/actions/setup-gradle@v5
+        with:
+          gradle-version: wrapper
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Generate license report
+        shell: bash
+        run: ./gradlew generateLicenseReport --no-parallel
+
+      - name: Build and stage Linux ARM64 assets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p app/out
+
+          ./gradlew app:createDistributable
+          ./gradlew app:packageDeb
+          ./gradlew app:createReleaseDistributable
+          ./gradlew app:packageReleaseDeb
+
+          get_latest_file() {
+            local root="$1"
+            local pattern="$2"
+            local file
+
+            file="$(find "$root" -type f -name "$pattern" -printf '%T@ %p\n' | sort -nr | head -n 1 | cut -d' ' -f2-)"
+            if [[ -z "$file" ]]; then
+              echo "::error::Not found: $pattern under $root"
+              exit 1
+            fi
+            printf '%s\n' "$file"
+          }
+
+          get_first_dir() {
+            local root="$1"
+            local dir
+
+            dir="$(find "$root" -mindepth 1 -maxdepth 1 -type d | sort | head -n 1)"
+            if [[ -z "$dir" ]]; then
+              echo "::error::Not found directory under $root"
+              exit 1
+            fi
+            printf '%s\n' "$dir"
+          }
+
+          v="$ASSET_VERSION"
+          debVersion="$ASSET_VERSION"
+          arch="$LINUX_ARCH"
+          debArch="$DEB_ARCH"
+
+          deb="$(get_latest_file "app/build/compose/binaries/main" "*.deb")"
+          debMin="$(get_latest_file "app/build/compose/binaries/main-release" "*.deb")"
+
+          cp "$deb" "app/out/server-list-explorer_${debVersion}_${debArch}.deb"
+          cp "$debMin" "app/out/server-list-explorer_${debVersion}+opt_${debArch}.deb"
+
+          appDir="$(get_first_dir "app/build/compose/binaries/main/app")"
+          appDirMin="$(get_first_dir "app/build/compose/binaries/main-release/app")"
+
+          tar -C "$(dirname "$appDir")" -czf "app/out/ServerListExplorer-$v-linux-$arch.tar.gz" "$(basename "$appDir")"
+          tar -C "$(dirname "$appDirMin")" -czf "app/out/ServerListExplorer-minified-$v-linux-$arch.tar.gz" "$(basename "$appDirMin")"
+
+          ls -lh app/out
+
+      - name: Upload Linux ARM64 assets
+        if: env.ACT != 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          gh release upload "$TAG" \
+            "app/out/ServerListExplorer-${ASSET_VERSION}-linux-arm64.tar.gz" \
+            "app/out/ServerListExplorer-minified-${ASSET_VERSION}-linux-arm64.tar.gz" \
+            "app/out/server-list-explorer_${ASSET_VERSION}_arm64.deb" \
+            "app/out/server-list-explorer_${ASSET_VERSION}+opt_arm64.deb" \
+            --clobber
+
+  update-readme-download-links:
+    name: Update README Download Links
+    needs:
+      - prepare_release_meta
+      - build-jars
+      - release-linux-x64
+      - release-windows-x64
+      - release-windows-arm64
+      - release-linux-arm64
+    if: ${{ !contains(needs.prepare_release_meta.outputs.tag, '-alpha') && !contains(needs.prepare_release_meta.outputs.tag, '.alpha') && !contains(needs.prepare_release_meta.outputs.tag, '-beta') && !contains(needs.prepare_release_meta.outputs.tag, '.beta') && !contains(needs.prepare_release_meta.outputs.tag, '-rc') && !contains(needs.prepare_release_meta.outputs.tag, '.rc') }}
+    uses: ./.github/workflows/update-readme-download-links.yml
+    with:
+      version: ${{ needs.prepare_release_meta.outputs.version }}
+      tag: ${{ needs.prepare_release_meta.outputs.tag }}
+      asset_version: ${{ needs.prepare_release_meta.outputs.asset_version }}
+    secrets: inherit
