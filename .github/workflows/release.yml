@@ -44,8 +44,8 @@ jobs:
             exit 1
           fi
 
-          BUILD_VERSION="$(echo "$V" | sed -E 's/-(dev|alpha|beta|rc)([0-9]+)/-\1.\2/g')"
-          ASSET_VERSION="$(echo "$V" | sed -E 's/-(dev|alpha|beta|rc)\.?([0-9]+)/-\1\2/g')"
+          BUILD_VERSION="$(echo "$V" | sed -E 's/([.-])(dev|alpha|beta|rc)\.?([0-9]+)/-\2.\3/g')"
+          ASSET_VERSION="$(echo "$V" | sed -E 's/([.-])(dev|alpha|beta|rc)\.?([0-9]+)/-\2\3/g')"
           DEB_ASSET_VERSION="$(echo "$ASSET_VERSION" | sed -E 's/-(dev|alpha|beta|rc)/~\1/')"
 
           echo "version=$BUILD_VERSION" >> "$GITHUB_OUTPUT"
@@ -67,7 +67,7 @@ jobs:
           tag_name: ${{ env.TAG }}
           name: "Server List Explorer ${{ env.TAG }}"
           generate_release_notes: true
-          prerelease: ${{ contains(env.TAG, '-alpha') || contains(env.TAG, '-beta') || contains(env.TAG, '-rc') }}
+          prerelease: ${{ contains(env.TAG, '-alpha') || contains(env.TAG, '.alpha') || contains(env.TAG, '-beta') || contains(env.TAG, '.beta') || contains(env.TAG, '-rc') || contains(env.TAG, '.rc') }}
           overwrite_files: true
 
   build-jars:
@@ -579,7 +579,7 @@ jobs:
       - release-windows-x64
       - release-windows-arm64
       - release-linux-arm64
-    if: ${{ !contains(needs.prepare_release_meta.outputs.tag, '-alpha') && !contains(needs.prepare_release_meta.outputs.tag, '-beta') && !contains(needs.prepare_release_meta.outputs.tag, '-rc') }}
+    if: ${{ !contains(needs.prepare_release_meta.outputs.tag, '-alpha') && !contains(needs.prepare_release_meta.outputs.tag, '.alpha') && !contains(needs.prepare_release_meta.outputs.tag, '-beta') && !contains(needs.prepare_release_meta.outputs.tag, '.beta') && !contains(needs.prepare_release_meta.outputs.tag, '-rc') && !contains(needs.prepare_release_meta.outputs.tag, '.rc') }}
     uses: ./.github/workflows/update-readme-download-links.yml
     with:
       version: ${{ needs.prepare_release_meta.outputs.version }}

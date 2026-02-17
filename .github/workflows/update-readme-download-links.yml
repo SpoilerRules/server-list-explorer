@@ -33,7 +33,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          ASSET_VERSION="$(echo "$VERSION" | sed -E 's/-(dev|alpha|beta|rc)\.?([0-9]+)/-\1\2/g')"
+          ASSET_VERSION="$(echo "$VERSION" | sed -E 's/([.-])(dev|alpha|beta|rc)\.?([0-9]+)/-\2\3/g')"
           DEB_ASSET_VERSION="$(echo "$ASSET_VERSION" | sed -E 's/-(dev|alpha|beta|rc)/~\1/')"
           BASE_URL="https://github.com/$REPOSITORY/releases/download/$TAG"
 
