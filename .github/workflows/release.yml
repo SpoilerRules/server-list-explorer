@@ -259,6 +259,36 @@ jobs:
             app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}_amd64.deb
             app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}+opt_amd64.deb
 
+      - name: Remove legacy dotted Debian x64 assets
+        if: env.ACT != 'true'
+        uses: actions/github-script@v8
+        env:
+          TAG: ${{ env.TAG }}
+          DEB_ARCH: amd64
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const tag = process.env.TAG;
+            const arch = process.env.DEB_ARCH;
+            const legacyPattern = new RegExp(`^server-list-explorer_.*\\.(dev|alpha|beta|rc)\\.?[0-9]+(\\+opt)?_${arch}\\.deb$`);
+
+            const release = await github.rest.repos.getReleaseByTag({ owner, repo, tag });
+            const assets = release.data.assets || [];
+            const legacyAssets = assets.filter((asset) => legacyPattern.test(asset.name));
+
+            for (const asset of legacyAssets) {
+              core.info(`Deleting legacy Debian asset: ${asset.name}`);
+              await github.rest.repos.deleteReleaseAsset({
+                owner,
+                repo,
+                asset_id: asset.id,
+              });
+            }
+
+            if (legacyAssets.length === 0) {
+              core.info("No legacy dotted Debian x64 assets found.");
+            }
+
   release-windows-x64:
     name: Windows x64
     needs:
@@ -574,6 +604,36 @@ jobs:
             app/out/ServerListExplorer-minified-${{ env.ASSET_VERSION }}-linux-arm64.tar.gz
             app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}_arm64.deb
             app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}+opt_arm64.deb
+
+      - name: Remove legacy dotted Debian ARM64 assets
+        if: env.ACT != 'true'
+        uses: actions/github-script@v8
+        env:
+          TAG: ${{ env.TAG }}
+          DEB_ARCH: arm64
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const tag = process.env.TAG;
+            const arch = process.env.DEB_ARCH;
+            const legacyPattern = new RegExp(`^server-list-explorer_.*\\.(dev|alpha|beta|rc)\\.?[0-9]+(\\+opt)?_${arch}\\.deb$`);
+
+            const release = await github.rest.repos.getReleaseByTag({ owner, repo, tag });
+            const assets = release.data.assets || [];
+            const legacyAssets = assets.filter((asset) => legacyPattern.test(asset.name));
+
+            for (const asset of legacyAssets) {
+              core.info(`Deleting legacy Debian asset: ${asset.name}`);
+              await github.rest.repos.deleteReleaseAsset({
+                owner,
+                repo,
+                asset_id: asset.id,
+              });
+            }
+
+            if (legacyAssets.length === 0) {
+              core.info("No legacy dotted Debian ARM64 assets found.");
+            }
 
   update-readme-download-links:
     name: Update README Download Links
