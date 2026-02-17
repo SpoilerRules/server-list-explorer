@@ -112,6 +112,7 @@ val buildWithProjectModules by tasks.registering(Jar::class) {
         // include contents of that jar, but drop the generated BuildConfig to avoid conflicts
         from({ project.zipTree(jarProvider.flatMap { it.archiveFile }) }) {
             exclude("com/spoiligaming/explorer/build/BuildConfig.class")
+            exclude("com/spoiligaming/explorer/build/PlatformDirs.class")
         }
     }
 }

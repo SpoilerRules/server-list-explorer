@@ -26,7 +26,7 @@ import kotlinx.serialization.json.Json
 import java.io.File
 
 internal class SettingsFile<T>(
-    private val fileName: String,
+    fileName: String,
     private val serializer: KSerializer<T>,
     private val defaultValueProvider: () -> T,
 ) {
@@ -37,21 +37,20 @@ internal class SettingsFile<T>(
             ignoreUnknownKeys = true
         }
 
-    private val settingsFile
-        get() = SettingsStorage.settingsDir.resolve(fileName)
+    private val settingsDir = AppStoragePaths.settingsDir
+    private val settingsFile = settingsDir.resolve(fileName)
 
     val lastModifiedMillis
         get() = settingsFile.takeIf { it.exists() }?.lastModified()
 
     suspend fun read() =
         withContext(Dispatchers.IO) {
-            val dir = SettingsStorage.settingsDir
             val file = settingsFile
 
             logger.debug { "Attempting to read settings from: ${file.absolutePath}" }
 
             if (!file.exists()) {
-                ensureDirExists(dir)
+                ensureDirExists(settingsDir)
 
                 val defaultObj = defaultValueProvider()
                 file.writeText(json.encodeToString(serializer, defaultObj))
@@ -78,10 +77,9 @@ internal class SettingsFile<T>(
         data: T,
         onComplete: (() -> Unit)? = null,
     ) = withContext(Dispatchers.IO) {
-        val dir = SettingsStorage.settingsDir
         val file = settingsFile
 
-        ensureDirExists(dir)
+        ensureDirExists(settingsDir)
 
         val serialized = json.encodeToString(serializer, data)
         file.writeText(serialized)

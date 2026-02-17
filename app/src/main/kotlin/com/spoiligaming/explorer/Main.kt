@@ -27,7 +27,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 
 fun main(args: Array<String>) {
     val env = if (System.getProperty("env") == "dev") "dev" else "prod"
-    val logsDir = LogStorage.logsDir
+    val logsDir = StartupAppDataMigration.migrateBeforeLogging()
     logsDir.mkdirs()
     System.setProperty("log4j2.configurationFile", "log4j2-$env.xml")
     System.setProperty("app.logs.dir", logsDir.absolutePath)
