@@ -22,7 +22,6 @@ jobs:
       version: ${{ steps.meta.outputs.version }}
       tag: ${{ steps.meta.outputs.tag }}
       asset_version: ${{ steps.meta.outputs.asset_version }}
-      deb_asset_version: ${{ steps.meta.outputs.deb_asset_version }}
 
     steps:
       - name: Determine version & tag
@@ -46,17 +45,10 @@ jobs:
 
           BUILD_VERSION="$(echo "$V" | sed -E 's/[.-](dev|alpha|beta|rc)[.-]?([0-9]+)/-\1.\2/g')"
           ASSET_VERSION="$(echo "$V" | sed -E 's/[.-](dev|alpha|beta|rc)[.-]?([0-9]+)/-\1\2/g')"
-          DEB_ASSET_VERSION="$(echo "$ASSET_VERSION" | sed -E 's/-((dev|alpha|beta|rc)[0-9]+)/~\1/g')"
-
-          if [[ "$ASSET_VERSION" =~ -(dev|alpha|beta|rc)[0-9]+ ]] && [[ "$DEB_ASSET_VERSION" != *"~"* ]]; then
-            echo "::error::Debian prerelease version must contain '~': ASSET_VERSION=$ASSET_VERSION DEB_ASSET_VERSION=$DEB_ASSET_VERSION"
-            exit 1
-          fi
 
           echo "version=$BUILD_VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "asset_version=$ASSET_VERSION" >> "$GITHUB_OUTPUT"
-          echo "deb_asset_version=$DEB_ASSET_VERSION" >> "$GITHUB_OUTPUT"
 
   create_release:
     name: Initialize GitHub Release
@@ -84,7 +76,6 @@ jobs:
     env:
       VERSION: ${{ needs.prepare_release_meta.outputs.version }}
       ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.asset_version }}
-      DEB_ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.deb_asset_version }}
       APP_VERSION: ${{ needs.prepare_release_meta.outputs.version }}
       TAG: ${{ needs.prepare_release_meta.outputs.tag }}
 
@@ -158,7 +149,6 @@ jobs:
     env:
       VERSION: ${{ needs.prepare_release_meta.outputs.version }}
       ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.asset_version }}
-      DEB_ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.deb_asset_version }}
       APP_VERSION: ${{ needs.prepare_release_meta.outputs.version }}
       TAG: ${{ needs.prepare_release_meta.outputs.tag }}
 
@@ -228,7 +218,7 @@ jobs:
           }
 
           v="$ASSET_VERSION"
-          debVersion="$DEB_ASSET_VERSION"
+          debVersion="$ASSET_VERSION"
           arch="$LINUX_ARCH"
           debArch="$DEB_ARCH"
 
@@ -246,36 +236,6 @@ jobs:
 
           ls -lh app/out
 
-      - name: Remove legacy dotted Debian x64 assets
-        if: env.ACT != 'true'
-        uses: actions/github-script@v8
-        env:
-          TAG: ${{ env.TAG }}
-          DEB_ARCH: amd64
-        with:
-          script: |
-            const { owner, repo } = context.repo;
-            const tag = process.env.TAG;
-            const arch = process.env.DEB_ARCH;
-            const legacyPattern = new RegExp(`^server-list-explorer_.*\\.(dev|alpha|beta|rc)\\.?[0-9]+(\\+opt)?_${arch}\\.deb$`);
-
-            const release = await github.rest.repos.getReleaseByTag({ owner, repo, tag });
-            const assets = release.data.assets || [];
-            const legacyAssets = assets.filter((asset) => legacyPattern.test(asset.name));
-
-            for (const asset of legacyAssets) {
-              core.info(`Deleting legacy Debian asset: ${asset.name}`);
-              await github.rest.repos.deleteReleaseAsset({
-                owner,
-                repo,
-                asset_id: asset.id,
-              });
-            }
-
-            if (legacyAssets.length === 0) {
-              core.info("No legacy dotted Debian x64 assets found.");
-            }
-
       - name: Upload Linux x64 assets
         if: env.ACT != 'true'
         shell: bash
@@ -287,46 +247,9 @@ jobs:
           gh release upload "$TAG" \
             "app/out/ServerListExplorer-${ASSET_VERSION}-linux-x64.tar.gz" \
             "app/out/ServerListExplorer-minified-${ASSET_VERSION}-linux-x64.tar.gz" \
-            "app/out/server-list-explorer_${DEB_ASSET_VERSION}_amd64.deb" \
-            "app/out/server-list-explorer_${DEB_ASSET_VERSION}+opt_amd64.deb" \
+            "app/out/server-list-explorer_${ASSET_VERSION}_amd64.deb" \
+            "app/out/server-list-explorer_${ASSET_VERSION}+opt_amd64.deb" \
             --clobber
-
-      - name: Verify Debian x64 asset names on release
-        if: env.ACT != 'true'
-        uses: actions/github-script@v8
-        env:
-          TAG: ${{ env.TAG }}
-          DEB_ARCH: amd64
-          DEB_ASSET_VERSION: ${{ env.DEB_ASSET_VERSION }}
-        with:
-          script: |
-            const { owner, repo } = context.repo;
-            const tag = process.env.TAG;
-            const arch = process.env.DEB_ARCH;
-            const debVersion = process.env.DEB_ASSET_VERSION;
-
-            const expected = new Set([
-              `server-list-explorer_${debVersion}_${arch}.deb`,
-              `server-list-explorer_${debVersion}+opt_${arch}.deb`,
-            ]);
-            const dottedPattern = new RegExp(`^server-list-explorer_.*\\.(dev|alpha|beta|rc)\\.?[0-9]+(\\+opt)?_${arch}\\.deb$`);
-
-            const release = await github.rest.repos.getReleaseByTag({ owner, repo, tag });
-            const names = (release.data.assets || []).map((asset) => asset.name);
-            const debNames = names.filter((name) => name.endsWith(`_${arch}.deb`));
-
-            core.info(`Debian ${arch} assets on release: ${debNames.join(", ") || "(none)"}`);
-
-            const dotted = debNames.filter((name) => dottedPattern.test(name));
-            if (dotted.length > 0) {
-              core.setFailed(`Found dotted prerelease Debian asset names: ${dotted.join(", ")}`);
-              return;
-            }
-
-            const missing = [...expected].filter((name) => !debNames.includes(name));
-            if (missing.length > 0) {
-              core.setFailed(`Missing expected Debian ${arch} assets: ${missing.join(", ")}`);
-            }
 
   release-windows-x64:
     name: Windows x64
@@ -542,7 +465,6 @@ jobs:
     env:
       VERSION: ${{ needs.prepare_release_meta.outputs.version }}
       ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.asset_version }}
-      DEB_ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.deb_asset_version }}
       APP_VERSION: ${{ needs.prepare_release_meta.outputs.version }}
       TAG: ${{ needs.prepare_release_meta.outputs.tag }}
 
@@ -613,7 +535,7 @@ jobs:
           }
 
           v="$ASSET_VERSION"
-          debVersion="$DEB_ASSET_VERSION"
+          debVersion="$ASSET_VERSION"
           arch="$LINUX_ARCH"
           debArch="$DEB_ARCH"
 
@@ -631,36 +553,6 @@ jobs:
 
           ls -lh app/out
 
-      - name: Remove legacy dotted Debian ARM64 assets
-        if: env.ACT != 'true'
-        uses: actions/github-script@v8
-        env:
-          TAG: ${{ env.TAG }}
-          DEB_ARCH: arm64
-        with:
-          script: |
-            const { owner, repo } = context.repo;
-            const tag = process.env.TAG;
-            const arch = process.env.DEB_ARCH;
-            const legacyPattern = new RegExp(`^server-list-explorer_.*\\.(dev|alpha|beta|rc)\\.?[0-9]+(\\+opt)?_${arch}\\.deb$`);
-
-            const release = await github.rest.repos.getReleaseByTag({ owner, repo, tag });
-            const assets = release.data.assets || [];
-            const legacyAssets = assets.filter((asset) => legacyPattern.test(asset.name));
-
-            for (const asset of legacyAssets) {
-              core.info(`Deleting legacy Debian asset: ${asset.name}`);
-              await github.rest.repos.deleteReleaseAsset({
-                owner,
-                repo,
-                asset_id: asset.id,
-              });
-            }
-
-            if (legacyAssets.length === 0) {
-              core.info("No legacy dotted Debian ARM64 assets found.");
-            }
-
       - name: Upload Linux ARM64 assets
         if: env.ACT != 'true'
         shell: bash
@@ -672,46 +564,9 @@ jobs:
           gh release upload "$TAG" \
             "app/out/ServerListExplorer-${ASSET_VERSION}-linux-arm64.tar.gz" \
             "app/out/ServerListExplorer-minified-${ASSET_VERSION}-linux-arm64.tar.gz" \
-            "app/out/server-list-explorer_${DEB_ASSET_VERSION}_arm64.deb" \
-            "app/out/server-list-explorer_${DEB_ASSET_VERSION}+opt_arm64.deb" \
+            "app/out/server-list-explorer_${ASSET_VERSION}_arm64.deb" \
+            "app/out/server-list-explorer_${ASSET_VERSION}+opt_arm64.deb" \
             --clobber
-
-      - name: Verify Debian ARM64 asset names on release
-        if: env.ACT != 'true'
-        uses: actions/github-script@v8
-        env:
-          TAG: ${{ env.TAG }}
-          DEB_ARCH: arm64
-          DEB_ASSET_VERSION: ${{ env.DEB_ASSET_VERSION }}
-        with:
-          script: |
-            const { owner, repo } = context.repo;
-            const tag = process.env.TAG;
-            const arch = process.env.DEB_ARCH;
-            const debVersion = process.env.DEB_ASSET_VERSION;
-
-            const expected = new Set([
-              `server-list-explorer_${debVersion}_${arch}.deb`,
-              `server-list-explorer_${debVersion}+opt_${arch}.deb`,
-            ]);
-            const dottedPattern = new RegExp(`^server-list-explorer_.*\\.(dev|alpha|beta|rc)\\.?[0-9]+(\\+opt)?_${arch}\\.deb$`);
-
-            const release = await github.rest.repos.getReleaseByTag({ owner, repo, tag });
-            const names = (release.data.assets || []).map((asset) => asset.name);
-            const debNames = names.filter((name) => name.endsWith(`_${arch}.deb`));
-
-            core.info(`Debian ${arch} assets on release: ${debNames.join(", ") || "(none)"}`);
-
-            const dotted = debNames.filter((name) => dottedPattern.test(name));
-            if (dotted.length > 0) {
-              core.setFailed(`Found dotted prerelease Debian asset names: ${dotted.join(", ")}`);
-              return;
-            }
-
-            const missing = [...expected].filter((name) => !debNames.includes(name));
-            if (missing.length > 0) {
-              core.setFailed(`Missing expected Debian ${arch} assets: ${missing.join(", ")}`);
-            }
 
   update-readme-download-links:
     name: Update README Download Links
@@ -728,5 +583,4 @@ jobs:
       version: ${{ needs.prepare_release_meta.outputs.version }}
       tag: ${{ needs.prepare_release_meta.outputs.tag }}
       asset_version: ${{ needs.prepare_release_meta.outputs.asset_version }}
-      deb_asset_version: ${{ needs.prepare_release_meta.outputs.deb_asset_version }}
     secrets: inherit

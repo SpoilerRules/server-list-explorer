@@ -12,9 +12,6 @@ on:
       asset_version:
         required: true
         type: string
-      deb_asset_version:
-        required: true
-        type: string
 
 permissions:
   contents: write
@@ -35,7 +32,6 @@ jobs:
         env:
           TAG: ${{ inputs.tag }}
           ASSET_VERSION: ${{ inputs.asset_version }}
-          DEB_ASSET_VERSION: ${{ inputs.deb_asset_version }}
           REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
@@ -43,7 +39,6 @@ jobs:
           BASE_URL="https://github.com/$REPOSITORY/releases/download/$TAG"
 
           export ASSET_VERSION
-          export DEB_ASSET_VERSION
           export BASE_URL
 
           node <<'NODE'
@@ -51,10 +46,7 @@ jobs:
 
           const readmePath = "README.md";
           const assetVersion = process.env.ASSET_VERSION;
-          const debAssetVersion = process.env.DEB_ASSET_VERSION;
           const baseUrl = process.env.BASE_URL;
-          const tag = process.env.TAG;
-          const repository = process.env.REPOSITORY;
 
           const content = fs.readFileSync(readmePath, "utf8");
 
@@ -119,7 +111,7 @@ jobs:
             if (/\.deb$/i.test(filename)) {
               const minified = /server-list-explorer-minified|minified|\+opt/i.test(filename);
               const debArch = detectDebArch(filename);
-              const debVersion = minified ? `${debAssetVersion}+opt` : debAssetVersion;
+              const debVersion = minified ? `${assetVersion}+opt` : assetVersion;
               return `server-list-explorer_${debVersion}_${debArch}.deb`;
             }
 
