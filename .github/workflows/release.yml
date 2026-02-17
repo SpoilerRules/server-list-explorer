@@ -278,16 +278,18 @@ jobs:
 
       - name: Upload Linux x64 assets
         if: env.ACT != 'true'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.TAG }}
-          overwrite_files: true
-          fail_on_unmatched_files: true
-          files: |
-            app/out/ServerListExplorer-${{ env.ASSET_VERSION }}-linux-x64.tar.gz
-            app/out/ServerListExplorer-minified-${{ env.ASSET_VERSION }}-linux-x64.tar.gz
-            app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}_amd64.deb
-            app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}+opt_amd64.deb
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          gh release upload "$TAG" \
+            "app/out/ServerListExplorer-${ASSET_VERSION}-linux-x64.tar.gz" \
+            "app/out/ServerListExplorer-minified-${ASSET_VERSION}-linux-x64.tar.gz" \
+            "app/out/server-list-explorer_${DEB_ASSET_VERSION}_amd64.deb" \
+            "app/out/server-list-explorer_${DEB_ASSET_VERSION}+opt_amd64.deb" \
+            --clobber
 
       - name: Verify Debian x64 asset names on release
         if: env.ACT != 'true'
@@ -661,16 +663,18 @@ jobs:
 
       - name: Upload Linux ARM64 assets
         if: env.ACT != 'true'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.TAG }}
-          overwrite_files: true
-          fail_on_unmatched_files: true
-          files: |
-            app/out/ServerListExplorer-${{ env.ASSET_VERSION }}-linux-arm64.tar.gz
-            app/out/ServerListExplorer-minified-${{ env.ASSET_VERSION }}-linux-arm64.tar.gz
-            app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}_arm64.deb
-            app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}+opt_arm64.deb
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          gh release upload "$TAG" \
+            "app/out/ServerListExplorer-${ASSET_VERSION}-linux-arm64.tar.gz" \
+            "app/out/ServerListExplorer-minified-${ASSET_VERSION}-linux-arm64.tar.gz" \
+            "app/out/server-list-explorer_${DEB_ASSET_VERSION}_arm64.deb" \
+            "app/out/server-list-explorer_${DEB_ASSET_VERSION}+opt_arm64.deb" \
+            --clobber
 
       - name: Verify Debian ARM64 asset names on release
         if: env.ACT != 'true'
