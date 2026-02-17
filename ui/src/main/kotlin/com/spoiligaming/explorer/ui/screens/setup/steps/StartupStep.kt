@@ -155,7 +155,10 @@ private fun StartupToggleSection(
     )
 
     HorizontalDivider(
-        modifier = Modifier.height(StartupToggleDividerThickness).padding(horizontal = StartupToggleDividerHorizontalInset),
+        modifier =
+            Modifier
+                .height(StartupToggleDividerThickness)
+                .padding(horizontal = StartupToggleDividerHorizontalInset),
         color = MaterialTheme.colorScheme.outlineVariant,
     )
 
@@ -169,7 +172,9 @@ private fun StartupToggleSection(
     )
 
     HorizontalDivider(
-        modifier = Modifier.height(StartupToggleDividerThickness).padding(horizontal = StartupToggleDividerHorizontalInset),
+        modifier = Modifier
+            .height(StartupToggleDividerThickness)
+            .padding(horizontal = StartupToggleDividerHorizontalInset),
         color = MaterialTheme.colorScheme.outlineVariant,
     )
 
