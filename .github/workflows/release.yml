@@ -289,6 +289,43 @@ jobs:
             app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}_amd64.deb
             app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}+opt_amd64.deb
 
+      - name: Verify Debian x64 asset names on release
+        if: env.ACT != 'true'
+        uses: actions/github-script@v8
+        env:
+          TAG: ${{ env.TAG }}
+          DEB_ARCH: amd64
+          DEB_ASSET_VERSION: ${{ env.DEB_ASSET_VERSION }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const tag = process.env.TAG;
+            const arch = process.env.DEB_ARCH;
+            const debVersion = process.env.DEB_ASSET_VERSION;
+
+            const expected = new Set([
+              `server-list-explorer_${debVersion}_${arch}.deb`,
+              `server-list-explorer_${debVersion}+opt_${arch}.deb`,
+            ]);
+            const dottedPattern = new RegExp(`^server-list-explorer_.*\\.(dev|alpha|beta|rc)\\.?[0-9]+(\\+opt)?_${arch}\\.deb$`);
+
+            const release = await github.rest.repos.getReleaseByTag({ owner, repo, tag });
+            const names = (release.data.assets || []).map((asset) => asset.name);
+            const debNames = names.filter((name) => name.endsWith(`_${arch}.deb`));
+
+            core.info(`Debian ${arch} assets on release: ${debNames.join(", ") || "(none)"}`);
+
+            const dotted = debNames.filter((name) => dottedPattern.test(name));
+            if (dotted.length > 0) {
+              core.setFailed(`Found dotted prerelease Debian asset names: ${dotted.join(", ")}`);
+              return;
+            }
+
+            const missing = [...expected].filter((name) => !debNames.includes(name));
+            if (missing.length > 0) {
+              core.setFailed(`Missing expected Debian ${arch} assets: ${missing.join(", ")}`);
+            }
+
   release-windows-x64:
     name: Windows x64
     needs:
@@ -634,6 +671,43 @@ jobs:
             app/out/ServerListExplorer-minified-${{ env.ASSET_VERSION }}-linux-arm64.tar.gz
             app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}_arm64.deb
             app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}+opt_arm64.deb
+
+      - name: Verify Debian ARM64 asset names on release
+        if: env.ACT != 'true'
+        uses: actions/github-script@v8
+        env:
+          TAG: ${{ env.TAG }}
+          DEB_ARCH: arm64
+          DEB_ASSET_VERSION: ${{ env.DEB_ASSET_VERSION }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const tag = process.env.TAG;
+            const arch = process.env.DEB_ARCH;
+            const debVersion = process.env.DEB_ASSET_VERSION;
+
+            const expected = new Set([
+              `server-list-explorer_${debVersion}_${arch}.deb`,
+              `server-list-explorer_${debVersion}+opt_${arch}.deb`,
+            ]);
+            const dottedPattern = new RegExp(`^server-list-explorer_.*\\.(dev|alpha|beta|rc)\\.?[0-9]+(\\+opt)?_${arch}\\.deb$`);
+
+            const release = await github.rest.repos.getReleaseByTag({ owner, repo, tag });
+            const names = (release.data.assets || []).map((asset) => asset.name);
+            const debNames = names.filter((name) => name.endsWith(`_${arch}.deb`));
+
+            core.info(`Debian ${arch} assets on release: ${debNames.join(", ") || "(none)"}`);
+
+            const dotted = debNames.filter((name) => dottedPattern.test(name));
+            if (dotted.length > 0) {
+              core.setFailed(`Found dotted prerelease Debian asset names: ${dotted.join(", ")}`);
+              return;
+            }
+
+            const missing = [...expected].filter((name) => !debNames.includes(name));
+            if (missing.length > 0) {
+              core.setFailed(`Missing expected Debian ${arch} assets: ${missing.join(", ")}`);
+            }
 
   update-readme-download-links:
     name: Update README Download Links
