@@ -27,8 +27,9 @@ jobs:
       - name: Rewrite README Available Downloads links
         shell: bash
         env:
-          VERSION: ${{ inputs.version }}
           TAG: ${{ inputs.tag }}
+          ASSET_VERSION: ${{ inputs.asset_version }}
+          DEB_ASSET_VERSION: ${{ inputs.deb_asset_version }}
           REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
