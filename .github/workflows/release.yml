@@ -46,7 +46,12 @@ jobs:
 
           BUILD_VERSION="$(echo "$V" | sed -E 's/[.-](dev|alpha|beta|rc)[.-]?([0-9]+)/-\1.\2/g')"
           ASSET_VERSION="$(echo "$V" | sed -E 's/[.-](dev|alpha|beta|rc)[.-]?([0-9]+)/-\1\2/g')"
-          DEB_ASSET_VERSION="$(echo "$V" | sed -E 's/[.-](dev|alpha|beta|rc)[.-]?([0-9]+)/~\1\2/g')"
+          DEB_ASSET_VERSION="$(echo "$ASSET_VERSION" | sed -E 's/-((dev|alpha|beta|rc)[0-9]+)/~\1/g')"
+
+          if [[ "$ASSET_VERSION" =~ -(dev|alpha|beta|rc)[0-9]+ ]] && [[ "$DEB_ASSET_VERSION" != *"~"* ]]; then
+            echo "::error::Debian prerelease version must contain '~': ASSET_VERSION=$ASSET_VERSION DEB_ASSET_VERSION=$DEB_ASSET_VERSION"
+            exit 1
+          fi
 
           echo "version=$BUILD_VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
@@ -584,4 +589,6 @@ jobs:
     with:
       version: ${{ needs.prepare_release_meta.outputs.version }}
       tag: ${{ needs.prepare_release_meta.outputs.tag }}
+      asset_version: ${{ needs.prepare_release_meta.outputs.asset_version }}
+      deb_asset_version: ${{ needs.prepare_release_meta.outputs.deb_asset_version }}
     secrets: inherit

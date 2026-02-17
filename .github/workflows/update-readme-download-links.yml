@@ -9,6 +9,12 @@ on:
       tag:
         required: true
         type: string
+      asset_version:
+        required: true
+        type: string
+      deb_asset_version:
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -34,8 +40,6 @@ jobs:
         run: |
           set -euo pipefail
 
-          ASSET_VERSION="$(echo "$VERSION" | sed -E 's/[.-](dev|alpha|beta|rc)[.-]?([0-9]+)/-\1\2/g')"
-          DEB_ASSET_VERSION="$(echo "$VERSION" | sed -E 's/[.-](dev|alpha|beta|rc)[.-]?([0-9]+)/~\1\2/g')"
           BASE_URL="https://github.com/$REPOSITORY/releases/download/$TAG"
 
           export ASSET_VERSION
