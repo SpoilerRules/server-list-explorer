@@ -46,7 +46,7 @@ jobs:
 
           BUILD_VERSION="$(echo "$V" | sed -E 's/([.-])(dev|alpha|beta|rc)\.?([0-9]+)/-\2.\3/g')"
           ASSET_VERSION="$(echo "$V" | sed -E 's/([.-])(dev|alpha|beta|rc)\.?([0-9]+)/-\2\3/g')"
-          DEB_ASSET_VERSION="$(echo "$ASSET_VERSION" | sed -E 's/-(dev|alpha|beta|rc)/~\1/')"
+          DEB_ASSET_VERSION="$(echo "$V" | sed -E 's/([.-])(dev|alpha|beta|rc)\.?([0-9]+)/~\2\3/g')"
 
           echo "version=$BUILD_VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
