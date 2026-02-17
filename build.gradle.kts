@@ -1,6 +1,6 @@
 /*
  * This file is part of Server List Explorer.
- * Copyright (C) 2025 SpoilerRules
+ * Copyright (C) 2025-2026 SpoilerRules
  *
  * Server List Explorer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -145,6 +145,11 @@ allprojects {
 
             buildConfigField("VERSION", appVersion)
             buildConfigField("DISTRIBUTION", appDistribution)
+
+            forClass("PlatformDirs") {
+                buildConfigField("WINDOWS_MACOS_APP_DIR_NAME", "Server List Explorer")
+                buildConfigField("LINUX_APP_DIR_NAME", "server-list-explorer")
+            }
         }
     }
 }

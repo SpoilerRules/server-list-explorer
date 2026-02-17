@@ -21,8 +21,8 @@
 package com.spoiligaming.explorer.serverlist.bookmarks
 
 import com.spoiligaming.explorer.multiplayer.repository.ServerListRepository
+import com.spoiligaming.explorer.settings.util.AppStoragePaths
 import com.spoiligaming.explorer.settings.util.LegacyMultiplayerSettingsReader
-import com.spoiligaming.explorer.settings.util.SettingsStorage
 import com.spoiligaming.explorer.util.canonicalize
 import com.spoiligaming.explorer.util.serverListBookmarkKey
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -40,7 +40,7 @@ import kotlin.uuid.Uuid
 
 object ServerListFileBookmarksManager {
     private val mutex = Mutex()
-    private val store = ServerListFileBookmarksStore(SettingsStorage.platformConfigDir.toPath())
+    private val store = ServerListFileBookmarksStore(AppStoragePaths.platformSettingsDir.toPath())
     private val _entries = MutableStateFlow<List<ServerListFileBookmarkEntry>>(emptyList())
     val entries = _entries.asStateFlow()
     private val _activePath = MutableStateFlow<Path?>(null)

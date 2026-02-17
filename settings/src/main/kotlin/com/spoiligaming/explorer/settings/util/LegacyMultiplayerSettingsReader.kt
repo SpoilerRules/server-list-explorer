@@ -1,6 +1,6 @@
 /*
  * This file is part of Server List Explorer.
- * Copyright (C) 2025 SpoilerRules
+ * Copyright (C) 2025-2026 SpoilerRules
  *
  * Server List Explorer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ object LegacyMultiplayerSettingsReader {
         }
 
     fun readServerListFile(): Path? {
-        val file = SettingsStorage.settingsDir.resolve(SETTINGS_FILE_NAME)
+        val file = AppStoragePaths.settingsDir.resolve(SETTINGS_FILE_NAME)
         if (!file.exists() || file.length() == 0L) return null
 
         return runCatching {
