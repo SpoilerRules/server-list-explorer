@@ -14,8 +14,8 @@ on:
         required: true
 
 jobs:
-  build-jars:
-    name: Linux x64
+  prepare_release_meta:
+    name: Prepare Release Metadata
     runs-on: ubuntu-latest
 
     outputs:
@@ -25,11 +25,6 @@ jobs:
       deb_asset_version: ${{ steps.meta.outputs.deb_asset_version }}
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
       - name: Determine version & tag
         id: meta
         shell: bash
@@ -57,11 +52,42 @@ jobs:
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "asset_version=$ASSET_VERSION" >> "$GITHUB_OUTPUT"
           echo "deb_asset_version=$DEB_ASSET_VERSION" >> "$GITHUB_OUTPUT"
-          echo "VERSION=$BUILD_VERSION" >> "$GITHUB_ENV"
-          echo "APP_VERSION=$BUILD_VERSION" >> "$GITHUB_ENV"
-          echo "TAG=$TAG" >> "$GITHUB_ENV"
-          echo "ASSET_VERSION=$ASSET_VERSION" >> "$GITHUB_ENV"
-          echo "DEB_ASSET_VERSION=$DEB_ASSET_VERSION" >> "$GITHUB_ENV"
+
+  create_release:
+    name: Initialize GitHub Release
+    needs: prepare_release_meta
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ needs.prepare_release_meta.outputs.tag }}
+    steps:
+      - name: Create GitHub release
+        if: env.ACT != 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          name: "Server List Explorer ${{ env.TAG }}"
+          generate_release_notes: true
+          prerelease: ${{ contains(env.TAG, '-alpha') || contains(env.TAG, '-beta') || contains(env.TAG, '-rc') }}
+          overwrite_files: true
+
+  build-jars:
+    name: JARs
+    needs:
+      - prepare_release_meta
+      - create_release
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.asset_version }}
+      DEB_ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.deb_asset_version }}
+      APP_VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      TAG: ${{ needs.prepare_release_meta.outputs.tag }}
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 21
         uses: actions/setup-java@v5
@@ -106,14 +132,11 @@ jobs:
           fi
           cp "$RELEASE_JAR" "app/out/ServerListExplorer-$v-minified-all.jar"
 
-      - name: Create GitHub Release with JARs
+      - name: Upload JAR assets
         if: env.ACT != 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
-          name: "Server List Explorer ${{ env.TAG }}"
-          generate_release_notes: true
-          prerelease: ${{ contains(env.TAG, '-alpha') || contains(env.TAG, '-beta') || contains(env.TAG, '-rc') }}
           overwrite_files: true
           fail_on_unmatched_files: true
           files: |
@@ -121,15 +144,127 @@ jobs:
             app/out/ServerListExplorer-${{ env.ASSET_VERSION }}-all.jar
             app/out/ServerListExplorer-${{ env.ASSET_VERSION }}-minified-all.jar
 
+  release-linux-x64:
+    name: Linux x64
+    needs:
+      - prepare_release_meta
+      - create_release
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.asset_version }}
+      DEB_ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.deb_asset_version }}
+      APP_VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      TAG: ${{ needs.prepare_release_meta.outputs.tag }}
+
+      LINUX_ARCH: x64
+      DEB_ARCH: amd64
+      ONLY_LINUX_X64: true
+      ONLY_LINUX_ARM64: false
+      ONLY_WINDOWS_X64: false
+      ONLY_WINDOWS_ARM64: false
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-java@v5
+        with:
+          # Note: GraalVM locks files
+          distribution: jetbrains
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v5
+        with:
+          gradle-version: wrapper
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Generate license report
+        shell: bash
+        run: ./gradlew generateLicenseReport --no-parallel
+
+      - name: Build and stage Linux x64 assets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p app/out
+
+          ./gradlew app:createDistributable
+          ./gradlew app:packageDeb
+          ./gradlew app:createReleaseDistributable
+          ./gradlew app:packageReleaseDeb
+
+          get_latest_file() {
+            local root="$1"
+            local pattern="$2"
+            local file
+
+            file="$(find "$root" -type f -name "$pattern" -printf '%T@ %p\n' | sort -nr | head -n 1 | cut -d' ' -f2-)"
+            if [[ -z "$file" ]]; then
+              echo "::error::Not found: $pattern under $root"
+              exit 1
+            fi
+            printf '%s\n' "$file"
+          }
+
+          get_first_dir() {
+            local root="$1"
+            local dir
+
+            dir="$(find "$root" -mindepth 1 -maxdepth 1 -type d | sort | head -n 1)"
+            if [[ -z "$dir" ]]; then
+              echo "::error::Not found directory under $root"
+              exit 1
+            fi
+            printf '%s\n' "$dir"
+          }
+
+          v="$ASSET_VERSION"
+          debVersion="$DEB_ASSET_VERSION"
+          arch="$LINUX_ARCH"
+          debArch="$DEB_ARCH"
+
+          deb="$(get_latest_file "app/build/compose/binaries/main" "*.deb")"
+          debMin="$(get_latest_file "app/build/compose/binaries/main-release" "*.deb")"
+
+          cp "$deb" "app/out/server-list-explorer_${debVersion}_${debArch}.deb"
+          cp "$debMin" "app/out/server-list-explorer_${debVersion}+opt_${debArch}.deb"
+
+          appDir="$(get_first_dir "app/build/compose/binaries/main/app")"
+          appDirMin="$(get_first_dir "app/build/compose/binaries/main-release/app")"
+
+          tar -C "$(dirname "$appDir")" -czf "app/out/ServerListExplorer-$v-linux-$arch.tar.gz" "$(basename "$appDir")"
+          tar -C "$(dirname "$appDirMin")" -czf "app/out/ServerListExplorer-minified-$v-linux-$arch.tar.gz" "$(basename "$appDirMin")"
+
+          ls -lh app/out
+
+      - name: Upload Linux x64 assets
+        if: env.ACT != 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          overwrite_files: true
+          fail_on_unmatched_files: true
+          files: |
+            app/out/ServerListExplorer-${{ env.ASSET_VERSION }}-linux-x64.tar.gz
+            app/out/ServerListExplorer-minified-${{ env.ASSET_VERSION }}-linux-x64.tar.gz
+            app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}_amd64.deb
+            app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}+opt_amd64.deb
+
   release-windows-x64:
     name: Windows x64
-    needs: build-jars
+    needs:
+      - prepare_release_meta
+      - create_release
     runs-on: windows-latest
     env:
-      VERSION: ${{ needs.build-jars.outputs.version }}
-      ASSET_VERSION: ${{ needs.build-jars.outputs.asset_version }}
-      APP_VERSION: ${{ needs.build-jars.outputs.version }}
-      TAG: ${{ needs.build-jars.outputs.tag }}
+      VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.asset_version }}
+      APP_VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      TAG: ${{ needs.prepare_release_meta.outputs.tag }}
 
       WIN_ARCH: x64
       ONLY_WINDOWS_X64: true
@@ -223,13 +358,15 @@ jobs:
 
   release-windows-arm64:
     name: Windows ARM64
-    needs: build-jars
+    needs:
+      - prepare_release_meta
+      - create_release
     runs-on: windows-11-arm
     env:
-      VERSION: ${{ needs.build-jars.outputs.version }}
-      ASSET_VERSION: ${{ needs.build-jars.outputs.asset_version }}
-      APP_VERSION: ${{ needs.build-jars.outputs.version }}
-      TAG: ${{ needs.build-jars.outputs.tag }}
+      VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.asset_version }}
+      APP_VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      TAG: ${{ needs.prepare_release_meta.outputs.tag }}
 
       WIN_ARCH: arm64
       ONLY_WINDOWS_ARM64: true
@@ -322,124 +459,18 @@ jobs:
             app/out/ServerListExplorer-${{ env.ASSET_VERSION }}-windows-arm64-portable.zip
             app/out/ServerListExplorer-minified-${{ env.ASSET_VERSION }}-windows-arm64-portable.zip
 
-  release-linux-x64:
-    name: Linux x64
-    needs: build-jars
-    runs-on: ubuntu-latest
-    env:
-      VERSION: ${{ needs.build-jars.outputs.version }}
-      ASSET_VERSION: ${{ needs.build-jars.outputs.asset_version }}
-      DEB_ASSET_VERSION: ${{ needs.build-jars.outputs.deb_asset_version }}
-      APP_VERSION: ${{ needs.build-jars.outputs.version }}
-      TAG: ${{ needs.build-jars.outputs.tag }}
-
-      LINUX_ARCH: x64
-      DEB_ARCH: amd64
-      ONLY_LINUX_X64: true
-      ONLY_LINUX_ARM64: false
-      ONLY_WINDOWS_X64: false
-      ONLY_WINDOWS_ARM64: false
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: actions/setup-java@v5
-        with:
-          # Note: GraalVM locks files
-          distribution: jetbrains
-          java-version: 21
-
-      - uses: gradle/actions/setup-gradle@v5
-        with:
-          gradle-version: wrapper
-          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-
-      - name: Make Gradle wrapper executable
-        run: chmod +x ./gradlew
-
-      - name: Generate license report
-        shell: bash
-        run: ./gradlew generateLicenseReport --no-parallel
-
-      - name: Build and stage Linux x64 assets
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          mkdir -p app/out
-
-          ./gradlew app:createDistributable
-          ./gradlew app:packageDeb
-          ./gradlew app:createReleaseDistributable
-          ./gradlew app:packageReleaseDeb
-
-          get_latest_file() {
-            local root="$1"
-            local pattern="$2"
-            local file
-
-            file="$(find "$root" -type f -name "$pattern" -printf '%T@ %p\n' | sort -nr | head -n 1 | cut -d' ' -f2-)"
-            if [[ -z "$file" ]]; then
-              echo "::error::Not found: $pattern under $root"
-              exit 1
-            fi
-            printf '%s\n' "$file"
-          }
-
-          get_first_dir() {
-            local root="$1"
-            local dir
-
-            dir="$(find "$root" -mindepth 1 -maxdepth 1 -type d | sort | head -n 1)"
-            if [[ -z "$dir" ]]; then
-              echo "::error::Not found directory under $root"
-              exit 1
-            fi
-            printf '%s\n' "$dir"
-          }
-
-          v="$ASSET_VERSION"
-          debVersion="$DEB_ASSET_VERSION"
-          arch="$LINUX_ARCH"
-          debArch="$DEB_ARCH"
-
-          deb="$(get_latest_file "app/build/compose/binaries/main" "*.deb")"
-          debMin="$(get_latest_file "app/build/compose/binaries/main-release" "*.deb")"
-
-          cp "$deb" "app/out/server-list-explorer_${debVersion}_${debArch}.deb"
-          cp "$debMin" "app/out/server-list-explorer-minified_${debVersion}_${debArch}.deb"
-
-          appDir="$(get_first_dir "app/build/compose/binaries/main/app")"
-          appDirMin="$(get_first_dir "app/build/compose/binaries/main-release/app")"
-
-          tar -C "$(dirname "$appDir")" -czf "app/out/ServerListExplorer-$v-linux-$arch.tar.gz" "$(basename "$appDir")"
-          tar -C "$(dirname "$appDirMin")" -czf "app/out/ServerListExplorer-minified-$v-linux-$arch.tar.gz" "$(basename "$appDirMin")"
-
-          ls -lh app/out
-
-      - name: Upload Linux x64 assets
-        if: env.ACT != 'true'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.TAG }}
-          overwrite_files: true
-          fail_on_unmatched_files: true
-          files: |
-            app/out/ServerListExplorer-${{ env.ASSET_VERSION }}-linux-x64.tar.gz
-            app/out/ServerListExplorer-minified-${{ env.ASSET_VERSION }}-linux-x64.tar.gz
-            app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}_amd64.deb
-            app/out/server-list-explorer-minified_${{ env.DEB_ASSET_VERSION }}_amd64.deb
-
   release-linux-arm64:
     name: Linux ARM64
-    needs: build-jars
+    needs:
+      - prepare_release_meta
+      - create_release
     runs-on: ubuntu-24.04-arm
     env:
-      VERSION: ${{ needs.build-jars.outputs.version }}
-      ASSET_VERSION: ${{ needs.build-jars.outputs.asset_version }}
-      DEB_ASSET_VERSION: ${{ needs.build-jars.outputs.deb_asset_version }}
-      APP_VERSION: ${{ needs.build-jars.outputs.version }}
-      TAG: ${{ needs.build-jars.outputs.tag }}
+      VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.asset_version }}
+      DEB_ASSET_VERSION: ${{ needs.prepare_release_meta.outputs.deb_asset_version }}
+      APP_VERSION: ${{ needs.prepare_release_meta.outputs.version }}
+      TAG: ${{ needs.prepare_release_meta.outputs.tag }}
 
       LINUX_ARCH: arm64
       DEB_ARCH: arm64
@@ -516,7 +547,7 @@ jobs:
           debMin="$(get_latest_file "app/build/compose/binaries/main-release" "*.deb")"
 
           cp "$deb" "app/out/server-list-explorer_${debVersion}_${debArch}.deb"
-          cp "$debMin" "app/out/server-list-explorer-minified_${debVersion}_${debArch}.deb"
+          cp "$debMin" "app/out/server-list-explorer_${debVersion}+opt_${debArch}.deb"
 
           appDir="$(get_first_dir "app/build/compose/binaries/main/app")"
           appDirMin="$(get_first_dir "app/build/compose/binaries/main-release/app")"
@@ -537,19 +568,19 @@ jobs:
             app/out/ServerListExplorer-${{ env.ASSET_VERSION }}-linux-arm64.tar.gz
             app/out/ServerListExplorer-minified-${{ env.ASSET_VERSION }}-linux-arm64.tar.gz
             app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}_arm64.deb
-            app/out/server-list-explorer-minified_${{ env.DEB_ASSET_VERSION }}_arm64.deb
+            app/out/server-list-explorer_${{ env.DEB_ASSET_VERSION }}+opt_arm64.deb
 
   update-readme-download-links:
     name: Update README Download Links
     needs:
+      - prepare_release_meta
       - build-jars
+      - release-linux-x64
       - release-windows-x64
       - release-windows-arm64
-      - release-linux-x64
       - release-linux-arm64
-    if: ${{ needs.build-jars.result == 'success' && needs.release-windows-x64.result == 'success' && needs.release-windows-arm64.result == 'success' && needs.release-linux-x64.result == 'success' && needs.release-linux-arm64.result == 'success' }}
     uses: ./.github/workflows/update-readme-download-links.yml
     with:
-      version: ${{ needs.build-jars.outputs.version }}
-      tag: ${{ needs.build-jars.outputs.tag }}
+      version: ${{ needs.prepare_release_meta.outputs.version }}
+      tag: ${{ needs.prepare_release_meta.outputs.tag }}
     secrets: inherit

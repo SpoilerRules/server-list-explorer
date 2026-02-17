@@ -112,10 +112,10 @@ jobs:
             }
 
             if (/\.deb$/i.test(filename)) {
-              const minified = /server-list-explorer-minified|minified/i.test(filename);
-              const packageName = minified ? "server-list-explorer-minified" : "server-list-explorer";
+              const minified = /server-list-explorer-minified|minified|\+opt/i.test(filename);
               const debArch = detectDebArch(filename);
-              return `${packageName}_${debAssetVersion}_${debArch}.deb`;
+              const debVersion = minified ? `${debAssetVersion}+opt` : debAssetVersion;
+              return `server-list-explorer_${debVersion}_${debArch}.deb`;
             }
 
             if (/\.jar$/i.test(filename)) {
