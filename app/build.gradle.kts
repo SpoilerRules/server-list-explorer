@@ -42,10 +42,14 @@ dependencies {
 
     val onlyWindowsX64: Boolean by rootProject.extra
     val onlyWindowsArm64: Boolean by rootProject.extra
+    val onlyLinuxX64: Boolean by rootProject.extra
+    val onlyLinuxArm64: Boolean by rootProject.extra
     val targetRuntimes =
         when {
             onlyWindowsX64 -> listOf(libs.compose.desktop.jvm.windows.x64)
             onlyWindowsArm64 -> listOf(libs.compose.desktop.jvm.windows.arm64)
+            onlyLinuxX64 -> listOf(libs.compose.desktop.jvm.linux.x64)
+            onlyLinuxArm64 -> listOf(libs.compose.desktop.jvm.linux.arm64)
             else ->
                 listOf(
                     libs.compose.desktop.jvm.windows.x64,
@@ -178,6 +182,19 @@ require(windowsBuild in 0..65535) {
 }
 
 val numericWindowsVersion = "$major.$minor.$windowsBuild"
+val debPackageVer =
+    if (qualifier.isNotEmpty()) {
+        "$major.$minor.$patch~$qualifier"
+    } else {
+        "$major.$minor.$patch"
+    }
+
+val isDebDebugBuild: Boolean =
+    providers
+        .gradleProperty("debDebug")
+        .map { it.equals("true", ignoreCase = true) }
+        .orElse(false)
+        .get()
 
 val startYear = 2025
 val copyrightYears =
@@ -225,11 +242,16 @@ compose.desktop.application {
         )
 
     jvmArgs += optimizedJvmArgs
+    if (isDebDebugBuild) {
+        jvmArgs +=
+            listOf(
+                "-Denv=dev",
+            )
+    }
 
     nativeDistributions {
-        packageName = "ServerListExplorer"
-
         windows {
+            packageName = "ServerListExplorer"
             packageVersion = numericWindowsVersion
             msiPackageVersion = numericWindowsVersion
             exePackageVersion = numericWindowsVersion
@@ -243,7 +265,20 @@ compose.desktop.application {
             upgradeUuid = "4bd4c2a2-2567-4c63-9abf-aa5adab76c4c"
         }
 
-        description = "Minecraft server list explorer"
+        linux {
+            packageName = "server-list-explorer"
+            debPackageVersion = debPackageVer
+            debMaintainer = "SpoilerRules"
+
+            shortcut = true
+
+            menuGroup = "Utility"
+            appCategory = "Utility"
+
+            modules("jdk.security.auth")
+        }
+
+        description = "Server List Explorer for Minecraft"
         copyright = "Copyright (C) $copyrightYears SpoilerRules"
         vendor = "SpoilerRules"
         licenseFile.set(rootProject.file("LICENSE"))
@@ -251,9 +286,10 @@ compose.desktop.application {
         targetFormats(
             TargetFormat.Msi,
             TargetFormat.Exe,
+            TargetFormat.Deb,
         )
 
-        modules("java.management", "jdk.unsupported")
+        modules("java.management", "jdk.unsupported", "jdk.accessibility")
     }
 
     buildTypes.release.proguard {
