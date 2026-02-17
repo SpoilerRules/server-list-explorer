@@ -579,6 +579,7 @@ jobs:
       - release-windows-x64
       - release-windows-arm64
       - release-linux-arm64
+    if: ${{ !contains(needs.prepare_release_meta.outputs.tag, '-alpha') && !contains(needs.prepare_release_meta.outputs.tag, '-beta') && !contains(needs.prepare_release_meta.outputs.tag, '-rc') }}
     uses: ./.github/workflows/update-readme-download-links.yml
     with:
       version: ${{ needs.prepare_release_meta.outputs.version }}
