@@ -63,7 +63,8 @@ jobs:
         with:
           tag_name: ${{ env.TAG }}
           name: "Server List Explorer ${{ env.TAG }}"
-          generate_release_notes: true
+          generate_release_notes: false
+          body_path: .github/releases/${{ env.TAG }}.md
           prerelease: ${{ contains(env.TAG, '-alpha') || contains(env.TAG, '.alpha') || contains(env.TAG, '-beta') || contains(env.TAG, '.beta') || contains(env.TAG, '-rc') || contains(env.TAG, '.rc') }}
           overwrite_files: true
 
