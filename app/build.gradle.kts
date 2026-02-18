@@ -189,9 +189,9 @@ val debPackageVer =
         "$major.$minor.$patch"
     }
 
-val isDebDebugBuild: Boolean =
+val isDebugBuild: Boolean =
     providers
-        .gradleProperty("debDebug")
+        .gradleProperty("debugBuild")
         .map { it.equals("true", ignoreCase = true) }
         .orElse(false)
         .get()
@@ -242,7 +242,7 @@ compose.desktop.application {
         )
 
     jvmArgs += optimizedJvmArgs
-    if (isDebDebugBuild) {
+    if (isDebugBuild) {
         jvmArgs +=
             listOf(
                 "-Denv=dev",
@@ -256,8 +256,9 @@ compose.desktop.application {
             msiPackageVersion = numericWindowsVersion
             exePackageVersion = numericWindowsVersion
 
-            console = false
+            console = isDebugBuild
 
+            menuGroup = "Minecraft Utility Tool"
             shortcut = true
             menu = true
             perUserInstall = true
