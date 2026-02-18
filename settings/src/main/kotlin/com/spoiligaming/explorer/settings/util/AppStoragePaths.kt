@@ -31,7 +31,10 @@ object AppStoragePaths {
     private val osName = System.getProperty("os.name")?.lowercase().orEmpty()
     private val isMac = osName.contains("mac")
     private val isWindows = osName.contains("win")
-    val isPortableWindows = isWindows && BuildConfig.DISTRIBUTION.contains("portable", ignoreCase = true)
+
+    private val isPortableDistribution = BuildConfig.DISTRIBUTION.contains("portable", ignoreCase = true)
+    private val isJarDistribution = BuildConfig.DISTRIBUTION.contains("jar", ignoreCase = true)
+    val isPortableInstall = isPortableDistribution || isJarDistribution
 
     val preferredAppDirName =
         if (isWindows || isMac) {
@@ -104,9 +107,9 @@ object AppStoragePaths {
 
     val platformLogsDir = platformLogsRootDir.resolve(LOGS_DIR_NAME)
 
-    val settingsDir = if (isPortableWindows) legacyConfigDir else platformSettingsDir
+    val settingsDir = if (isPortableInstall) legacyConfigDir else platformSettingsDir
 
-    val firstRunConfigDir = if (isPortableWindows) legacyConfigDir else platformConfigRootDir
+    val firstRunConfigDir = if (isPortableInstall) legacyConfigDir else platformConfigRootDir
 
-    val logsDir = if (isPortableWindows) legacyLogsDir else platformLogsDir
+    val logsDir = if (isPortableInstall) legacyLogsDir else platformLogsDir
 }

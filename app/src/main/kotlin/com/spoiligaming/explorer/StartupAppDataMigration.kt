@@ -37,7 +37,7 @@ internal object StartupAppDataMigration {
     )
 
     fun migrateBeforeLogging(): File {
-        if (AppStoragePaths.isPortableWindows) {
+        if (AppStoragePaths.isPortableInstall) {
             return AppStoragePaths.logsDir
         }
 
