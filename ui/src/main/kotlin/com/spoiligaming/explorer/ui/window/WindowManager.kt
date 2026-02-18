@@ -79,22 +79,20 @@ internal object WindowManager {
             val prefs = LocalPrefs.current
             val startupSettings = LocalStartupSettings.current
             val isFirstRun by FirstRunManager.isFirstRun.collectAsState()
+            val shouldStartMinimizedToTrayOnLaunch =
+                isAutoStartupLaunch &&
+                    startupSettings.isSystemTrayFeatureEnabled &&
+                    startupSettings.shouldStartMinimizedToSystemTray
             var isWindowVisible by
-                remember(isAutoStartupLaunch, startupSettings.shouldStartMinimizedToSystemTray) {
+                remember(isAutoStartupLaunch) {
                     mutableStateOf(
-                        !(isAutoStartupLaunch && startupSettings.shouldStartMinimizedToSystemTray),
+                        !shouldStartMinimizedToTrayOnLaunch,
                     )
                 }
             var shouldPrimeWindowComposition by
-                remember(
-                    isAutoStartupLaunch,
-                    startupSettings.isSystemTrayFeatureEnabled,
-                    startupSettings.shouldStartMinimizedToSystemTray,
-                ) {
+                remember(isAutoStartupLaunch) {
                     mutableStateOf(
-                        isAutoStartupLaunch &&
-                            startupSettings.isSystemTrayFeatureEnabled &&
-                            startupSettings.shouldStartMinimizedToSystemTray,
+                        shouldStartMinimizedToTrayOnLaunch,
                     )
                 }
 
