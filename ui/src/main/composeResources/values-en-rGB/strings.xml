@@ -17,7 +17,7 @@
     <string name="setup_path_step_ready">Review the selected paths and continue</string>
     <string name="setup_path_step_missing">Select the required paths to proceed</string>
     <string name="setup_server_list_path_locked_title">Server list file already saved</string>
-    <string name="setup_server_list_path_locked_message">You already have saved server list file path(s). The set-up wizard can’t change them. Manage server list files from Multiplayer settings.</string>
+    <string name="setup_server_list_path_locked_message">You already have saved server list file path(s). The set-up wizard can't change them. Manage server list files from Multiplayer settings.</string>
     <string name="setup_server_list_path_save_detected_failed">Couldn't save the detected server list file</string>
     <string name="setup_server_list_path_save_selected_failed">Couldn't save the selected server list file</string>
     <string name="setup_startup_step_subtitle">Choose how Server List Explorer behaves when your computer starts and when it closes</string>
