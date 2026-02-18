@@ -60,15 +60,52 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v6
 
+      - name: Prepare release body
+        id: release_body
+        if: ${{ !contains(env.TAG, '-alpha') && !contains(env.TAG, '.alpha') && !contains(env.TAG, '-beta') && !contains(env.TAG, '.beta') && !contains(env.TAG, '-rc') && !contains(env.TAG, '.rc') }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          source_body=".github/releases/${TAG}.md"
+          output_body="$RUNNER_TEMP/release-body.md"
+
+          if [[ ! -f "$source_body" ]]; then
+            echo "::error::Release notes file not found: $source_body"
+            exit 1
+          fi
+
+          {
+            echo "## Changelog"
+            echo
+            awk '
+              NR == 1 && /^# / { next }
+              !started && /^[[:space:]]*$/ { next }
+              { started = 1; print }
+            ' "$source_body"
+          } > "$output_body"
+
+          echo "path=$output_body" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub prerelease
+        if: ${{ env.ACT != 'true' && (contains(env.TAG, '-alpha') || contains(env.TAG, '.alpha') || contains(env.TAG, '-beta') || contains(env.TAG, '.beta') || contains(env.TAG, '-rc') || contains(env.TAG, '.rc')) }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          name: "Server List Explorer ${{ env.TAG }}"
+          generate_release_notes: true
+          prerelease: true
+          overwrite_files: true
+
       - name: Create GitHub release
-        if: env.ACT != 'true'
+        if: ${{ env.ACT != 'true' && !contains(env.TAG, '-alpha') && !contains(env.TAG, '.alpha') && !contains(env.TAG, '-beta') && !contains(env.TAG, '.beta') && !contains(env.TAG, '-rc') && !contains(env.TAG, '.rc') }}
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
           name: "Server List Explorer ${{ env.TAG }}"
           generate_release_notes: false
-          body_path: .github/releases/${{ env.TAG }}.md
-          prerelease: ${{ contains(env.TAG, '-alpha') || contains(env.TAG, '.alpha') || contains(env.TAG, '-beta') || contains(env.TAG, '.beta') || contains(env.TAG, '-rc') || contains(env.TAG, '.rc') }}
+          body_path: ${{ steps.release_body.outputs.path }}
+          prerelease: false
           overwrite_files: true
 
   build-jars:
