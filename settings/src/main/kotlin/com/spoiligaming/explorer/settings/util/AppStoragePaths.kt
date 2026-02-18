@@ -86,7 +86,7 @@ object AppStoragePaths {
 
     val logsParentDir =
         when {
-            isWindows -> windowsLocalDir
+            isWindows -> windowsRoamingDir
             isMac -> homeDir.resolve("Library/Logs")
             else -> xdgStateDir
         }
@@ -101,7 +101,12 @@ object AppStoragePaths {
 
     val legacyNamedPlatformConfigRootDir = configParentDir.resolve(LEGACY_APP_DIR_NAME)
 
-    val legacyNamedPlatformLogsRootDir = logsParentDir.resolve(LEGACY_APP_DIR_NAME)
+    val legacyNamedPlatformLogsRootDir =
+        if (isWindows) {
+            windowsLocalDir.resolve(LEGACY_APP_DIR_NAME).resolve(LOGS_DIR_NAME)
+        } else {
+            logsParentDir.resolve(LEGACY_APP_DIR_NAME).resolve(LOGS_DIR_NAME)
+        }
 
     val platformSettingsDir = platformConfigRootDir.resolve(SETTINGS_DIR_NAME)
 

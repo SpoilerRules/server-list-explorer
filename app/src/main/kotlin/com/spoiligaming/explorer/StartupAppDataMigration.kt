@@ -78,9 +78,9 @@ internal object StartupAppDataMigration {
                     targetDir = AppStoragePaths.platformConfigRootDir,
                 ),
                 MigrationSpec(
-                    name = "LegacyNamedPlatformLogsRootToPreferredLogsRoot",
+                    name = "LegacyNamedPlatformLogsToPreferredLogsInAppData",
                     sourceDir = AppStoragePaths.legacyNamedPlatformLogsRootDir,
-                    targetDir = AppStoragePaths.platformLogsRootDir,
+                    targetDir = AppStoragePaths.platformLogsDir,
                 ),
             )
 
