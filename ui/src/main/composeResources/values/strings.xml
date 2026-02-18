@@ -26,6 +26,7 @@
     <string name="setup_startup_low_memory_message">This device has less than 8 GB of memory. Server List Explorer is expected to use at least 300 MB while idle in the system tray.</string>
     <string name="setup_startup_low_memory_icon_content_description">Low memory warning</string>
     <string name="setup_startup_save_failed">Couldn't update startup preference. Please try again.</string>
+    <string name="setup_locale_save_failed">Couldn't update language. Please try again.</string>
     <string name="settings_section_startup">Startup</string>
     <string name="startup_when_computer_starts_dropdown_title">When my computer starts</string>
     <string name="startup_when_computer_starts_dropdown_description">Choose how Server List Explorer starts when your computer starts.</string>

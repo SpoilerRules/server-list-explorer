@@ -34,9 +34,13 @@ import com.spoiligaming.explorer.ui.widgets.LanguagePickerDropdownMenu
 import server_list_explorer.ui.generated.resources.Res
 import server_list_explorer.ui.generated.resources.preferred_language_label
 import server_list_explorer.ui.generated.resources.setup_step_title_localization
+import java.util.Locale
 
 @Composable
-internal fun LanguageSelectionStep(state: SetupUiState) {
+internal fun LanguageSelectionStep(
+    state: SetupUiState,
+    onLocaleSelected: (Locale) -> Unit,
+) {
     SetupStepContainer(title = t(Res.string.setup_step_title_localization)) {
         Column(
             verticalArrangement = Arrangement.spacedBy(LanguageStepItemSpacing),
@@ -49,7 +53,7 @@ internal fun LanguageSelectionStep(state: SetupUiState) {
             LanguagePickerDropdownMenu(
                 selectedLocale = state.locale,
                 onLocaleSelected = { locale ->
-                    state.locale = locale
+                    onLocaleSelected(locale)
                 },
             )
         }
