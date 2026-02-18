@@ -57,6 +57,9 @@ jobs:
     env:
       TAG: ${{ needs.prepare_release_meta.outputs.tag }}
     steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+
       - name: Create GitHub release
         if: env.ACT != 'true'
         uses: softprops/action-gh-release@v2
