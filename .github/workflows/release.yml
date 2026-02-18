@@ -56,16 +56,27 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TAG: ${{ needs.prepare_release_meta.outputs.tag }}
+      IS_PRERELEASE: ${{ contains(needs.prepare_release_meta.outputs.tag, '-alpha') || contains(needs.prepare_release_meta.outputs.tag, '.alpha') || contains(needs.prepare_release_meta.outputs.tag, '-beta') || contains(needs.prepare_release_meta.outputs.tag, '.beta') || contains(needs.prepare_release_meta.outputs.tag, '-rc') || contains(needs.prepare_release_meta.outputs.tag, '.rc') }}
     steps:
+      - name: Create GitHub prerelease
+        if: env.ACT != 'true' && env.IS_PRERELEASE == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          name: "Server List Explorer ${{ env.TAG }}"
+          generate_release_notes: true
+          prerelease: true
+          overwrite_files: true
+
       - name: Create GitHub release
-        if: env.ACT != 'true'
+        if: env.ACT != 'true' && env.IS_PRERELEASE != 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
           name: "Server List Explorer ${{ env.TAG }}"
           generate_release_notes: false
           body_path: .github/releases/${{ env.TAG }}.md
-          prerelease: ${{ contains(env.TAG, '-alpha') || contains(env.TAG, '.alpha') || contains(env.TAG, '-beta') || contains(env.TAG, '.beta') || contains(env.TAG, '-rc') || contains(env.TAG, '.rc') }}
+          prerelease: false
           overwrite_files: true
 
   build-jars:
