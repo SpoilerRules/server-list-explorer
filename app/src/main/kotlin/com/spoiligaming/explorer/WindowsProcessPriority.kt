@@ -18,6 +18,7 @@
 
 package com.spoiligaming.explorer
 
+import com.spoiligaming.explorer.settings.util.AppStoragePaths
 import com.spoiligaming.explorer.util.OSUtils
 import com.sun.jna.platform.win32.Kernel32
 import com.sun.jna.platform.win32.WinDef.DWORD
@@ -27,7 +28,7 @@ internal object WindowsProcessPriority {
     private const val WINDOWS_IDLE_PRIORITY_CLASS = 0x00000040
 
     fun applyAutoStartupPriority() {
-        if (!OSUtils.isWindows || OSUtils.isRunningOnBareJvm) {
+        if (!OSUtils.isWindows || OSUtils.isRunningOnBareJvm || AppStoragePaths.isPortableInstall) {
             return
         }
 

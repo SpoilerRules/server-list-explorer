@@ -63,6 +63,7 @@ import com.spoiligaming.explorer.settings.manager.singleplayerSettingsManager
 import com.spoiligaming.explorer.settings.manager.startupSettingsManager
 import com.spoiligaming.explorer.settings.model.ComputerStartupBehavior
 import com.spoiligaming.explorer.settings.model.StartupSettings
+import com.spoiligaming.explorer.settings.util.AppStoragePaths
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalPrefs
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalSingleplayerSettings
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalStartupSettings
@@ -170,7 +171,7 @@ internal fun SetupWizard(
     val scope = rememberCoroutineScope()
     val activeServerListFilePath by ServerListFileBookmarksManager.activePath.collectAsState()
     val setupWizardFinishFailedMessage = t(Res.string.setup_wizard_finish_failed)
-    val supportsStartupRegistration = (OSUtils.isWindows || OSUtils.isDebian) && !OSUtils.isRunningOnBareJvm
+    val supportsStartupRegistration = (OSUtils.isWindows || OSUtils.isDebian) && !OSUtils.isRunningOnBareJvm && !AppStoragePaths.isPortableInstall
 
     LaunchedEffect(Unit) {
         ServerListFileBookmarksManager.load()

@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import com.spoiligaming.explorer.settings.manager.startupSettingsManager
 import com.spoiligaming.explorer.settings.model.ComputerStartupBehavior
+import com.spoiligaming.explorer.settings.util.AppStoragePaths
 import com.spoiligaming.explorer.ui.com.spoiligaming.explorer.ui.LocalStartupSettings
 import com.spoiligaming.explorer.ui.screens.settings.components.SettingsSection
 import com.spoiligaming.explorer.ui.snackbar.SnackbarController
@@ -59,7 +60,7 @@ internal fun StartupSettingsSection() {
         header = t(Res.string.settings_section_startup),
         settings =
             buildList {
-                if ((OSUtils.isWindows || OSUtils.isDebian) && !OSUtils.isRunningOnBareJvm) {
+                if ((OSUtils.isWindows || OSUtils.isDebian) && !OSUtils.isRunningOnBareJvm && !AppStoragePaths.isPortableInstall) {
                     add {
                         ComputerStartupBehaviorDropdown(
                             currentMode = startupSettings.computerStartupBehavior,

@@ -43,6 +43,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import com.spoiligaming.explorer.settings.model.ComputerStartupBehavior
+import com.spoiligaming.explorer.settings.util.AppStoragePaths
 import com.spoiligaming.explorer.ui.screens.setup.SetupStepContainer
 import com.spoiligaming.explorer.ui.screens.setup.SetupUiState
 import com.spoiligaming.explorer.ui.screens.setup.widgets.OnboardingItemSwitch
@@ -227,7 +228,7 @@ private fun LowMemoryNoticeCard(modifier: Modifier = Modifier) =
         }
     }
 
-val supportsStartupRegistration = (OSUtils.isWindows || OSUtils.isDebian) && !OSUtils.isRunningOnBareJvm
+val supportsStartupRegistration = (OSUtils.isWindows || OSUtils.isDebian) && !OSUtils.isRunningOnBareJvm && !AppStoragePaths.isPortableInstall
 private val isLowMemoryDevice by lazy {
     OSUtils.totalPhysicalMemoryBytes in 1..<LOW_MEMORY_THRESHOLD_BYTES
 }
