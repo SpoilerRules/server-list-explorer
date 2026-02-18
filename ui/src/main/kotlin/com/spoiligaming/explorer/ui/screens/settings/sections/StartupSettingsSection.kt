@@ -60,7 +60,10 @@ internal fun StartupSettingsSection() {
         header = t(Res.string.settings_section_startup),
         settings =
             buildList {
-                if ((OSUtils.isWindows || OSUtils.isDebian) && !OSUtils.isRunningOnBareJvm && !AppStoragePaths.isPortableInstall) {
+                if ((OSUtils.isWindows || OSUtils.isDebian) &&
+                    !OSUtils.isRunningOnBareJvm &&
+                    !AppStoragePaths.isPortableInstall
+                ) {
                     add {
                         ComputerStartupBehaviorDropdown(
                             currentMode = startupSettings.computerStartupBehavior,

@@ -228,7 +228,8 @@ private fun LowMemoryNoticeCard(modifier: Modifier = Modifier) =
         }
     }
 
-val supportsStartupRegistration = (OSUtils.isWindows || OSUtils.isDebian) && !OSUtils.isRunningOnBareJvm && !AppStoragePaths.isPortableInstall
+val supportsStartupRegistration =
+    (OSUtils.isWindows || OSUtils.isDebian) && !OSUtils.isRunningOnBareJvm && !AppStoragePaths.isPortableInstall
 private val isLowMemoryDevice by lazy {
     OSUtils.totalPhysicalMemoryBytes in 1..<LOW_MEMORY_THRESHOLD_BYTES
 }

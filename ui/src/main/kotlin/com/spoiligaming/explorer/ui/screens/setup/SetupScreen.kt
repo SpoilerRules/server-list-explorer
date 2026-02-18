@@ -171,7 +171,8 @@ internal fun SetupWizard(
     val scope = rememberCoroutineScope()
     val activeServerListFilePath by ServerListFileBookmarksManager.activePath.collectAsState()
     val setupWizardFinishFailedMessage = t(Res.string.setup_wizard_finish_failed)
-    val supportsStartupRegistration = (OSUtils.isWindows || OSUtils.isDebian) && !OSUtils.isRunningOnBareJvm && !AppStoragePaths.isPortableInstall
+    val supportsStartupRegistration =
+        (OSUtils.isWindows || OSUtils.isDebian) && !OSUtils.isRunningOnBareJvm && !AppStoragePaths.isPortableInstall
 
     LaunchedEffect(Unit) {
         ServerListFileBookmarksManager.load()
