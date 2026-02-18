@@ -82,6 +82,7 @@ import server_list_explorer.ui.generated.resources.Res
 import server_list_explorer.ui.generated.resources.button_back
 import server_list_explorer.ui.generated.resources.button_finish
 import server_list_explorer.ui.generated.resources.button_next
+import server_list_explorer.ui.generated.resources.setup_locale_save_failed
 import server_list_explorer.ui.generated.resources.setup_wizard_finish_failed
 import server_list_explorer.ui.generated.resources.setup_wizard_step_counter
 import java.nio.file.Path
@@ -171,6 +172,7 @@ internal fun SetupWizard(
     val scope = rememberCoroutineScope()
     val activeServerListFilePath by ServerListFileBookmarksManager.activePath.collectAsState()
     val setupWizardFinishFailedMessage = t(Res.string.setup_wizard_finish_failed)
+    val setupLocaleSaveFailedMessage = t(Res.string.setup_locale_save_failed)
     val supportsStartupRegistration =
         (OSUtils.isWindows || OSUtils.isDebian) && !OSUtils.isRunningOnBareJvm && !AppStoragePaths.isPortableInstall
 
@@ -198,15 +200,44 @@ internal fun SetupWizard(
         }
     }
 
+    suspend fun persistLocaleSetting(locale: Locale) =
+        persistSettingsUpdate(
+            manager = preferenceSettingsManager,
+            context = "locale setting",
+            update = { it.copy(locale = locale) },
+            isPersisted = { it.locale == locale },
+        )
+
+    fun applyLocaleSelection(locale: Locale) {
+        if (state.locale == locale) {
+            return
+        }
+
+        state.locale = locale
+        scope.launch {
+            runCatching {
+                persistLocaleSetting(locale)
+            }.onFailure { e ->
+                logger.error(e) {
+                    "Failed to apply setup wizard locale selection immediately. locale=$locale"
+                }
+                if (state.locale == locale) {
+                    state.locale = preferenceSettingsManager.settingsFlow.value.locale
+                    SnackbarController.sendEvent(
+                        SnackbarEvent(
+                            message = setupLocaleSaveFailedMessage,
+                            duration = SnackbarDuration.Short,
+                        ),
+                    )
+                }
+            }
+        }
+    }
+
     suspend fun persistSetupState() =
         runCatching {
             if (prefs.locale != state.locale) {
-                persistSettingsUpdate(
-                    manager = preferenceSettingsManager,
-                    context = "locale setting",
-                    update = { it.copy(locale = state.locale) },
-                    isPersisted = { it.locale == state.locale },
-                )
+                persistLocaleSetting(state.locale)
             }
 
             if (sp.savesDirectory != state.worldSavesPath) {
@@ -293,7 +324,11 @@ internal fun SetupWizard(
                     },
                 ) { targetStep ->
                     when (targetStep) {
-                        SetupStep.LANGUAGE_SELECTION -> LanguageSelectionStep(state = state)
+                        SetupStep.LANGUAGE_SELECTION ->
+                            LanguageSelectionStep(
+                                state = state,
+                                onLocaleSelected = ::applyLocaleSelection,
+                            )
                         SetupStep.STARTUP_CONFIGURATION -> StartupStep(state = state)
                         SetupStep.PATH_CONFIGURATION -> PathStep(state = state)
                     }
