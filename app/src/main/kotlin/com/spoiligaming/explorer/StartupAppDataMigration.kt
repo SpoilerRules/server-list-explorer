@@ -19,7 +19,6 @@
 package com.spoiligaming.explorer
 
 import com.spoiligaming.explorer.settings.util.AppStoragePaths
-import com.spoiligaming.explorer.util.FirstRunManager
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -43,35 +42,6 @@ internal object StartupAppDataMigration {
 
         val specs =
             listOf(
-                MigrationSpec(
-                    name = "LegacyLocalConfigJsonToPlatformSettings",
-                    sourceDir = AppStoragePaths.legacyConfigDir,
-                    targetDir = AppStoragePaths.platformSettingsDir,
-                    sourceFilter = { it.isFile && it.extension.equals("json", ignoreCase = true) },
-                    deleteSourceDirectoryWhenFinished = false,
-                ),
-                MigrationSpec(
-                    name = "LegacyLocalConfigMarkerToPlatformConfigRoot",
-                    sourceDir = AppStoragePaths.legacyConfigDir,
-                    targetDir = AppStoragePaths.platformConfigRootDir,
-                    sourceFilter = { it.isFile && it.name.equals(FirstRunManager.MARKER_NAME, ignoreCase = true) },
-                    deleteSourceDirectoryWhenFinished = false,
-                ),
-                MigrationSpec(
-                    name = "LegacyLocalConfigRemainderToPlatformConfigRoot",
-                    sourceDir = AppStoragePaths.legacyConfigDir,
-                    targetDir = AppStoragePaths.platformConfigRootDir,
-                    sourceFilter = {
-                        it.isFile &&
-                            !it.extension.equals("json", ignoreCase = true) &&
-                            !it.name.equals(FirstRunManager.MARKER_NAME, ignoreCase = true)
-                    },
-                ),
-                MigrationSpec(
-                    name = "LegacyLocalLogsToPlatformLogs",
-                    sourceDir = AppStoragePaths.legacyLogsDir,
-                    targetDir = AppStoragePaths.platformLogsDir,
-                ),
                 MigrationSpec(
                     name = "LegacyNamedPlatformConfigRootToPreferredConfigRoot",
                     sourceDir = AppStoragePaths.legacyNamedPlatformConfigRootDir,
