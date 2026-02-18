@@ -100,8 +100,8 @@
 | ☕ **Cross-Platform** – Uber JAR (.jar)  |     [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0-minified-all.jar)      |     [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0-all.jar)      |
 
 > [!NOTE]
-> **Optimized (Recommended, also referred to as Minified):** Reduced package size with unnecessary files removed and code optimized. Intended for standard use.
-> **Full:** Includes all files and debugging information. Intended for troubleshooting.
+> - **Optimized (Recommended, also referred to as Minified):** Reduced package size with unnecessary files removed and code optimized. Intended for standard use.
+> - **Full:** Includes all files and debugging information. Intended for troubleshooting.
 >
 > All native packages bundle JBR 21 (no Java installation needed). JAR files require Java SE 21+.
 
