@@ -93,11 +93,11 @@
 
 | Platform                                |                                                                Optimized                                                                 |                                                              Full                                                               |
 |:----------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------:|
-| 🪟 **Windows x64** – Installer (.exe)   | [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-minified-2.2.0-windows-x64-setup.exe) | [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0-windows-x64-setup.exe) |
-| 🪟 **Windows ARM64** – Installer (.exe) | [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-minified-2.2.0-windows-arm64-setup.exe)  | [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0-windows-arm64-setup.exe)  |
-| 🐧 **Linux x64** – .deb                 |   [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/server-list-explorer_2.2.0+opt_amd64.deb)    |   [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/server-list-explorer_2.2.0_amd64.deb)    |
-| 🐧 **Linux ARM64** – .deb               |   [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/server-list-explorer_2.2.0+opt_arm64.deb)    |   [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/server-list-explorer_2.2.0_arm64.deb)    |
-| ☕ **Cross-Platform** – Uber JAR (.jar)  |     [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0-minified-all.jar)      |     [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0-all.jar)      |
+| 🪟 **Windows x64** – Installer (.exe)   | [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-minified-2.2.1-windows-x64-setup.exe) | [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-2.2.1-windows-x64-setup.exe) |
+| 🪟 **Windows ARM64** – Installer (.exe) | [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-minified-2.2.1-windows-arm64-setup.exe)  | [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-2.2.1-windows-arm64-setup.exe)  |
+| 🐧 **Linux x64** – .deb                 |   [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/server-list-explorer_2.2.1+opt_amd64.deb)    |   [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/server-list-explorer_2.2.1_amd64.deb)    |
+| 🐧 **Linux ARM64** – .deb               |   [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/server-list-explorer_2.2.1+opt_arm64.deb)    |   [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/server-list-explorer_2.2.1_arm64.deb)    |
+| ☕ **Cross-Platform** – Uber JAR (.jar)  |     [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-2.2.1-minified-all.jar)      |     [⬇ Download](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-2.2.1-all.jar)      |
 
 > [!NOTE]
 > - **Optimized (Recommended, also referred to as Minified):** Reduced package size with unnecessary files removed and code optimized. Intended for standard use.
@@ -114,12 +114,12 @@
 
 | Package         | Variant  | Download Link                                                                                                                                                                                    | Runtime        |
 |-----------------|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
-| Installer (EXE) | Full     | [ServerListExplorer-2.2.0-windows-x64-setup.exe](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0-windows-x64-setup.exe)                                         | Bundled JBR 21 |
-| Installer (MSI) | Full     | [ServerListExplorer-2.2.0-windows-x64.msi](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0-windows-x64.msi)                                                     | Bundled JBR 21 |
-| Portable (ZIP)  | Full     | [ServerListExplorer-2.2.0-windows-x64-portable.zip](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0-windows-x64-portable.zip)                   | Bundled JBR 21 |
-| Installer (EXE) | Minified | [ServerListExplorer-minified-2.2.0-windows-x64-setup.exe](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-minified-2.2.0-windows-x64-setup.exe)                       | Bundled JBR 21 |
-| Installer (MSI) | Minified | [ServerListExplorer-minified-2.2.0-windows-x64.msi](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-minified-2.2.0-windows-x64.msi)                                   | Bundled JBR 21 |
-| Portable (ZIP)  | Minified | [ServerListExplorer-minified-2.2.0-windows-x64-portable.zip](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-minified-2.2.0-windows-x64-portable.zip) | Bundled JBR 21 |
+| Installer (EXE) | Full     | [ServerListExplorer-2.2.1-windows-x64-setup.exe](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-2.2.1-windows-x64-setup.exe)                                         | Bundled JBR 21 |
+| Installer (MSI) | Full     | [ServerListExplorer-2.2.1-windows-x64.msi](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-2.2.1-windows-x64.msi)                                                     | Bundled JBR 21 |
+| Portable (ZIP)  | Full     | [ServerListExplorer-2.2.1-windows-x64-portable.zip](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-2.2.1-windows-x64-portable.zip)                   | Bundled JBR 21 |
+| Installer (EXE) | Minified | [ServerListExplorer-minified-2.2.1-windows-x64-setup.exe](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-minified-2.2.1-windows-x64-setup.exe)                       | Bundled JBR 21 |
+| Installer (MSI) | Minified | [ServerListExplorer-minified-2.2.1-windows-x64.msi](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-minified-2.2.1-windows-x64.msi)                                   | Bundled JBR 21 |
+| Portable (ZIP)  | Minified | [ServerListExplorer-minified-2.2.1-windows-x64-portable.zip](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-minified-2.2.1-windows-x64-portable.zip) | Bundled JBR 21 |
 
 </details>
 
@@ -128,12 +128,12 @@
 
 | Package         | Variant  | Download Link                                                                                                                                                                                  | Runtime        |
 |-----------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
-| Installer (EXE) | Full     | [ServerListExplorer-2.2.0-windows-arm64-setup.exe](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0-windows-arm64-setup.exe)                                         | Bundled JBR 21 |
-| Installer (MSI) | Full     | [ServerListExplorer-2.2.0-windows-arm64.msi](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0-windows-arm64.msi)                                                     | Bundled JBR 21 |
-| Portable (ZIP)  | Full     | [ServerListExplorer-2.2.0-windows-arm64-portable.zip](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0-windows-arm64-portable.zip)                   | Bundled JBR 21 |
-| Installer (EXE) | Minified | [ServerListExplorer-minified-2.2.0-windows-arm64-setup.exe](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-minified-2.2.0-windows-arm64-setup.exe)                       | Bundled JBR 21 |
-| Installer (MSI) | Minified | [ServerListExplorer-minified-2.2.0-windows-arm64.msi](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-minified-2.2.0-windows-arm64.msi)                                   | Bundled JBR 21 |
-| Portable (ZIP)  | Minified | [ServerListExplorer-minified-2.2.0-windows-arm64-portable.zip](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-minified-2.2.0-windows-arm64-portable.zip) | Bundled JBR 21 |
+| Installer (EXE) | Full     | [ServerListExplorer-2.2.1-windows-arm64-setup.exe](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-2.2.1-windows-arm64-setup.exe)                                         | Bundled JBR 21 |
+| Installer (MSI) | Full     | [ServerListExplorer-2.2.1-windows-arm64.msi](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-2.2.1-windows-arm64.msi)                                                     | Bundled JBR 21 |
+| Portable (ZIP)  | Full     | [ServerListExplorer-2.2.1-windows-arm64-portable.zip](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-2.2.1-windows-arm64-portable.zip)                   | Bundled JBR 21 |
+| Installer (EXE) | Minified | [ServerListExplorer-minified-2.2.1-windows-arm64-setup.exe](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-minified-2.2.1-windows-arm64-setup.exe)                       | Bundled JBR 21 |
+| Installer (MSI) | Minified | [ServerListExplorer-minified-2.2.1-windows-arm64.msi](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-minified-2.2.1-windows-arm64.msi)                                   | Bundled JBR 21 |
+| Portable (ZIP)  | Minified | [ServerListExplorer-minified-2.2.1-windows-arm64-portable.zip](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-minified-2.2.1-windows-arm64-portable.zip) | Bundled JBR 21 |
 
 </details>
 
@@ -142,10 +142,10 @@
 
 | Package        | Variant  | Download Link                                                                                                                                                              | Runtime        |
 |----------------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
-| Portable (TAR) | Full     | [ServerListExplorer-2.2.0-linux-x64.tar.gz](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0-linux-x64.tar.gz)                   | Bundled JBR 21 |
-| DEB            | Full     | [server-list-explorer_2.2.0_amd64.deb](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/server-list-explorer_2.2.0_amd64.deb)                             | Bundled JBR 21 |
-| Portable (TAR) | Minified | [ServerListExplorer-minified-2.2.0-linux-x64.tar.gz](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-minified-2.2.0-linux-x64.tar.gz) | Bundled JBR 21 |
-| DEB            | Minified | [server-list-explorer_2.2.0+opt_amd64.deb](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/server-list-explorer_2.2.0+opt_amd64.deb)           | Bundled JBR 21 |
+| Portable (TAR) | Full     | [ServerListExplorer-2.2.1-linux-x64.tar.gz](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-2.2.1-linux-x64.tar.gz)                   | Bundled JBR 21 |
+| DEB            | Full     | [server-list-explorer_2.2.1_amd64.deb](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/server-list-explorer_2.2.1_amd64.deb)                             | Bundled JBR 21 |
+| Portable (TAR) | Minified | [ServerListExplorer-minified-2.2.1-linux-x64.tar.gz](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-minified-2.2.1-linux-x64.tar.gz) | Bundled JBR 21 |
+| DEB            | Minified | [server-list-explorer_2.2.1+opt_amd64.deb](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/server-list-explorer_2.2.1+opt_amd64.deb)           | Bundled JBR 21 |
 
 </details>
 
@@ -154,10 +154,10 @@
 
 | Package        | Variant  | Download Link                                                                                                                                                                  | Runtime        |
 |----------------|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
-| Portable (TAR) | Full     | [ServerListExplorer-2.2.0-linux-arm64.tar.gz](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0-linux-arm64.tar.gz)                   | Bundled JBR 21 |
-| DEB            | Full     | [server-list-explorer_2.2.0_arm64.deb](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/server-list-explorer_2.2.0_arm64.deb)                                 | Bundled JBR 21 |
-| Portable (TAR) | Minified | [ServerListExplorer-minified-2.2.0-linux-arm64.tar.gz](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-minified-2.2.0-linux-arm64.tar.gz) | Bundled JBR 21 |
-| DEB            | Minified | [server-list-explorer_2.2.0+opt_arm64.deb](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/server-list-explorer_2.2.0+opt_arm64.deb)               | Bundled JBR 21 |
+| Portable (TAR) | Full     | [ServerListExplorer-2.2.1-linux-arm64.tar.gz](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-2.2.1-linux-arm64.tar.gz)                   | Bundled JBR 21 |
+| DEB            | Full     | [server-list-explorer_2.2.1_arm64.deb](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/server-list-explorer_2.2.1_arm64.deb)                                 | Bundled JBR 21 |
+| Portable (TAR) | Minified | [ServerListExplorer-minified-2.2.1-linux-arm64.tar.gz](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-minified-2.2.1-linux-arm64.tar.gz) | Bundled JBR 21 |
+| DEB            | Minified | [server-list-explorer_2.2.1+opt_arm64.deb](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/server-list-explorer_2.2.1+opt_arm64.deb)               | Bundled JBR 21 |
 
 </details>
 
@@ -166,9 +166,9 @@
 
 | Package  | Distribution | Download Link                                                                                                                                            | Runtime Requirement  |
 |----------|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------|
-| Uber JAR | Full         | [ServerListExplorer-2.2.0-all.jar](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0-all.jar)                   | Requires Java SE 21+ |
-| Uber JAR | Minified     | [ServerListExplorer-2.2.0-minified-all.jar](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0-minified-all.jar) | Requires Java SE 21+ |
-| Thin JAR | Full         | [ServerListExplorer-2.2.0.jar](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.0/ServerListExplorer-2.2.0.jar)                           | Requires Java SE 21+ |
+| Uber JAR | Full         | [ServerListExplorer-2.2.1-all.jar](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-2.2.1-all.jar)                   | Requires Java SE 21+ |
+| Uber JAR | Minified     | [ServerListExplorer-2.2.1-minified-all.jar](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-2.2.1-minified-all.jar) | Requires Java SE 21+ |
+| Thin JAR | Full         | [ServerListExplorer-2.2.1.jar](https://github.com/SpoilerRules/server-list-explorer/releases/download/v2.2.1/ServerListExplorer-2.2.1.jar)                           | Requires Java SE 21+ |
 
 </details>
 
