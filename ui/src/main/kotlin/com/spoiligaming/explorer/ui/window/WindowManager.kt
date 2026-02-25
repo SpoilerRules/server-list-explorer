@@ -173,8 +173,7 @@ internal object WindowManager {
                         window.minimumSize = MIN_WINDOW_SIZE
 
                         with(WindowSettingsBinder) {
-                            window.listenMaximization()
-                            window.listenResizes()
+                            window.bind()
                         }
                     }
 
